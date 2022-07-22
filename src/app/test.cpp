@@ -3,6 +3,7 @@
 #include "../common/include/structures.h"
 #include "../common/include/util.h"
 #include "../common/include/RocketShape.h"
+#include "../common/include/Cartesian.h"
 
 int main(int argc, char *argv[]) {
 
@@ -10,5 +11,7 @@ int main(int argc, char *argv[]) {
     rshape.nozzle_shape = 2;
     Curve out = rshape.generate_constant_dx(0.001);
 
-    util::print_table("test.txt",out.x,out.y );
+    Cartesian::Vector v;
+
+    util::print_table("test/test.txt",out.x,out.y );
 }

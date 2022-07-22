@@ -1,10 +1,13 @@
 #pragma once
 
+#include "../common/include/Cartesian.h"
 #include <array>
 
 class Gravity {
 
 public:
 
-    void compute(const std::array<double,3>& )
+    Cartesian::Vector acceleration;
+
+    virtual void compute(const double* position, const double& latitude, const double& longitude);
 };

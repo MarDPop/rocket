@@ -2,13 +2,17 @@
 
 #include "Atmosphere.h"
 #include "Gravity.h"
+#include "Geoid.h"
+#include <memory>
 
 class Planet {
 
 public:
 
-    Atmosphere atmosphere;
+    std::unique_ptr< Atmosphere > atmosphere;
 
-    Gravity gravity;
+    std::unique_ptr< Gravity > gravity;
+
+    std::unique_ptr< Geoid > geoid;
 
 };

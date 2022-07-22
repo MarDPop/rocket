@@ -9,23 +9,34 @@ struct Air {
     static constexpr double R_DRY_AIR = 287.058;
     static constexpr double DRY_MW = 0.028964399592254;
 
-    double density;
-    double temperature;
-    double pressure;
-    double speed_of_sound;
-    double gamma;
-    double dynamic_viscosity;
-    double molecular_weight;
-    double specific_gas_constant;
-    double cp;
-    double cv;
+    union {
+        double data[12];
+        double density;
+        double temperature;
+        double pressure;
+        double speed_of_sound;
+        double kinematic_viscosity;
+        double gamma;
+        double molecular_weight;
+        double specific_gas_constant;
+        double absolute_viscosity;
+        double cp;
+        double cv;
+    }
+
+    double wind[3]; // East North Up velocity
+
 };
 
 class Atmosphere {
 
 public:
 
+    /**
+    * returns false if air was computed
+    */
     virtual bool get_air(Air& air, const std::array<double,3>& LLA) = 0;
+
 };
 
 class AtmosphereBasic : public Atmosphere {
@@ -44,3 +55,56 @@ public:
 
     }
 }
+
+class AtmosphereTable : public Atmosphere {
+
+    int idx;
+
+    std::vector< double > altitudes;
+
+    std::vector< std::array< double, 5 > > data;
+
+    std::vector< std::array< double, 5 > > delta;
+
+public:
+
+    AtmosphereTable() :
+
+}
+
+class AtmosphereUS1976 : public Atmosphere {
+
+    static constexpr double data[] = {};
+
+    static constexpr double delta[] = {};
+
+public:
+
+    AtmosphereUS1976() {}
+
+    bool get_air(Air& air, const std::array<double,3>& LLA) {
+        if(LLA[2] > 86) {
+            return false;
+        }
+
+        if(LLA[0] <= 0) {
+
+            return;
+        }
+
+        int idx = int(LLA[2]);
+
+        double factor = LLA[2] - idx;
+
+
+        air.density = this->data[idx]
+
+    }
+
+}
+
+
+
+
+
+

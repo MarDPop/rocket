@@ -3,6 +3,7 @@
 #include <vector>
 #include <memory>
 #include <array>
+#include <cmath>
 
 #include "StageDynamics.h"
 #include "Planet.h"
@@ -65,7 +66,7 @@ struct State {
 };
 
 class Vehicle {
-    Stage* current_stage;
+    int current_stage;
 
     std::vector< std::unique_ptr< Stage > > stages;
 
@@ -79,6 +80,8 @@ public:
 
     Planet planet;
 
+    std::array< std::array< double, 3 >, 3 > ECI_Axis;
+
     std::array< double, 3 > LLA;
 
     std::array< double, 3 > body_fixed_pos;
@@ -87,5 +90,9 @@ public:
 
     Vehicle();
     ~Vehicle();
+
+    inline void add_stage(Stage* stage) {
+        stages.emplace_back(stage);
+    }
 
 };
