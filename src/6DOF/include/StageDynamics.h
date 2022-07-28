@@ -12,7 +12,9 @@ struct Vehicle;
 
 struct StageDynamics : public Dynamics<14> {
 
-    Vehicle* vehicle;
+    Vehicle* vehicle = nullptr;
+
+public:
 
     std::unique_ptr< GNC > gnc;
 
@@ -20,9 +22,19 @@ struct StageDynamics : public Dynamics<14> {
 
     std::unique_ptr< Thruster > thruster;
 
-    Cartesian::Vector Force; // in inertial frame
+    std::vector< std::unique_ptr< Action > > other_forces;
 
-    std::array<double,3> Moment; // in body frame
+    Cartesian::Vector Force; // in inertial frame at COG
+
+    Cartesian::Vector Moment; // in body frame at COG
+
+    void set_vehicle(Vehicle* vehicle) {
+        this->vehicle = vehicle;
+    }
+
+    Vehicle* get_vehicle() {
+        return this->vehicle;
+    }
 
     void update_force_and_moment() {
 

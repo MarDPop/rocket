@@ -2,7 +2,7 @@
 
 #include <vector>
 #include <array>
-
+#include <string>
 
 template < unsigned int N, int COLS >
 class LinearFixedTable {
@@ -68,20 +68,77 @@ class CubicFixedTable {
 public:
 
     CubicFixedTable() {}
+
+    CubicFixedTable( const std::array<double,N>& v, const std::array< std::array< double, COLS >, N >& d) : values(v) , data(d) {
+        for(int i = 1; i < N-1; i++) {
+
+        }
+    }
+
 }
+
 
 struct NestedEntry {
 
-}
-
-template < unsigned int COLS >
-class LinearNestedTable {
-
-    double value;
-
     int level;
 
-    std::vector< NestedTable* > next;
+    std::vector< double > values;
+
+    std::vector< double > delta;
+
+    std::vector< NestedEntry > next;
+
+public:
+
+    NestedEntry(const std::vector< double >& vals) : values(vals) , level(0) {
+    }
+
+    NestedEntry(const std::vector< double >& vals, const std::vector< NestedEntry >& n, int l) : values(vals) , next(n), level(l) {
+
+    }
+
+    const std::vector< double > get(const double* key) {
+
+        if(this->level == 0) {
+            return this->values;
+        }
+
+        if(key[level] < values[0]) {
+            return next[0].get(key);
+        }
+
+        if(key[level] > values.back()) {
+            return next.back().get(key);
+        }
+
+        unsigned int lo = util::lowerbound(this->values.data(), key[level], this->values.size()-1);
+        unsigned int hi = lo + 1;
+
+        double f_hi = (key[level] - this->values[lo])/(this->values[hi] - this->values[lo]);
+        double f_lo = 1 - f_hi;
+
+        const std::vector< double >& l_v = this->next[lo].get(key);
+        const std::vector< double >& h_v = this->next[hi].get(key);
+
+        std::vector< double > out(lo.size());
+        for( unsigned int i = 0; i < lo.size(); i++) {
+            out[i] = f_lo*l_v[i] + f_hi*h_v[i];
+        }
+        return out;
+
+    }
+
+}
+
+class LinearNestedTable {
+
+    NestedEntry table;
+
+public:
+
+    LinearNestedTable() {}
+
+    LinearNestedTable(std::string file) {}
 
 
 }

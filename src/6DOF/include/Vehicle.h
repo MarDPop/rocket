@@ -22,8 +22,9 @@ class Stage {
 
     bool is_symmetric;
     bool is_ballistic;
+    bool is_3DOF;
 public:
-    std::unique_ptr< StageDynamics > dynamics;
+    StageDynamics dynamics;
 
     double mass; // in kg
     std::array<double,6> inertia; // from COG in kg m2
@@ -51,6 +52,12 @@ public:
                 this->is_symmetric = false;
             }
         }
+    }
+
+    void set_mass(const double& mass) {
+        this->mass = mass;
+
+
     }
 };
 
