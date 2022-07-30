@@ -10,7 +10,7 @@
 
 struct Vehicle;
 
-struct StageDynamics : public Dynamics<14> {
+struct StageDynamics {
 
     Vehicle* vehicle = nullptr;
 
@@ -36,14 +36,6 @@ public:
         return this->vehicle;
     }
 
-    void update_force_and_moment() {
-
-    }
-
-    std::array<double,N> get_state_rate(const std::array<double,N>& x, const double& t) {
-        this->update_force_and_moment();
-
-
-    }
+    void update_force_and_moment(const double& t);
 
 };

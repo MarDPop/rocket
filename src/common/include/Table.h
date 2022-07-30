@@ -70,8 +70,32 @@ public:
     CubicFixedTable() {}
 
     CubicFixedTable( const std::array<double,N>& v, const std::array< std::array< double, COLS >, N >& d) : values(v) , data(d) {
-        for(int i = 1; i < N-1; i++) {
+        for(int i = 1; i < N-2; i++) {
+            double dx1 = 1/(values[i+1] - values[i-1]);
+            double dx2 = 1/(values[i+2] - values[i]);
 
+            double tmp = 1/(values[i+1] - values[i]);
+            for(int j = 0; j < COLS; j++) {
+                this->coef[i][j][0] = data[i][j]; // d
+                this->coef[i][j][1] = (data[i + 1][j] - data[i - 1][j])*dx1; // c
+                double dydx2 = (data[i + 2][j] - data[i][j])*dx2;
+                this->coef[i][j][2] = 3*tmp*(data[i + 1][j] - this->this->coef[i][j][0]) - 2*this->coef[i][j][1] - dydx2;
+                this->coef[i][j][3] = 0.3333333333333333*tmp*((dydx2 - this->coef[i][j][1])*tmp - 2*this->coef[i][j][2]);
+            }
+        }
+        double dx1 = 1/(values[2] - values[0]);
+        double dx2 = 1/(values[N-1] - values[N-3]);
+        double tmp1 = 1/(values[1] - values[0]);
+        double tmp2 = 1/(values[N-1] - values[N-2]);
+        for(int j = 0; j < COLS; j++) {
+            this->coef[0][j][0] = data[0][j];
+            double dydx1 = (data[2][j] - data[0][j])*dx1;
+            this->coef[0][j][2] = (dydx1 + (this->coef[0][j][0] - data[1][j])*dx1)*dx1;
+            this->coef[0][j][1] = dydx1 - 2*this->coef[0][j][2]*tmp1;
+
+            this->coef[N-2][j][0] = data[N-2][j];
+            this->coef[N-2][j][1] = (data[N-1][j] - data[N-3][j])*dx2;
+            this->coef[N-2][j][2] = (data[N-1][j]*tmp2 - this->coef[N-2][j][1])*tmp2;
         }
     }
 

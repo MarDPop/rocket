@@ -8,13 +8,13 @@
 #include "StageDynamics.h"
 #include "Planet.h"
 
-class Stage {
-    const double empty_mass;
-    const double full_mass;
-    const std::array<double,6> empty_inertia;
-    const std::array<double,6> full_inertia;
-    const std::array<double,3> empty_COG;
-    const std::array<double,3> full_COG;
+class Stage : public Dynamics<14> {
+    const double mass_empty;
+    const double mass_full;
+    const std::array<double,6> inertia_empty;
+    const std::array<double,6> inertia_full;
+    const std::array<double,3> COG_empty;
+    const std::array<double,3> COG_full;
 
     double dm;
     std::array<double,6> dIdm;
@@ -31,15 +31,15 @@ public:
     std::array<double,3> COG; // from nose (reference) in m
 
     Stage(const double& empty, const double& full, const std::array<double,6>& empty_i, const std::array<double,6>& full_i,const std::array<double,3>& empty_x, const std::array<double,3>& full_x) :
-    empty_mass(empty), full_mass(full), empty_inertia(empty_i), full_inertia(full_i), empty_COG(empty_x), full_COG(full_x) {
+    mass_empty(empty), mass_full(full), inertia_empty(empty_i), inertia_full(full_i), COG_empty(empty_x), COG_full(full_x) {
         this->dm = full - empty;
 
         if(this->dm < 1e-3){
-            this->is_ballistic = false;
+            this->is_ballistic = true;
             return;
         }
 
-        this->is_ballistic = true;
+        this->is_ballistic = false;
         for(int i = 0; i < 3; i++) {
             this->dCGdm[i] = (full_COG[i] - empty_COG[i])/dm;
             this->dIdm[i] = (full_inertia[i] - empty_inertia[i])/dm;
@@ -57,6 +57,32 @@ public:
     void set_mass(const double& mass) {
         this->mass = mass;
 
+        double dm = mass - this->mass_empty;
+
+        int i = 0;
+        while(i < 3) {
+            this->COG[i] = this->COG_empty[i] + this->dCGdm[i]*dm;
+            this->inertia[i] = this->inertia_empty[i] + this->dIdm[i]*dm;
+            i++;
+        }
+
+        if(this->is_symmetric) {
+            return;
+        }
+
+        while(i < 6) {
+            this->inertia[i] = this->inertia_empty[i] + this->dIdm[i]*dm;
+            i++;
+        }
+
+    }
+
+    void get_state_rate(const std::array<double,N>& x, const double& t,std::array<double,N>& dx) {
+        dynamics.update_force_and_moment();
+
+        for(int i = 0; i < 3; i++) {
+
+        }
 
     }
 };
@@ -73,9 +99,11 @@ struct State {
 };
 
 class Vehicle {
-    int current_stage;
+    int current_stage_idx;
 
     std::vector< std::unique_ptr< Stage > > stages;
+
+    Stage* current_stage;
 
 public:
 

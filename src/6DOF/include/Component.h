@@ -1,11 +1,11 @@
 #pragma once
 
-#include <array>
+#include "../../common/include/Cartesian.h"
 
 class Component {
 
 public:
-    std::array<double,3> pos;
+    Cartesian::Vector location;
 
     double mass;
 

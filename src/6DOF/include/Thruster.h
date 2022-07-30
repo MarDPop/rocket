@@ -2,10 +2,10 @@
 
 #include "Component.h"
 
-class Thruster : public Component {
+class Thruster : public Action , virtual public Component {
 
 public:
 
-    
+
 
 };

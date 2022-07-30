@@ -1,7 +1,13 @@
 #pragma once
 
-class Aerodynamics {
+#include "Action.h"
 
+class Aerodynamics : public Action {
 
+    Air* air;
+
+public:
+
+    Aerodynamics() {}
 
 };

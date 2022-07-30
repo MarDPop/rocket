@@ -1,14 +1,16 @@
 #pragma once
 
-struct StageDynamics;
+#include "Action.h"
 
-class GNC {
+struct Vehicle;
 
-    StageDynamics* stage;
+class GNC : public Action {
+
+    Vehicle* vehicle;
 
 public:
 
-    GNC(StageDynamics* s) : stage(s) {}
+    GNC(Vehicle* v) : vehicle(v) {}
     ~GNC(){}
 
 };

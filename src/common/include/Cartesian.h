@@ -201,6 +201,43 @@ namespace Cartesian {
             return b;
         }
 
+        inline Axis get_transpose() {
+            Axis t;
+            t.data[0] = this->data[0];
+            t.data[1] = this->data[3];
+            t.data[2] = this->data[6];
+            t.data[3] = this->data[1];
+            t.data[4] = this->data[4];
+            t.data[5] = this->data[7];
+            t.data[6] = this->data[2];
+            t.data[7] = this->data[5];
+            t.data[8] = this->data[8];
+            return t;
+        }
+
+        inline Axis get_inverse() {
+            Axis Inv;
+            Inv.data[0] = this->data[4]*this->data[8] - this->data[5]*this->data[7];
+            Inv.data[1] = this->data[2]*this->data[7] - this->data[1]*this->data[8];
+            Inv.data[2] = this->data[1]*this->data[5] - this->data[2]*this->data[4];
+
+            Inv.data[3] = this->data[5]*this->data[6] - this->data[3]*this->data[8];
+            Inv.data[4] = this->data[0]*this->data[8] - this->data[2]*this->data[6];
+            Inv.data[5] = this->data[2]*this->data[3] - this->data[0]*this->data[5];
+
+            Inv.data[6] = this->data[3]*this->data[7] - this->data[4]*this->data[6];
+            Inv.data[7] = this->data[1]*this->data[6] - this->data[0]*this->data[7];
+            Inv.data[8] = this->data[0]*this->data[4] - this->data[1]*this->data[3];
+
+            double det = 1/(this->data[0]*Inv.data[0] + this->data[1]*Inv.data[3] + this->data[2]*Inv.data[6]);
+
+            for(int i = 0; i < 9; i++) {
+                Inv.data[i] *= det;
+            }
+
+            return Inv;
+        }
+
     };
 
 }
