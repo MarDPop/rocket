@@ -28,6 +28,8 @@ public:
 
     Cartesian::Vector Moment; // in body frame at COG
 
+    double mdot;
+
     void set_vehicle(Vehicle* vehicle) {
         this->vehicle = vehicle;
     }

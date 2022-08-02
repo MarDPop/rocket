@@ -7,6 +7,9 @@
 
 #include "StageDynamics.h"
 #include "Planet.h"
+#include "../../common/include/Cartesian.h"
+
+using namespace Cartesian;
 
 class Stage : public Dynamics<14> {
     const double mass_empty;
@@ -21,6 +24,7 @@ class Stage : public Dynamics<14> {
     std::array<double,3> dCGdm;
 
     bool is_symmetric;
+    bool is_plane;
     bool is_ballistic;
     bool is_3DOF;
 public:
@@ -45,12 +49,20 @@ public:
             this->dIdm[i] = (full_inertia[i] - empty_inertia[i])/dm;
         }
 
-        this->is_symmetric = true;
         for(int i = 3; i < 6; i++) {
             this->dIdm[i] = (full_inertia[i] - empty_inertia[i])/dm;
-            if(fabs(this->full_inertia[i]) > 1e-6) {
-                this->is_symmetric = false;
-            }
+        }
+
+        if(fabs(this->full_inertia[3]) < 1e-6 && fabs(this->full_inertia[4]) < 1e-6) {
+            this->is_plane = true;
+        } else {
+            this->is_plane = false;
+        }
+
+        if(this->is_plane && fabs(this->full_inertia[4]) < 1e-6) {
+            this->is_symmetric = true;
+        } else {
+            this->is_symmetric = false;
         }
     }
 
@@ -78,10 +90,43 @@ public:
     }
 
     void get_state_rate(const std::array<double,N>& x, const double& t,std::array<double,N>& dx) {
-        dynamics.update_force_and_moment();
+        this->set_mass(x[13]);
 
+        this->dynamics.update_force_and_moment();
+
+        dx[13] = this->dynamics->mdot;
+
+        Vector Force_in_inertial = this->vehicle->ECI.transpose_mult(this->dynamics.Force);
+
+        double x_inv = 1.0/x[13];
         for(int i = 0; i < 3; i++) {
+            dx[i] = x[i3];
+            dx[i3] = Force_in_inertial.data[i]*x_inv;
+        }
 
+        // Integration of quaternion
+        dx[6] = -0.5*(x[10]*x[7] + x[11]*x[8] + x[12]*x[9]);
+        dx[7] = 0.5*(x[10]*x[6] + x[12]*x[8] - x[11]*x[9]);
+        dx[8] = 0.5*(x[10]*x[7] - x[12]*x[7] + x[10]*x[9]);
+        dx[9] = 0.5*(x[10]*x[8] + x[11]*x[7] - x[10]*x[9]);
+
+        // Integration of angular velocity
+        if(this->is_symmetric) {
+            dx[10] = this->dynamics.Moment.data[0]/this->inertia[0];
+            dx[11] = this->dynamics.Moment.data[1]/this->inertia[1];
+            dx[12] = this->dynamics.Moment.data[2]/this->inertia[2];
+            return;
+        }
+
+        if(this->is_plane) {
+            dx[11] = (this->dynamics.Moment.data[1] + this->inertia[5]*(x[12]*x[12] - x[10]*x[10]) + x[10]*x[12]*(this->inertia[0] - this->inertia[2]))/this->inertia[1];
+            double y1 = this->dynamics.Moment.data[0] + x[11]*(x[12]*(this->inertia[1] - this->inertia[2]) + x[10]*this->inertia[5]);
+            double y2 = this->dynamics.Moment.data[2] + x[11]*(x[10]*(this->inertia[0] - this->inertia[1]) - x[12]*this->inertia[5]);
+
+            double det = 1/(this->inertia[0]*this->inertia[2] + this->inertia[5]*this->inertia[5]);
+
+            dx[10] = (this->inertia[2]*y1 - this->inertia[5]*y2)*det;
+            dx[12] = (this->inertia[0]*y2 - this->inertia[5]*y1)*det;
         }
 
     }
@@ -113,15 +158,17 @@ public:
 
     State dstate;
 
+    Axis ECI;
+
     Planet planet;
 
-    std::array< std::array< double, 3 >, 3 > ECI_Axis;
+    Axis ENU;
 
     std::array< double, 3 > LLA;
 
-    std::array< double, 3 > body_fixed_pos;
+    Vector body_fixed_pos;
 
-    std::array< double, 3 > body_fixed_velocity;
+    Vector body_fixed_velocity;
 
     Vehicle();
     ~Vehicle();

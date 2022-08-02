@@ -59,4 +59,8 @@ namespace util {
        file.close();
     }
 
+    void quaternion2rotm(double* quat, double* rotm) {
+
+    }
+
 }

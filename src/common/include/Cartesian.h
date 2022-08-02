@@ -24,7 +24,7 @@ namespace Cartesian {
             std::copy_n(b,3,this->data);
         }
 
-        inline Vector(const double& x,const double& y,const double& z) : data{x,y,z} {
+        inline Vector(double x,double y,double z) : data{x,y,z} {
         }
 
         inline void operator=(const double* b) {
@@ -43,7 +43,7 @@ namespace Cartesian {
             return data[idx];
         }
 
-        inline const double& operator[](unsigned int& idx) const {
+        inline doubleoperator[](unsigned int& idx) const {
             return data[idx];
         }
 
@@ -55,19 +55,19 @@ namespace Cartesian {
             return Vector(data[0] - b.data[0], data[1] - b.data[1],data[2] - b.data[2]);
         }
 
-        inline Vector operator+(const double& b) const {
+        inline Vector operator+(double b) const {
             return Vector(data[0] + b, data[1] + b,data[2] + b);
         }
 
-        inline Vector operator-(const double& b) const {
+        inline Vector operator-(double b) const {
             return Vector(data[0] - b, data[1] - b,data[2] - b);
         }
 
-        inline Vector operator*(const double& b) const {
+        inline Vector operator*(double b) const {
             return Vector(data[0]*b, data[1]*b,data[2]*b);
         }
 
-        inline Vector operator/(const double& b) const {
+        inline Vector operator/(double b) const {
             return Vector(data[0]/b, data[1]/b,data[2]/b);
         }
 
@@ -83,19 +83,19 @@ namespace Cartesian {
             this->data[2] -= a.data[2];
         }
 
-        inline void operator+=(const double& a) {
+        inline void operator+=(double a) {
             this->data[0] += a;
             this->data[1] += a;
             this->data[2] += a;
         }
 
-        inline void operator-=(const double& a) {
+        inline void operator-=(double a) {
             this->data[0] -= a;
             this->data[1] -= a;
             this->data[2] -= a;
         }
 
-        inline void operator*=(const double& a) {
+        inline void operator*=(double a) {
             this->data[0] *= a;
             this->data[1] *= a;
             this->data[2] *= a;
@@ -124,15 +124,19 @@ namespace Cartesian {
             this->data[2] *= n;
         }
 
-        inline const double& x() const {
+        inline doublex() const {
             return data[0];
         }
 
-        inline const double& y() const {
+        inline void x(double v) {
+            data[0] = v;
+        }
+
+        inline doubley() const {
             return data[1];
         }
 
-        inline const double& z() const {
+        inline doublez() const {
             return data[2];
         }
 
@@ -187,7 +191,7 @@ namespace Cartesian {
             }
         }
 
-        inline void operator*=(const double& b) {
+        inline void operator*=(double b) {
             for(int i = 0; i < 9; i++) {
                 this->data[i] *= b;
             }
@@ -213,6 +217,14 @@ namespace Cartesian {
             t.data[7] = this->data[5];
             t.data[8] = this->data[8];
             return t;
+        }
+
+        inline Vector transpose_mult(const Vector& v) {
+            Vector b;
+            b.data[0] = this->data[0]*v.data[0] + this->data[3]*v.data[1] + this->data[6]*v.data[2];
+            b.data[1] = this->data[1]*v.data[0] + this->data[4]*v.data[1] + this->data[7]*v.data[2];
+            b.data[2] = this->data[2]*v.data[0] + this->data[5]*v.data[1] + this->data[8]*v.data[2];
+            return b;
         }
 
         inline Axis get_inverse() {
