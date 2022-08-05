@@ -6,6 +6,12 @@
 
 namespace Cartesian {
 
+    void cross(const double* u, const double* v, double* w) {
+        w[0] = u[1]*v[2] - u[2]*v[1];
+        w[1] = u[2]*v[0] - u[0]*v[2];
+        w[2] = u[0]*v[1] - u[1]*v[0];
+    }
+
     struct Vector  {
 
         alignas(32) double data[3];

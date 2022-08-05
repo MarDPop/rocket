@@ -10,7 +10,8 @@
 
 struct Vehicle;
 
-struct StageDynamics {
+struct StageDynamics
+{
 
     Vehicle* vehicle = nullptr;
 
@@ -30,11 +31,13 @@ public:
 
     double mdot;
 
-    void set_vehicle(Vehicle* vehicle) {
+    void set_vehicle(Vehicle* vehicle)
+    {
         this->vehicle = vehicle;
     }
 
-    Vehicle* get_vehicle() {
+    Vehicle* get_vehicle()
+    {
         return this->vehicle;
     }
 
