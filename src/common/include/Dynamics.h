@@ -12,6 +12,6 @@ public:
         return false;
     }
 
-    virtual void get_state_rate(const std::array<double,N>& x, const double& t, std::array<double,N>& dx) = 0;
+    virtual void get_state_rate(const std::array<double,N>& x, const double t, std::array<double,N>& dx) = 0;
 
 };

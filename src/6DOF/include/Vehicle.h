@@ -56,6 +56,6 @@ public:
         stage.set_vehicle(this);
     }
 
-    void get_state_rate(const std::array<double,N>& x, const double& t, std::array<double,N>& dx);
+    void get_state_rate(const std::array<double,N>& x, const double t, std::array<double,N>& dx) override;
 
 };

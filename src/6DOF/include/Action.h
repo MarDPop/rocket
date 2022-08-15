@@ -8,8 +8,8 @@ struct Action {
 
     Vector force;
     Vector moment;
-    Vector location;
+    Vector center;
 
-    virtual void update(const double& time);
+    virtual void update(const double time);
 
 }

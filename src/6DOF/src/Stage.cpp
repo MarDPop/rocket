@@ -39,7 +39,7 @@ void Stage::set_mass(double mass) {
 
     int i = 0;
     while(i < 3) {
-        this->COG[i] = this->COG_empty[i] + this->dCGdm[i]*dm;
+        this->center[i] = this->COG_empty[i] + this->dCGdm[i]*dm;
         this->inertia[i] = this->inertia_empty[i] + this->dIdm[i]*dm;
         i++;
     }
@@ -53,4 +53,10 @@ void Stage::set_mass(double mass) {
         i++;
     }
 
+}
+
+void Stage::update_force_and_moment() {
+    for(Action& a : this->actions) {
+
+    }
 }
