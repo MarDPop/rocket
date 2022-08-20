@@ -3,6 +3,7 @@
 #include <fuctional>
 #include <vector>
 #include <cmath>
+#include "../../common/include/Constants.h"
 
 class Thruster {
 
@@ -30,10 +31,17 @@ public:
 struct Fuel {
 
     static constexpr double KNSU_DENSITY = 1.8;
-     // KNSU - SUCROSE , KNSB - SORBITOL, KNEY - EURYTHTROL, KNDX - DEXTROSE, KNMN - Mannitol
-    const double density;
+    static constexpr double KNSU_HEATING_VALUE = 3.9e5;
+    static constexpr double KNSU_GAS_GAMMA = 1.05; // approx with 2 phase flow
+    static constexpr double KNSU_GAS_MW = 0.042;
 
-    inline Fuel(double d) : density(d) {}
+     // KNSU - SUCROSE , KNSB - SORBITOL, KNEY - EURYTHTROL, KNDX - DEXTROSE, KNMN - Mannitol
+    const double density; // kg/m3
+    const double heating_value; // J/kg
+    const double gas_gamma; // specific heat ratio
+    const double gas_MW;
+
+    inline Fuel(double d, double h, double k, double mw) : density(d), heating_value(h), gas_gamma(k), gas_MW(mw) {}
 
     virtual double burn_rate(double pressure, double temperature);
 
@@ -45,7 +53,7 @@ struct Fuel {
 
 struct Fuel_KNSU : Fuel {
 
-    inline Fuel_KNSU() : Fuel(Fuel::KNSU_DENSITY) {}
+    inline Fuel_KNSU() : Fuel(Fuel::KNSU_DENSITY,Fuel::KNSU_HEATING_VALUE,Fuel::KNSU_GAS_GAMMA,Fuel::KNSU_GAS_MW) {}
 
     /*
         pressure in Pa
@@ -147,19 +155,27 @@ class SolidThruster : public Thruster {
 
     std::vector<double> time;
 
-    std::vector<double> pressure_chamber;
+    std::vector<double> mass_rates;
 
-    std::vector<double> temperature_chamber;
+    std::vector<double> p_exit;
+
+    std::vector<double> v_exit;
 
     double area_ratio;
+
+    double area_exit;
+
+    double area_throat;
 
 public:
 
     SolidThruster();
     virtual ~SolidThruster();
 
-    inline void set_area_ratio(double area_ratio) {
-        this->area_ratio = area_ratio;
+    inline void set_areas(double area_throat, double area_exit) {
+        this->area_ratio = area_exit/area_exit;
+        this->area_exit = area_exit;
+        this->area_throat = area_throat;
     }
 
     virtual void update(double ambient_pressure, double time, double throttle);
@@ -180,8 +196,9 @@ public:
 
     public SugarThruster();
 
+    void compute(double A_b, double V, double M_fuel, double dt);
 
-
+    void update(double ambient_pressure, double time, double throttle);
 
 
 }

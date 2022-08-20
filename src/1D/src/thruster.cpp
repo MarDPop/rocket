@@ -66,3 +66,43 @@ double Nozzle::isentropic_exit_mach(double area_ratio, double k, double M_guess)
     }
     return M_guess;
 }
+
+void SolidThruster::update(double ambient_pressure, double time, double throttle) {
+    unsigned int idx = util::bisection_search(this->time.data(),time,this->time.size());
+
+    this->mass_rate = this->mass_rates[i];
+    this->thrust = this->mass_rate*this->v_exit[i] + (this->p_exit[i] - ambient_pressure)*this->area_exit;
+}
+
+void SugarThruster::compute(double A_b, double V, double M_fuel, double dt) {
+
+    double P = 1e5;
+    double T = 300;
+    double R_gas = Constants::GAS_CONSTANT/this->fuel->gas_mw;
+
+    double rho = P/(R_gas*T);
+    double M = density_chamber*V;
+
+    double time = 0;
+    while(time < 10000) {
+        double r = this->fuel->burn_rate(P,T);
+        double dV = A_b*r;
+        double dM = dV*this->fuel->density;
+        double dH = dM*this->fuel->heating_value;
+
+        V += dV;
+        M += dM;
+
+        rho = M/V;
+
+        time += dt;
+    }
+
+
+
+}
+
+
+
+
+

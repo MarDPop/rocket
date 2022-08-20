@@ -23,16 +23,16 @@ namespace util {
         return out;
     }
 
-    unsigned int lowerbound(const double* x, const double& val, unsigned int hi){
+    unsigned int bisection_search(const double* x, double val, unsigned int hi){
         unsigned int lo = 0;
-        unsigned int mid = (lo + hi)/2;
+        unsigned int mid = (lo + hi) >> 1;
         while(lo != mid){
-            if(x[mid] > val){
+            if(val > x[mid]){
                 lo = mid;
             } else {
                 hi = mid;
             }
-            mid = (lo + hi)/2;
+            mid = (lo + hi) >> 1;
         }
         return mid;
     }
