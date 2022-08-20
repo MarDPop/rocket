@@ -25,7 +25,7 @@ public:
 
     virtual void update(double ambient_pressure, double time, double throttle);
 
-}
+};
 
 struct Fuel {
 
@@ -60,7 +60,18 @@ struct Fuel_KNSU : Fuel {
         }
         return 3.5e-3 + 6.43e-9*pressure;
     }
-}
+};
+
+struct Gas {
+    double P_total;
+    double T_total;
+    double cp;
+    double cv;
+    double gamma;
+    double mass_rate;
+    double mw;
+    double R_gas;
+};
 
 class Combustor {
 
@@ -80,6 +91,10 @@ public:
 
     double mass_rate;
 
+    double mw;
+
+    double R_gas;
+
     Combustor();
 
     virtual void update(double throttle, double time);
@@ -93,7 +108,7 @@ class Nozzle {
 
     double area_ratio;
 
-    std::unique_ptr<Combustor> combuster;
+    std::unique_ptr<Combustor> combustor;
 
 public:
 
@@ -101,11 +116,18 @@ public:
 
     inline void set_exit_area(double area) {
         this->area_exit = area;
-        this->area_ratio = area/this->combuster->area_throat;
+        if(this->combustor) {
+            this->area_ratio = area/this->combustor->area_throat;
+        }
     }
 
-    inline void set_combuster(std::unique_ptr<Combuster> combuster) {
-        this->combustor
+    inline void set_combustor(std::unique_ptr<Combuster> combustor) {
+        this->combustor = std::move(combustor);
+        this->area_ratio = area/this->combustor->area_throat;
+    }
+
+    inline void set_nozzle_efficiency(double nozzle_efficiency) {
+        this->nozzle_efficiency = nozzle_efficiency;
     }
 
     static inline double chocked_flow_mass_flux(double p_total, double t_total, double k, double mw) {
@@ -113,68 +135,11 @@ public:
         return p_total*sqrt(k*mw/(t_total*physics::R_GAS*pow(0.5*k1,k1/(k-1))));
     }
 
-    static inline double isentropic_exit_mach(double area_ratio, double k) {
-        double k1 = k - 1;
-        double k2 = (k + 1)*0.5;
-        double ex = k2/k1;
-        double ex1 = ex - 1;
-        double k1_ex = ex*k1;
+    static double isentropic_exit_mach(double area_ratio, double k);
 
-        area_ratio *= pow(k2,ex);
+    static double isentropic_exit_mach(double area_ratio, double k, double M_guess);
 
-        double M_guess = 3*(area_ratio - 0.5);
-
-        k1 *= 0.5;
-
-        for(int iter = 0; iter < 10; iter++) {
-            double df = 1.0/M_guess;
-            double tmp = 1 + k1*M_guess*M_guess;
-            double f = pow(tmp,ex)*df;
-            df = (pow(tmp,ex1)*(k1_ex*M_guess) - f)*df;
-            tmp = (f - area_ratio)/df;
-            M_guess -= tmp;
-            if(fabs(tmp) < 1e-6) {
-                break;
-            }
-        }
-        return M_guess;
-    }
-
-    static inline double isentropic_exit_mach(double area_ratio, double k, double M_guess) {
-        double k1 = k - 1;
-        double k2 = (k + 1)*0.5;
-        double ex = k2/k1;
-        double ex1 = ex - 1;
-        double k1_ex = ex*k1;
-
-        area_ratio *= pow(k2,ex);
-
-        k1 *= 0.5;
-
-        for(int iter = 0; iter < 10; iter++) {
-            double df = 1.0/M_guess;
-            double tmp = 1 + k1*M_guess*M_guess;
-            double f = pow(tmp,ex)*df;
-            df = (pow(tmp,ex1)*(k1_ex*M_guess) - f)*df;
-            tmp = (f - area_ratio)/df;
-            M_guess -= tmp;
-            if(fabs(tmp) < 1e-6) {
-                break;
-            }
-        }
-        return M_guess;
-    }
-
-    double get_thrust(double ambient_pressure) {
-        double M_exit = Nozzle::isentropic_exit_mach(this->Area_ratio,this->combustor->gamma);
-        double beta = 1.0 + 0.5*(this->combuster->gamma-1)*M_exit*M_exit;
-        double T_exit = this->combustor.T_total/beta;
-        double P_exit = this->combuster.P_total*pow(beta,this->combuster->gamma/(1.0 - this->combuster->gamma));
-
-
-    }
-
-
+    double get_thrust(double ambient_pressure);
 
 };
 
