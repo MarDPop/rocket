@@ -80,20 +80,35 @@ void SugarThruster::compute(double A_b, double V, double M_fuel, double dt) {
     double T = 300;
     double R_gas = Constants::GAS_CONSTANT/this->fuel->gas_mw;
 
+    double k1 = this->fuel->gas_gamma - 1;
+    double k2 = this->fuel->gas_gamma + 1;
+
+    double cp = this->fuel->gas_gamma*R_gas/k1;
+
+    double critical_pressure_ratio = pow(2/k2,this->fuel->gas_gamma/k1);
+    double P_crit = P/critical_pressure_ratio;
+    double constant = pow(2/k2,0.5*k2/k1);
+
     double rho = P/(R_gas*T);
     double M = density_chamber*V;
+    double H = cp*T;
 
+    double m_dot = 0;
     double time = 0;
     while(time < 10000) {
         double r = this->fuel->burn_rate(P,T);
-        double dV = A_b*r;
-        double dM = dV*this->fuel->density;
-        double dH = dM*this->fuel->heating_value;
+        double dV = A_b*r*dt;
+        double M_in = dV*this->fuel->density;
+        double M_out = m_dot*dt;
+        double dM = M_in - M_out;
+        double dH = M_in*this->fuel->heating_value - M_out*H;
 
         V += dV;
         M += dM;
 
         rho = M/V;
+
+        m_dot = rho*sqrt(this->fuel->gas_gamma*T)*constant;
 
         time += dt;
     }
