@@ -3,3 +3,5 @@
 void Thruster::update(double ambient_temperature, double time, double throttle) {
 
 }
+
+Combustor::Combuster(){}
