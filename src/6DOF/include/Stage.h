@@ -1,7 +1,18 @@
 #pragma once
 
+#include <array>
+#include <memory>
+#include "Action.h"
+#include "GNC.h"
+#include "Aerodynamics.h"
+#include "Thruster.h"
+
+class Vehicle;
 
 class Stage : public Action {
+
+friend class Vehicle;
+
     const double mass_empty;
     const double mass_full;
     const std::array<double,6> inertia_empty;
@@ -31,9 +42,6 @@ public:
     std::unique_ptr< Thruster > thruster;
 
     std::vector< std::unique_ptr< Action > > actions;
-
-    double mass; // in kg
-    std::array<double,6> inertia; // from COG in kg m2
 
     Stage(const double& empty, const double& full, const std::array<double,6>& empty_i, const std::array<double,6>& full_i,
             const std::array<double,3>& empty_x, const std::array<double,3>& full_x);

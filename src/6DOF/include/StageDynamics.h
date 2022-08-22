@@ -2,8 +2,8 @@
 
 #include <memory>
 
-#include "../common/include/Cartesian.h"
-#include "../common/include/Dynamics.h"
+#include "../../common/include/Cartesian.h"
+#include "../../common/include/Dynamics.h"
 #include "Aerodynamics.h"
 #include "GNC.h"
 #include "Thruster.h"

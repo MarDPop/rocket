@@ -2,6 +2,7 @@
 
 #include <array>
 #include <cmath>
+#include <vector>
 
 struct Air {
     static constexpr double GAMMA = 1.4;
@@ -22,7 +23,7 @@ struct Air {
         double absolute_viscosity;
         double cp;
         double cv;
-    }
+    };
 
     double wind[3]; // East North Up velocity
 
@@ -31,6 +32,8 @@ struct Air {
 class Atmosphere {
 
 public:
+
+    double max_height;
 
     /**
     * returns false if air was computed
@@ -46,15 +49,15 @@ class AtmosphereBasic : public Atmosphere {
     const double sea_temp;
     const double R_gas;
 public:
-    AtmosphereBasic() : scale_height(8.4), sea_pressure(101325), sea_density(1.22), R_gas(Air::R_DRY_AIR), sea_temp()  {}
+    AtmosphereBasic() : scale_height(8.4), sea_pressure(101325), sea_density(1.22), sea_temp(297), R_gas(Air::R_DRY_AIR)  {}
 
     bool get_air(Air& air, const std::array<double,3>& LLA) {
         double factor = exp(-LLA[2]/scale_height);
         air.density = sea_density*factor;
         air.pressure = sea_pressure*factor;
-
+        return true;
     }
-}
+};
 
 class AtmosphereTable : public Atmosphere {
 
@@ -70,12 +73,12 @@ public:
 
     AtmosphereTable() {}
 
-}
+};
 
 class AtmosphereUS1976 : public Atmosphere {
 
     //pressure(Pa), density (kg/m3), speed_sound (m/s), temp (K), dynamic viscosity (Pa s)
-    static constexpr double data[][] = {{101325.0,1.225,340.294,288.15,1.81206e-05},
+    static constexpr double data[87][5] = {{101325.0,1.225,340.294,288.15,1.81206e-05},
 {89874.6,1.11164,336.434,281.65,1.77943e-05},
 {79495.2,1.00649,332.529,275.15,1.74645e-05},
 {70108.5,0.909122,328.578,268.65,1.71311e-05},
@@ -163,7 +166,7 @@ class AtmosphereUS1976 : public Atmosphere {
 {0.36342,6.77222e-06,274.096,186.946,1.25915e-05},
 {0.302723,5.64114e-06,274.096,186.946,1.25915e-05}};
 
-    static constexpr double delta[][] = {{-1.1450e+04,-1.1336e-01,-3.8600e+00,-6.5000e+00,-3.2630e-07},
+    static constexpr double delta[86][5] = {{-1.1450e+04,-1.1336e-01,-3.8600e+00,-6.5000e+00,-3.2630e-07},
 {-1.0379e+04,-1.0515e-01,-3.9050e+00,-6.5000e+00,-3.2980e-07},
 {-9.3867e+03,-9.7368e-02,-3.9510e+00,-6.5000e+00,-3.3340e-07},
 {-8.4683e+03,-8.9993e-02,-3.9990e+00,-6.5000e+00,-3.3710e-07},
@@ -272,8 +275,8 @@ public:
 
         double factor = LLA[2] - idx;
 
-        double* row = this->data[idx];
-        double* d = this->delta[idx];
+        const double* row = this->data[idx];
+        const double* d = this->delta[idx];
 
         for( int i = 0; i < 5; i++) {
             air.data[i] = row[i] + factor*d[i];
@@ -281,7 +284,7 @@ public:
         return true;
     }
 
-}
+};
 
 
 

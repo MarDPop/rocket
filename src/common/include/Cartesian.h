@@ -6,28 +6,44 @@
 
 namespace Cartesian {
 
-    void cross(const double* u, const double* v, double* w) {
+    inline void add(const double* u, const double* v, double* w) {
+        w[0] = u[0] + v[0];
+        w[1] = u[1] + v[1];
+        w[2] = u[2] + v[2];
+    }
+
+    inline void sub(const double* u, const double* v, double* w) {
+        w[0] = u[0] - v[0];
+        w[1] = u[1] - v[1];
+        w[2] = u[2] - v[2];
+    }
+
+    inline void cross(const double* u, const double* v, double* w) {
         w[0] = u[1]*v[2] - u[2]*v[1];
         w[1] = u[2]*v[0] - u[0]*v[2];
         w[2] = u[0]*v[1] - u[1]*v[0];
     }
 
-    struct Vector  {
+    inline double dot(const double* u, const double* v) {
+        return u[0]*v[0]+u[1]*v[1]+u[2]*v[2];
+    }
+
+    struct Vector {
 
         alignas(32) double data[3];
 
         inline Vector() {}
 
-        inline Vector(const char& x) {
+        inline Vector(const char x) {
             memset(data,x,sizeof(data));
         }
 
         inline Vector(const Vector& b) {
-            std::copy_n(b,3,this->data);
+            std::copy(b.data,b.data + 3,this->data);
         }
 
         inline Vector(const double* b) {
-            std::copy_n(b,3,this->data);
+            std::copy(b,b+3,this->data);
         }
 
         inline Vector(double x,double y,double z) : data{x,y,z} {
@@ -45,11 +61,11 @@ namespace Cartesian {
             memset(data,0,sizeof(data));
         }
 
-        inline double& operator[](unsigned int& idx){
+        inline double& operator[](unsigned int idx){
             return data[idx];
         }
 
-        inline doubleoperator[](unsigned int& idx) const {
+        inline const double operator[](unsigned int idx) const {
             return data[idx];
         }
 
@@ -130,7 +146,7 @@ namespace Cartesian {
             this->data[2] *= n;
         }
 
-        inline doublex() const {
+        inline double x() const {
             return data[0];
         }
 
@@ -138,12 +154,20 @@ namespace Cartesian {
             data[0] = v;
         }
 
-        inline doubley() const {
+        inline double y() const {
             return data[1];
         }
 
-        inline doublez() const {
+        inline void y(double v) {
+            data[1] = v;
+        }
+
+        inline double z() const {
             return data[2];
+        }
+
+        inline void z(double v) {
+            data[2] = v;
         }
 
         static inline void cross(const Vector& a, const Vector& b, Vector& c) {
@@ -206,7 +230,7 @@ namespace Cartesian {
         inline Vector operator*(const Vector& a) {
             Vector b;
             for(int i = 0; i < 3; i++){
-                b.data[i] = this->data[i]*a[0] + this->data[i + 1]*a[1] + this->data[i + 2]*a[2];
+                b.data[i] = this->data[i]*a.data[0] + this->data[i + 1]*a.data[1] + this->data[i + 2]*a.data[2];
             }
             return b;
         }

@@ -10,6 +10,6 @@ struct Action {
     Vector moment;
     Vector center;
 
-    virtual void update(const double time);
+    virtual void update(double time) = 0;
 
-}
+};

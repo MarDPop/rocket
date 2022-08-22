@@ -1,3 +1,145 @@
 # depslib dependency file v1.0
-1657377317 source:/home/marius/Repos/C++/rocket/src/1D/src/simulation.cpp
+1661128526 source:/home/marius/Repos/C++/rocket/src/1D/src/simulation.cpp
+	<string>
+	<vector>
+	<fstream>
+	<cmath>
+	"../include/thruster.h"
+
+1660402397 source:/home/marius/Repos/C++/rocket/src/1D/src/physics.cpp
+	"../include/physics.h"
+
+1661134385 /home/marius/Repos/C++/rocket/src/1D/include/physics.h
+
+1661135007 /home/marius/Repos/C++/rocket/src/1D/include/thruster.h
+	<vector>
+	<cmath>
+	<memory>
+	"../../common/include/Constants.h"
+
+1661126430 /home/marius/Repos/C++/rocket/src/common/include/Constants.h
+
+1661137485 source:/home/marius/Repos/C++/rocket/src/1D/src/thruster.cpp
+	"../include/thruster.h"
+	"../../common/include/fluid.h"
+	"../../common/include/util.h"
+	<fstream>
+	<iostream>
+	<cmath>
+
+1661135288 /home/marius/Repos/C++/rocket/src/common/include/fluid.h
+	"Molecule.h"
+	<cmath>
+
+1661130814 /home/marius/Repos/C++/rocket/src/common/include/Molecule.h
+	<string>
+	<vector>
+
+1661131772 /home/marius/Repos/C++/rocket/src/common/include/util.h
+	<fstream>
+	<string>
+	<vector>
+
+1661128816 source:/home/marius/Repos/C++/rocket/src/6DOF/src/Vehicle.cpp
+	"../include/Vehicle.h"
+
+1661128847 /home/marius/Repos/C++/rocket/src/6DOF/include/Vehicle.h
+	<vector>
+	<memory>
+	<array>
+	<cmath>
+	"../../common/include/Dynamics.h"
+	"Stage.h"
+	"Planet.h"
+	"../../common/include/Cartesian.h"
+
+1660007775 /home/marius/Repos/C++/rocket/src/common/include/Dynamics.h
+	<array>
+	<stdint.h>
+
+1661128636 /home/marius/Repos/C++/rocket/src/6DOF/include/Stage.h
+	<array>
+	<memory>
+	"Action.h"
+	"GNC.h"
+	"Aerodynamics.h"
+	"Thruster.h"
+
+1661120625 /home/marius/Repos/C++/rocket/src/6DOF/include/Action.h
+	"../../common/include/Cartesian.h"
+
+1661121445 /home/marius/Repos/C++/rocket/src/common/include/Cartesian.h
+	<cmath>
+	<algorithm>
+	"string.h"
+
+1659158695 /home/marius/Repos/C++/rocket/src/6DOF/include/GNC.h
+	"Action.h"
+
+1661119948 /home/marius/Repos/C++/rocket/src/6DOF/include/Aerodynamics.h
+	"Action.h"
+	"Atmosphere.h"
+
+1661133930 /home/marius/Repos/C++/rocket/src/6DOF/include/Atmosphere.h
+	<array>
+	<cmath>
+	<vector>
+
+1659158889 /home/marius/Repos/C++/rocket/src/6DOF/include/Thruster.h
+	"Component.h"
+
+1659158866 /home/marius/Repos/C++/rocket/src/6DOF/include/Component.h
+	"../../common/include/Cartesian.h"
+
+1657498285 /home/marius/Repos/C++/rocket/src/6DOF/include/Planet.h
+	"Atmosphere.h"
+	"Gravity.h"
+	"Geoid.h"
+	<memory>
+
+1661128319 /home/marius/Repos/C++/rocket/src/6DOF/include/Gravity.h
+	"../../common/include/Cartesian.h"
+	<array>
+
+1657498404 /home/marius/Repos/C++/rocket/src/6DOF/include/Geoid.h
+
+1661128866 source:/home/marius/Repos/C++/rocket/src/6DOF/src/Stage.cpp
+	"../include/Stage.h"
+	"../include/Vehicle.h"
+
+1659158294 source:/home/marius/Repos/C++/rocket/src/6DOF/src/StageDynamics.cpp
+	"../include/StageDynamics.h"
+
+1661131672 /home/marius/Repos/C++/rocket/src/6DOF/include/StageDynamics.h
+	<memory>
+	"../../common/include/Cartesian.h"
+	"../../common/include/Dynamics.h"
+	"Aerodynamics.h"
+	"GNC.h"
+	"Thruster.h"
+
+1661136486 source:/home/marius/Repos/C++/rocket/src/app/test.cpp
+	<iostream>
+	"../1D/include/structures.h"
+	"../common/include/structures.h"
+	"../common/include/util.h"
+	"../common/include/RocketShape.h"
+	"../common/include/Cartesian.h"
+	"../1D/include/thruster.h"
+	<memory>
+	<cmath>
+
+1657393246 /home/marius/Repos/C++/rocket/src/1D/include/structures.h
+
+1656808848 /home/marius/Repos/C++/rocket/src/common/include/structures.h
+	<vector>
+	"util.h"
+
+1656889126 /home/marius/Repos/C++/rocket/src/common/include/RocketShape.h
+	"structures.h"
+	<cmath>
+	<memory>
+	<fstream>
+	<string>
+	<iostream>
 

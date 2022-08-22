@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Action.h"
+#include "Atmosphere.h"
 
 class Aerodynamics : public Action {
 
@@ -32,4 +33,4 @@ public:
 
     AerodynamicsBasic() {}
 
-}
+};

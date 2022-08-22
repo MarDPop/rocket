@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Molecule.h"
 #include <cmath>
 
 class flow {
@@ -20,7 +21,7 @@ public:
 
     inline static double p_static2p_total(double M, double k) {
         double k1 = k-1;
-        return pow(1 + 0.5*k1*M*M,k/k1);
+        return pow(1 + 0.5*k1*M*M,-k/k1);
     }
 
     inline static double rho_static2rho_total(double M, double k) {
@@ -60,19 +61,18 @@ public:
     }
 };
 
-
-struct Molecule;
-
-template<int M>
 struct Gas {
-    double mixture[M];
-    Molecule* species[M];
-
     double gamma;
     double cp;
     double cv;
     double molecular_weight;
     double R_specific;
+};
+
+template<int M>
+struct Gas_Mixture : Gas {
+    Molecule* species[M];
+    double mixture[M];
 };
 
 template<int N>

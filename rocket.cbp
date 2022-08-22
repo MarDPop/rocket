@@ -34,7 +34,10 @@
 		<Unit filename="Makefile" />
 		<Unit filename="README.txt" />
 		<Unit filename="build.sh" />
-		<Unit filename="gui/app.java" />
+		<Unit filename="gui/app.java">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
 		<Unit filename="lib/Eigen/AccelerateSupport" />
 		<Unit filename="lib/Eigen/Cholesky" />
 		<Unit filename="lib/Eigen/CholmodSupport" />
@@ -435,6 +438,7 @@
 		<Unit filename="src/common/include/Dynamics.h" />
 		<Unit filename="src/common/include/Math.h" />
 		<Unit filename="src/common/include/Matrix.h" />
+		<Unit filename="src/common/include/Molecule.h" />
 		<Unit filename="src/common/include/ODE.h" />
 		<Unit filename="src/common/include/RocketShape.h" />
 		<Unit filename="src/common/include/Table.h" />

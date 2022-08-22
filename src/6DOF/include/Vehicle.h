@@ -5,6 +5,7 @@
 #include <array>
 #include <cmath>
 
+#include "../../common/include/Dynamics.h"
 #include "Stage.h"
 #include "Planet.h"
 #include "../../common/include/Cartesian.h"
@@ -36,6 +37,8 @@ public:
 
     State state;
 
+    std::array<double,6> inertia; // from COG in kg m2
+
     Axis ECI;
 
     Planet planet;
@@ -53,9 +56,9 @@ public:
 
     inline void add_stage(Stage* stage) {
         stages.emplace_back(stage);
-        stage.set_vehicle(this);
+        stage->set_vehicle(this);
     }
 
-    void get_state_rate(const std::array<double,N>& x, const double t, std::array<double,N>& dx) override;
+    void get_state_rate(const std::array<double,14>& x, const double t, std::array<double,14>& dx) override;
 
 };

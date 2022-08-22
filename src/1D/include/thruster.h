@@ -1,11 +1,13 @@
 #pragma once
 
-#include <fuctional>
 #include <vector>
 #include <cmath>
+#include <memory>
 #include "../../common/include/Constants.h"
 
 class Thruster {
+
+protected:
 
     double thrust;
 
@@ -30,8 +32,8 @@ public:
 
 struct Fuel {
 
-    static constexpr double KNSU_DENSITY = 1.8;
-    static constexpr double KNSU_HEATING_VALUE = 3.9e5;
+    static constexpr double KNSU_DENSITY = 1820; // kg / m3
+    static constexpr double KNSU_HEATING_VALUE = 5.77392e6; // J/kg
     static constexpr double KNSU_GAS_GAMMA = 1.05; // approx with 2 phase flow
     static constexpr double KNSU_GAS_MW = 0.042;
 
@@ -43,9 +45,9 @@ struct Fuel {
 
     inline Fuel(double d, double h, double k, double mw) : density(d), heating_value(h), gas_gamma(k), gas_MW(mw) {}
 
-    virtual double burn_rate(double pressure, double temperature);
+    virtual double burn_rate(double pressure, double temperature) = 0;
 
-    static double saint_roberts_burn(double a, double n, double r0, double P) {
+    static inline double saint_roberts_burn(double a, double n, double r0, double P) {
         return a*pow(P,n) + r0;
     }
 
@@ -70,7 +72,7 @@ struct Fuel_KNSU : Fuel {
     }
 };
 
-struct Gas {
+struct Gas1D {
     double P_total;
     double T_total;
     double cp;
@@ -83,9 +85,9 @@ struct Gas {
 
 class Combustor {
 
-    double Area_throat;
-
 public:
+
+    double area_throat;
 
     double P_total;
 
@@ -104,9 +106,10 @@ public:
     double R_gas;
 
     Combustor();
+    virtual ~Combustor();
 
-    virtual void update(double throttle, double time);
-}
+    //virtual void update(double throttle, double time);
+};
 
 class Nozzle {
 
@@ -121,6 +124,7 @@ class Nozzle {
 public:
 
     Nozzle();
+    virtual ~Nozzle();
 
     inline void set_exit_area(double area) {
         this->area_exit = area;
@@ -129,9 +133,9 @@ public:
         }
     }
 
-    inline void set_combustor(std::unique_ptr<Combuster> combustor) {
+    inline void set_combustor(std::unique_ptr<Combustor> combustor) {
         this->combustor = std::move(combustor);
-        this->area_ratio = area/this->combustor->area_throat;
+        this->area_ratio = this->area_exit/this->combustor->area_throat;
     }
 
     inline void set_nozzle_efficiency(double nozzle_efficiency) {
@@ -140,7 +144,7 @@ public:
 
     static inline double chocked_flow_mass_flux(double p_total, double t_total, double k, double mw) {
         double k1 = k+1;
-        return p_total*sqrt(k*mw/(t_total*physics::R_GAS*pow(0.5*k1,k1/(k-1))));
+        return p_total*sqrt(k*mw/(t_total*Constants::GAS_CONSTANT*pow(0.5*k1,k1/(k-1))));
     }
 
     static double isentropic_exit_mach(double area_ratio, double k);
@@ -153,7 +157,9 @@ public:
 
 class SolidThruster : public Thruster {
 
-    std::vector<double> time;
+protected:
+
+    std::vector<double> times;
 
     std::vector<double> mass_rates;
 
@@ -173,7 +179,7 @@ public:
     virtual ~SolidThruster();
 
     inline void set_areas(double area_throat, double area_exit) {
-        this->area_ratio = area_exit/area_exit;
+        this->area_ratio = area_exit/area_throat;
         this->area_exit = area_exit;
         this->area_throat = area_throat;
     }
@@ -184,21 +190,21 @@ public:
 
     void load(std::string fn);
 
-}
+};
 
 class SugarThruster : public SolidThruster {
-
 
 
 public:
 
     std::unique_ptr<Fuel> fuel;
 
-    public SugarThruster();
+    SugarThruster();
+    ~SugarThruster();
 
     void compute(double A_b, double V, double M_fuel, double dt);
 
-    void update(double ambient_pressure, double time, double throttle);
+    //void update(double ambient_pressure, double time, double throttle);
 
 
-}
+};

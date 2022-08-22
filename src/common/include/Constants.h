@@ -2,8 +2,6 @@
 
 namespace Constants {
 
-    const double GAS_CONSTANT;
-    
-}
+    constexpr double GAS_CONSTANT = 8.31446261815324;
 
-const double Constants::GAS_CONSTANT = 8.31446261815324;
+}

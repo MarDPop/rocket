@@ -20,8 +20,8 @@ for ((i=0; i<$len; i++)); do
         continue
     fi
 
-    for filename in $files; do
-        
+    for filename in ${files[@]}; do
+
         fn=${filename%.*}
         ext=${filename#$fn.} 
 
@@ -53,6 +53,8 @@ for ((i=0; i<$len; i++)); do
         ${cmd[@]}
     fi
 done
+
+echo "running test"
 
 ./bin/test.exe
 

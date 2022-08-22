@@ -1,18 +1,18 @@
 #include "../include/Vehicle.h"
 
-void Vehicle::get_state_rate(const std::array<double,N>& x, const double t, std::array<double,N>& dx) {
+void Vehicle::get_state_rate(const std::array<double,14>& x, const double t, std::array<double,14>& dx) {
     this->current_stage->set_mass(x[13]);
 
     this->current_stage->update_force_and_moment();
 
-    dx[13] = this->current_stage->get_mass_rate();
+    dx[13] = this->current_stage->mdot;
 
-    Vector Force_in_inertial = this->ECI.transpose_mult(this->current_stage.force);
+    Vector Force_in_inertial = this->ECI.transpose_mult(this->current_stage->force);
 
     double x_inv = 1.0/x[13];
     for(int i = 0; i < 3; i++) {
-        dx[i] = x[i3];
-        dx[i3] = Force_in_inertial.data[i]*x_inv + this->planet.gravity.acceleration.data[i];
+        dx[i] = x[i+3];
+        dx[i+3] = Force_in_inertial.data[i]*x_inv + this->planet.gravity->acceleration[i];
     }
 
     // Integration of quaternion
@@ -22,17 +22,17 @@ void Vehicle::get_state_rate(const std::array<double,N>& x, const double t, std:
     dx[9] = 0.5*(x[10]*x[8] + x[11]*x[7] - x[10]*x[9]);
 
     // Integration of angular velocity
-    if(this->is_symmetric) {
-        dx[10] = this->current_stage.moment.data[0]/this->inertia[0];
-        dx[11] = this->current_stage.moment.data[1]/this->inertia[1];
-        dx[12] = this->current_stage.moment.data[2]/this->inertia[2];
+    if(this->current_stage->is_symmetric) {
+        dx[10] = this->current_stage->moment.data[0]/this->inertia[0];
+        dx[11] = this->current_stage->moment.data[1]/this->inertia[1];
+        dx[12] = this->current_stage->moment.data[2]/this->inertia[2];
         return;
     }
 
-    if(this->is_plane) {
-        dx[11] = (this->current_stage.moment.data[1] + this->inertia[4]*(x[12]*x[12] - x[10]*x[10]) + x[10]*x[12]*(this->inertia[0] - this->inertia[2]))/this->inertia[1];
-        double y1 = this->current_stage.moment.data[0] + x[11]*(x[12]*(this->inertia[1] - this->inertia[2]) + x[10]*this->inertia[4]);
-        double y2 = this->current_stage.moment.data[2] + x[11]*(x[10]*(this->inertia[0] - this->inertia[1]) - x[12]*this->inertia[4]);
+    if(this->current_stage->is_plane) {
+        dx[11] = (this->current_stage->moment.data[1] + this->inertia[4]*(x[12]*x[12] - x[10]*x[10]) + x[10]*x[12]*(this->inertia[0] - this->inertia[2]))/this->inertia[1];
+        double y1 = this->current_stage->moment.data[0] + x[11]*(x[12]*(this->inertia[1] - this->inertia[2]) + x[10]*this->inertia[4]);
+        double y2 = this->current_stage->moment.data[2] + x[11]*(x[10]*(this->inertia[0] - this->inertia[1]) - x[12]*this->inertia[4]);
 
         double det = 1/(this->inertia[0]*this->inertia[2] + this->inertia[4]*this->inertia[4]);
 
@@ -47,10 +47,10 @@ void Vehicle::get_state_rate(const std::array<double,N>& x, const double t, std:
     Iw[2] = this->inertia[4]*x[10] + this->inertia[5]*x[11] + this->inertia[2]*x[12];
 
     double wxIw[3];
-    Cartesian::cross(&x[10],Iw,wxIx);
-    Iw[0] = this->current_stage.moment.data[0] - wxIw[0];
-    Iw[1] = this->current_stage.moment.data[1] - wxIw[1];
-    Iw[2] = this->current_stage.moment.data[2] - wxIw[2];
+    Cartesian::cross(&x[10],Iw,wxIw);
+    Iw[0] = this->current_stage->moment.data[0] - wxIw[0];
+    Iw[1] = this->current_stage->moment.data[1] - wxIw[1];
+    Iw[2] = this->current_stage->moment.data[2] - wxIw[2];
 
     double A[9];
     A[0] = this->inertia[1]*this->inertia[2] - this->inertia[5]*this->inertia[5];
