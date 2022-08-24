@@ -202,7 +202,7 @@ public:
     SugarThruster();
     ~SugarThruster();
 
-    void compute(double A_b, double V, double M_fuel, double dt);
+    void compute(double A_b, double V, double M_fuel, double deltaT);
 
     //void update(double ambient_pressure, double time, double throttle);
 

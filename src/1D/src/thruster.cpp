@@ -37,11 +37,11 @@ double Nozzle::isentropic_exit_mach(double area_ratio, double k) {
 
     area_ratio *= pow(k2,ex);
 
-    double M_guess = 3*(area_ratio - 0.5);
+    double M_guess = sqrt(area_ratio) + 0.1;
 
     k1 *= 0.5;
 
-    for(int iter = 0; iter < 20; iter++) {
+    for(int iter = 0; iter < 50; iter++) {
         double df = 1.0/M_guess;
         double tmp = 1 + k1*M_guess*M_guess;
         double f = pow(tmp,ex)*df;
@@ -106,7 +106,7 @@ SugarThruster::SugarThruster() {}
 
 SugarThruster::~SugarThruster() {}
 
-void SugarThruster::compute(double A_b, double V, double M_fuel, double dt) {
+void SugarThruster::compute(double A_b, double V, double M_fuel, double deltaT) {
 
     this->times.clear();
     this->mass_rates.clear();
@@ -136,6 +136,7 @@ void SugarThruster::compute(double A_b, double V, double M_fuel, double dt) {
 
     double P_crit = P/p_ratio;
     double m_constant = pow(2/k2,0.5*k2/k1)*this->area_throat;
+    //double e_constant = cp/(1+0.5*k1);
 
     double rho = P/(R_gas*T);
     double M = rho*V;
@@ -144,10 +145,12 @@ void SugarThruster::compute(double A_b, double V, double M_fuel, double dt) {
     double m_dot = 0;
     double time = 0;
     double t_record = 0;
-    double DT = 1e-6;
+    double dt = 5e-7;
     double dV, RT, M_in, pe,ve;
     double T_burnout = -1;
     double P_burnout = 0;
+    double time_burnout = -1;
+    double time_fizzle = -1;
     double burnout_const = 0;
     while(time < 10) {
 
@@ -173,15 +176,35 @@ void SugarThruster::compute(double A_b, double V, double M_fuel, double dt) {
 
         } else {
 
-            if(T_burnout < 0) {
-                T_burnout = time;
+            if(time_burnout < 0) {
+                time_burnout = time;
                 P_burnout = P;
-                burnout_const = -sqrt(R_gas*T)*m_constant/V;
+                T_burnout = T;
+                burnout_const = -sqrt(RT)*m_constant/V;
+            } else {
+
+                if(time_fizzle < 0) {
+                    M -= m_dot*dt;
+                    rho = M/V;
+                    P = rho*RT;
+
+                } else {
+                    P = P_burnout*exp(burnout_const*(time-time_burnout));
+
+                    if(P < P_crit) {
+                        time_fizzle = time;
+                        rho = P/RT;
+                        M = rho*V;
+                    }
+
+                    T = P/P_burnout*T_burnout;
+                    RT = R_gas*T;
+                    rho = P/RT;
+                }
+
             }
 
-            P = P_burnout*exp(burnout_const*(time-T_burnout));
-
-            if(P < 1.001e5) {
+            if(P < 1.0001e5) {
                 break;
             }
         }
@@ -208,10 +231,10 @@ void SugarThruster::compute(double A_b, double V, double M_fuel, double dt) {
             this->mass_rates.push_back(m_dot);
             this->p_exit.push_back(pe);
             this->v_exit.push_back(ve);
-            t_record += dt;
+            t_record += deltaT;
         }
 
-        time += DT;
+        time += dt;
     }
 
 
