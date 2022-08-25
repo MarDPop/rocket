@@ -32,6 +32,10 @@ Stage::Stage(const double& empty, const double& full, const std::array<double,6>
     } else {
         this->is_symmetric = false;
     }
+
+    this->actions.push_back(this->GNC); // GNC must be first
+    this->actions.push_back(this->aero);
+    this->actions.push_back(this->thruster);
 }
 
 void Stage::set_mass(double mass) {
@@ -57,7 +61,15 @@ void Stage::set_mass(double mass) {
 }
 
 void Stage::compute() {
-    //for(auto& a : this->actions) {
+    this->vehicle->force.zero();
+    this->vehicle->moment.zero();
 
-    //}
+    for(auto& a : this->actions) {
+        a.update(this->vehicle->Talo);
+        Vector torque = a.center.cross(a.force);
+        for(int i = 0; i < 3; i++) {
+            this->vehicle->force.data[i] += a.force.data[i];
+            this->vehicle->moment.data[i] += a.moment.data[i] + torque.data[i];
+        }
+    }
 }
