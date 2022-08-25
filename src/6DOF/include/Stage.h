@@ -9,7 +9,7 @@
 
 class Vehicle;
 
-class Stage : public Action {
+class Stage {
 
 friend class Vehicle;
 
@@ -52,6 +52,6 @@ public:
         this->vehicle = v;
     }
 
-    void update_force_and_moment();
+    void compute();
 
 };

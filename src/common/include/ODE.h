@@ -119,7 +119,7 @@ protected:
 public:
     Recording<N> recording;
 
-	std::function<bool (const std::array<double,6>&,const double&)> stop = [](const std::array<double,6>&,const double&){return false;};
+	std::function<bool (const std::array<double,N>&,const double&)> stop = [](const std::array<double,N>&,const double&){return false;};
 
     virtual void step() = 0;
 
@@ -183,7 +183,7 @@ class ODE_Euler : public virtual ODE_Base<N> {
 public:
     void step(){
 		this->dynamics->get_state_rate(this->state,this->time,this->state_rate);
-        for(int i = 0; i < N;i++){
+        for(int i = 0; i < N;i++) {
             this->state[i] += this->state_rate[i]*this->dt;
         }
         this->time += this->dt;

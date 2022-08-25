@@ -38,6 +38,8 @@ void test() {
     thruster.compute(A,V,M,5e-4);
 
     thruster.save("test_thruster.txt");
+
+
 }
 
 int main(int argc, char *argv[]) {

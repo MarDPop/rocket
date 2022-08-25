@@ -46,7 +46,7 @@ namespace Cartesian {
             std::copy(b,b+3,this->data);
         }
 
-        inline Vector(double x,double y,double z) : data{x,y,z} {
+        inline Vector(double x, double y ,double z) : data{x,y,z} {
         }
 
         inline void operator=(const double* b) {
@@ -279,6 +279,72 @@ namespace Cartesian {
 
             return Inv;
         }
+
+    };
+
+    struct Spherical {
+        alignas(32) double data[3];
+
+        Spherical() {}
+
+        Spherical(double r, double el, double az) data{r,el,az} {
+        }
+
+        Spherical(double b[3]) {
+            std::copy_n(b,3,this->data);
+        }
+
+        Spherical(const Spherical& b) {
+            std::copy_n(b.data,3,this->data);
+        }
+
+        Spherical(const Cartesian& x) {
+            this->data[0] = x.norm();
+            this->data[1] = asin(x[2]/this->data[0]);
+            this->data[2] = atan2(x[1],x[0]);
+        }
+
+        Cartesian to_cartesian() {
+            Cartesian out;
+            out.data[2] = sin(this->data[1]);
+            double r_t = sqrt(1.0 - out.data[2]*out.data[2])*this->data[0];
+            out.data[0] = cos(this->data[2])*r_t;
+            out.data[1] = sin(this->data[2])*r_t;
+            out.data[2] *= this->data[0];
+            return out;
+        }
+
+        inline double r() const {
+            return data[0];
+        }
+
+        inline void r(double v) {
+            data[0] = v;
+        }
+
+        inline double el() const {
+            return data[1];
+        }
+
+        inline void el(double v) {
+            data[1] = v;
+        }
+
+        inline double az() const {
+            return data[2];
+        }
+
+        inline void az(double v) {
+            data[2] = v;
+        }
+
+    };
+
+    struct Quaternion {
+
+        alignas(32) double data[4];
+
+        Quaternion() {}
 
     };
 

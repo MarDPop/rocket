@@ -19,7 +19,7 @@
 
 1661126430 /home/marius/Repos/C++/rocket/src/common/include/Constants.h
 
-1661311009 source:/home/marius/Repos/C++/rocket/src/1D/src/thruster.cpp
+1661311771 source:/home/marius/Repos/C++/rocket/src/1D/src/thruster.cpp
 	"../include/thruster.h"
 	"../../common/include/fluid.h"
 	"../../common/include/util.h"
@@ -35,29 +35,32 @@
 	<string>
 	<vector>
 
-1661131772 /home/marius/Repos/C++/rocket/src/common/include/util.h
+1661401024 /home/marius/Repos/C++/rocket/src/common/include/util.h
 	<fstream>
 	<string>
 	<vector>
+	<cmath>
 
-1661128816 source:/home/marius/Repos/C++/rocket/src/6DOF/src/Vehicle.cpp
+1661400984 source:/home/marius/Repos/C++/rocket/src/6DOF/src/Vehicle.cpp
 	"../include/Vehicle.h"
+	"../../common/include/util.h"
 
-1661128847 /home/marius/Repos/C++/rocket/src/6DOF/include/Vehicle.h
+1661400634 /home/marius/Repos/C++/rocket/src/6DOF/include/Vehicle.h
 	<vector>
 	<memory>
 	<array>
 	<cmath>
+	<functional>
 	"../../common/include/Dynamics.h"
 	"Stage.h"
 	"Planet.h"
 	"../../common/include/Cartesian.h"
 
-1660007775 /home/marius/Repos/C++/rocket/src/common/include/Dynamics.h
+1661400614 /home/marius/Repos/C++/rocket/src/common/include/Dynamics.h
 	<array>
 	<stdint.h>
 
-1661128636 /home/marius/Repos/C++/rocket/src/6DOF/include/Stage.h
+1661393621 /home/marius/Repos/C++/rocket/src/6DOF/include/Stage.h
 	<array>
 	<memory>
 	"Action.h"
@@ -103,7 +106,7 @@
 
 1657498404 /home/marius/Repos/C++/rocket/src/6DOF/include/Geoid.h
 
-1661128866 source:/home/marius/Repos/C++/rocket/src/6DOF/src/Stage.cpp
+1661393807 source:/home/marius/Repos/C++/rocket/src/6DOF/src/Stage.cpp
 	"../include/Stage.h"
 	"../include/Vehicle.h"
 
