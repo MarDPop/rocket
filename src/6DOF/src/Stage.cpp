@@ -33,7 +33,7 @@ Stage::Stage(const double& empty, const double& full, const std::array<double,6>
         this->is_symmetric = false;
     }
 
-    this->actions.emplace_back(this->GNC); // GNC must be first
+    this->actions.emplace_back(this->gnc); // GNC must be first
     this->actions.emplace_back(this->aero);
     this->actions.emplace_back(this->thruster);
 }
@@ -65,11 +65,11 @@ void Stage::compute() {
     this->vehicle->moment.zero();
 
     for(auto& a : this->actions) {
-        a.update(this->vehicle->Talo);
-        Vector torque = a.center.cross(a.force);
+        a->update(this->vehicle->Talo);
+        Vector torque = a->center.cross(a->force);
         for(int i = 0; i < 3; i++) {
-            this->vehicle->force.data[i] += a.force.data[i];
-            this->vehicle->moment.data[i] += a.moment.data[i] + torque.data[i];
+            this->vehicle->force.data[i] += a->force.data[i];
+            this->vehicle->moment.data[i] += a->moment.data[i] + torque.data[i];
         }
     }
 }

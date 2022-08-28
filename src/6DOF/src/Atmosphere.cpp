@@ -33,7 +33,7 @@ void AtmosphereTable::load(const char* fn) {
 }
 
 void AtmosphereTable::add(double alt, const std::array< double, 5 >& values) {
-    if(this->altitudes.isempty()){
+    if(this->altitudes.empty()){
         this->altitudes.push_back(alt);
         this->data.push_back(values);
         return;
@@ -81,12 +81,45 @@ void AtmosphereTable::add(double alt, const std::array< double, 5 >& values) {
     this->delta.insert(this->delta.begin()+idx,d);
 }
 
-bool AtmosphereUS1976::get_air(const std::array<double,3>& LLA, double time) {
-     if(LLA[2] > 86) {
+bool AtmosphereTable::get_air(const std::array<double,3>& LLA, double time) {
+    if(LLA[2] > this->altitudes.back()) {
         return false;
     }
 
-    if(LLA[0] <= 0) {
+    if(LLA[2] < this->altitudes[0]) {
+        this->air.density = this->data[0][1];
+        this->air.pressure = this->data[0][0];
+        this->air.speed_of_sound = this->data[0][2];
+        this->air.temperature = this->data[0][3];
+        this->air.dynamic_viscosity = this->data[0][4];
+        return true;
+    }
+
+    while(this->altitudes[this->idx] > LLA[2]) {
+        this->idx--;
+    }
+
+    while(this->altitudes[this->idx + 1] < LLA[2]) {
+        this->idx++;
+    }
+
+    double factor = LLA[2] - this->altitudes[idx];
+
+    const double* row = this->data[idx].data();
+    const double* d = this->delta[idx].data();
+
+    for( int i = 0; i < 5; i++) {
+        this->air.data[i] = row[i] + factor*d[i];
+    }
+    return true;
+}
+
+bool AtmosphereUS1976::get_air(const std::array<double,3>& LLA, double time) {
+    if(LLA[2] > 86) {
+        return false;
+    }
+
+    if(LLA[2] <= 0) {
         this->air.density = this->data[0][1];
         this->air.pressure = this->data[0][0];
         this->air.speed_of_sound = this->data[0][2];
@@ -99,8 +132,8 @@ bool AtmosphereUS1976::get_air(const std::array<double,3>& LLA, double time) {
 
     double factor = LLA[2] - idx;
 
-    const double* row = this->data[idx];
-    const double* d = this->delta[idx];
+    const double* row = AtmosphereUS1976::data[idx];
+    const double* d = AtmosphereUS1976::delta[idx];
 
     for( int i = 0; i < 5; i++) {
         this->air.data[i] = row[i] + factor*d[i];

@@ -79,9 +79,14 @@ public:
 
     void add(double alt, const std::array< double, 5 >& values);
 
+    bool get_air(const std::array<double,3>& LLA, double time) override;
+
 };
 
 class AtmosphereUS1976 : public Atmosphere {
+
+
+public:
 
     //pressure(Pa), density (kg/m3), speed_sound (m/s), temp (K), dynamic viscosity (Pa s)
     static constexpr double data[87][5] = {{101325.0,1.225,340.294,288.15,1.81206e-05},
@@ -259,7 +264,6 @@ class AtmosphereUS1976 : public Atmosphere {
 {-7.2561e-02,-1.2788e-06,-1.2470e+00,-1.7040e+00,-1.0200e-07},
 {-6.0697e-02,-1.1311e-06,0.0000e+00,0.0000e+00,0.0000e+00}};
 
-public:
 
     AtmosphereUS1976() {}
 

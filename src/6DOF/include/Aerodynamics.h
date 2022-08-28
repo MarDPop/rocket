@@ -3,7 +3,10 @@
 #include "Action.h"
 #include "Atmosphere.h"
 
+class Vehicle;
+
 class Aerodynamics : public virtual Action {
+protected:
 
     Vehicle* vehicle;
 
@@ -13,10 +16,7 @@ public:
 
     Aerodynamics() {}
 
-    inline void set_vehicle(Vehicle* vehicle){
-        this->vehicle = vehicle;
-        this->air = vehicle->planet->atmosphere->air;
-    }
+    void set_vehicle(Vehicle* vehicle);
 
 };
 

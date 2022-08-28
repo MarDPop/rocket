@@ -77,23 +77,23 @@ public:
     inline void set_stage(unsigned int stage_idx){
         if(stage_idx < this->stages.size()) {
             this->current_stage_idx = stage_idx;
-            this->current_stage = this->stages[stage_idx];
+            this->current_stage = this->stages[stage_idx].get();
 
             if(this->current_stage->is_symmetric){
-                this->compute_moment = std::bind(&Vehicle::compute_symmetric_moment,std::placeholders::_1,std::placeholders::_2);
+                this->compute_moment = std::bind(&Vehicle::compute_symmetric_moment,this,std::placeholders::_1,std::placeholders::_2);
                 return;
             }
             if(this->current_stage->is_plane){
-                this->compute_moment = std::bind(&Vehicle::compute_plane_moment,std::placeholders::_1,std::placeholders::_2);
+                this->compute_moment = std::bind(&Vehicle::compute_plane_moment,this,std::placeholders::_1,std::placeholders::_2);
                 return;
             }
 
             if(this->current_stage->is_ballistic || this->current_stage->is_3DOF) {
-                this->compute_moment = std::bind(&Vehicle::compute_no_moment,std::placeholders::_1,std::placeholders::_2);
+                this->compute_moment = std::bind(&Vehicle::compute_no_moment,this,std::placeholders::_1,std::placeholders::_2);
                 return;
             }
 
-            this->compute_moment = std::bind(&Vehicle::compute_full_moment,std::placeholders::_1,std::placeholders::_2);
+            this->compute_moment = std::bind(&Vehicle::compute_full_moment,this,std::placeholders::_1,std::placeholders::_2);
         }
     }
 

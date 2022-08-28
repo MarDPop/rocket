@@ -34,6 +34,8 @@ namespace Cartesian {
 
         inline Vector() {}
 
+        inline ~Vector(){}
+
         inline Vector(const char x) {
             memset(data,x,sizeof(data));
         }
@@ -180,16 +182,23 @@ namespace Cartesian {
 
     struct Axis {
 
-        alignas(32) double data[9];
-        double* const axis[3];
+        union {
+            alignas(32) double data[9];
+            struct {
+                Vector x;
+                Vector y;
+                Vector z;
+            } v;
+        };
 
-        Axis() : axis{&data[0],&data[3],&data[6]} {}
+        Axis() {}
+        ~Axis(){}
 
-        Axis(double b[9]) : axis{&data[0],&data[3],&data[6]} {
+        Axis(double b[9]) {
             std::copy_n(b,9,this->data);
         }
 
-        Axis(const Axis& b) : axis{&data[0],&data[3],&data[6]} {
+        Axis(const Axis& b) {
             std::copy_n(b.data,9,this->data);
         }
 
@@ -287,7 +296,7 @@ namespace Cartesian {
 
         Spherical() {}
 
-        Spherical(double r, double el, double az) data{r,el,az} {
+        Spherical(double r, double el, double az) : data{r,el,az} {
         }
 
         Spherical(double b[3]) {
@@ -298,14 +307,14 @@ namespace Cartesian {
             std::copy_n(b.data,3,this->data);
         }
 
-        Spherical(const Cartesian& x) {
+        Spherical(const Vector& x) {
             this->data[0] = x.norm();
             this->data[1] = asin(x[2]/this->data[0]);
             this->data[2] = atan2(x[1],x[0]);
         }
 
-        Cartesian to_cartesian() {
-            Cartesian out;
+        Vector to_cartesian() {
+            Vector out;
             out.data[2] = sin(this->data[1]);
             double r_t = sqrt(1.0 - out.data[2]*out.data[2])*this->data[0];
             out.data[0] = cos(this->data[2])*r_t;

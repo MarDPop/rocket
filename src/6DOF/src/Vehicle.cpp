@@ -19,7 +19,7 @@ void Vehicle::get_state_rate(std::array<double,14>& x, double t, std::array<doub
 
     this->set_orientation(&x[6]);
 
-    this->planet->update(this,t);
+    this->planet.update(this,t);
 
     this->current_stage->set_mass(x[13]);
 
@@ -42,7 +42,7 @@ void Vehicle::get_state_rate(std::array<double,14>& x, double t, std::array<doub
     dx[9] = 0.5*(x[10]*x[8] + x[11]*x[7] - x[10]*x[9]);
 
     // Integration of angular velocity
-    this->compute_moment(this,&x[10],&dx[10]);
+    this->compute_moment(&x[10],&dx[10]);
 }
 
 void Vehicle::compute_no_moment(double* w, double* dw) {
@@ -57,7 +57,7 @@ void Vehicle::compute_symmetric_moment(double* w, double* dw) {
     dw[2] = this->moment.data[2]/this->inertia[2];
 }
 
-void Vehicle::compute_plane_moment(double* x, double* dw) {
+void Vehicle::compute_plane_moment(double* w, double* dw) {
     dw[1] = (this->moment.data[1] + this->inertia[4]*(w[2]*w[2] - w[0]*w[0]) + w[0]*w[2]*(this->inertia[0] - this->inertia[2]))/this->inertia[1];
     double y1 = this->moment.data[0] + w[1]*(w[2]*(this->inertia[1] - this->inertia[2]) + w[0]*this->inertia[4]);
     double y2 = this->moment.data[2] + w[1]*(w[0]*(this->inertia[0] - this->inertia[1]) - w[2]*this->inertia[4]);

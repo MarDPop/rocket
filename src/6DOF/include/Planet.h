@@ -7,6 +7,8 @@
 #include "../../common/include/Cartesian.h"
 #include "../../common/include/Time.h"
 
+class Vehicle;
+
 using namespace Cartesian;
 
 struct Geodetic {
