@@ -1,5 +1,8 @@
 #include "../include/Atmosphere.h"
+#include "../../common/include/util.h"
 
+#include <fstream>
+#include <string>
 
 bool AtmosphereBasic::get_air(const std::array<double,3>& LLA, double time) {
     double factor = exp(-LLA[2]/scale_height);
@@ -8,9 +11,25 @@ bool AtmosphereBasic::get_air(const std::array<double,3>& LLA, double time) {
     return true;
 }
 
-
 void AtmosphereTable::load(const char* fn) {
-
+    std::ifstream file;
+    file.open(fn);
+    if(file.is_open()) {
+        std::string line;
+        while(getline(file,line)){
+            auto row = util::split(line);
+            if(row.size() < 6) {
+                continue;
+            }
+            double h = std::stod(row[0]);
+            std::array<double,5> values;
+            for(int i = 0; i < 5;i++) {
+                values[i] = std::stod(row[i+1]);
+            }
+            this->add(h,values);
+        }
+        file.close();
+    }
 }
 
 void AtmosphereTable::add(double alt, const std::array< double, 5 >& values) {

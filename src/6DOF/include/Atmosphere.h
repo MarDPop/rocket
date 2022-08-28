@@ -79,8 +79,6 @@ public:
 
     void add(double alt, const std::array< double, 5 >& values);
 
-
-
 };
 
 class AtmosphereUS1976 : public Atmosphere {
