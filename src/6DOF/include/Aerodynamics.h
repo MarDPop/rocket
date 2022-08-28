@@ -3,7 +3,9 @@
 #include "Action.h"
 #include "Atmosphere.h"
 
-class Aerodynamics : public Action {
+class Aerodynamics : public virtual Action {
+
+    Vehicle* vehicle;
 
     Air* air;
 
@@ -11,8 +13,9 @@ public:
 
     Aerodynamics() {}
 
-    inline void set_air(Air* air) {
-        this->air = air;
+    inline void set_vehicle(Vehicle* vehicle){
+        this->vehicle = vehicle;
+        this->air = vehicle->planet->atmosphere->air;
     }
 
 };
@@ -32,5 +35,7 @@ class AerodynamicsBasic : public Aerodynamics {
 public:
 
     AerodynamicsBasic() {}
+
+    void update(double time);
 
 };

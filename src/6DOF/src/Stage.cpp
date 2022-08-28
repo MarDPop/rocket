@@ -33,9 +33,9 @@ Stage::Stage(const double& empty, const double& full, const std::array<double,6>
         this->is_symmetric = false;
     }
 
-    this->actions.push_back(this->GNC); // GNC must be first
-    this->actions.push_back(this->aero);
-    this->actions.push_back(this->thruster);
+    this->actions.emplace_back(this->GNC); // GNC must be first
+    this->actions.emplace_back(this->aero);
+    this->actions.emplace_back(this->thruster);
 }
 
 void Stage::set_mass(double mass) {

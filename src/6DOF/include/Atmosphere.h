@@ -33,12 +33,17 @@ class Atmosphere {
 
 public:
 
+    Air air;
+
     double max_height;
 
     /**
     * returns false if air was computed
     */
-    virtual bool get_air(Air& air, const std::array<double,3>& LLA) = 0;
+    virtual bool get_air(const std::array<double,3>& LLA, double time) = 0;
+
+    Atmosphere(){}
+    virtual ~Atmosphere(){}
 
 };
 
@@ -51,12 +56,7 @@ class AtmosphereBasic : public Atmosphere {
 public:
     AtmosphereBasic() : scale_height(8.4), sea_pressure(101325), sea_density(1.22), sea_temp(297), R_gas(Air::R_DRY_AIR)  {}
 
-    bool get_air(Air& air, const std::array<double,3>& LLA) {
-        double factor = exp(-LLA[2]/scale_height);
-        air.density = sea_density*factor;
-        air.pressure = sea_pressure*factor;
-        return true;
-    }
+    bool get_air(const std::array<double,3>& LLA, double time) override;
 };
 
 class AtmosphereTable : public Atmosphere {
@@ -71,7 +71,15 @@ class AtmosphereTable : public Atmosphere {
 
 public:
 
-    AtmosphereTable() {}
+    AtmosphereTable(){}
+
+    void load(const std::vector<double>& Alt, const std::vector< std::array< double, 5 > >& Data);
+
+    void load(const char* fn);
+
+    void add(double alt, const std::array< double, 5 >& values);
+
+
 
 };
 
@@ -257,32 +265,7 @@ public:
 
     AtmosphereUS1976() {}
 
-    bool get_air(Air& air, const std::array<double,3>& LLA) {
-        if(LLA[2] > 86) {
-            return false;
-        }
-
-        if(LLA[0] <= 0) {
-            air.density = this->data[0][1];
-            air.pressure = this->data[0][0];
-            air.speed_of_sound = this->data[0][2];
-            air.temperature = this->data[0][3];
-            air.dynamic_viscosity = this->data[0][4];
-            return true;
-        }
-
-        int idx = int(LLA[2]);
-
-        double factor = LLA[2] - idx;
-
-        const double* row = this->data[idx];
-        const double* d = this->delta[idx];
-
-        for( int i = 0; i < 5; i++) {
-            air.data[i] = row[i] + factor*d[i];
-        }
-        return true;
-    }
+    bool get_air(const std::array<double,3>& LLA, double time) override;
 
 };
 

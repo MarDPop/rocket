@@ -35,13 +35,11 @@ friend class Vehicle;
 
     std::vector< std::unique_ptr< Action > > actions;
 
+    GNC* gnc = nullptr;
+    Aerodynamics* aero = nullptr;
+    Thruster* thruster = nullptr;
+
 public:
-
-    std::unique_ptr< GNC > gnc;
-
-    std::unique_ptr< Aerodynamics > aero;
-
-    std::unique_ptr< Thruster > thruster;
 
     Stage(const double& empty, const double& full, const std::array<double,6>& empty_i, const std::array<double,6>& full_i,
             const std::array<double,3>& empty_x, const std::array<double,3>& full_x);
@@ -50,6 +48,22 @@ public:
 
     inline void set_vehicle(Vehicle* v) {
         this->vehicle = v;
+    }
+
+    inline void set_GNC(std::unique_ptr<GNC> gnc) {
+        this->gnc = gnc.get();
+        this->actions[0] = std::move(gnc);
+    }
+
+    inline void set_aerodynamics(std::unique_ptr<Aerodynamics> aero) {
+        this->aero = aero.get();
+        this->actions[1] = std::move(aero);
+
+    }
+
+    inline void set_thruster(std::unique_ptr<Thruster> thruster) {
+        this->thruster = thruster.get();
+        this->actions[2] = std::move(thruster);
     }
 
     void compute();

@@ -10,7 +10,11 @@ class GNC : public Action {
 
 public:
 
-    GNC(Vehicle* v) : vehicle(v) {}
-    ~GNC(){}
+    GNC();
+    ~GNC();
+
+    inline void set_vehicle(Vehicle* vehicle) {
+        this->vehicle = vehicle;
+    }
 
 };
