@@ -41,7 +41,7 @@ friend class Vehicle;
 
 public:
 
-    Stage(const double& empty, const double& full, const std::array<double,6>& empty_i, const std::array<double,6>& full_i,
+    Stage(const double& empty_m, const double& full_m, const std::array<double,6>& empty_i, const std::array<double,6>& full_i,
             const std::array<double,3>& empty_x, const std::array<double,3>& full_x);
 
     void set_mass(double mass);

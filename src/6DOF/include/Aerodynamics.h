@@ -20,6 +20,19 @@ public:
 
 };
 
+class AerodynamicsDragOnly : public Aerodynamics {
+
+    const double CD_A;
+
+public:
+
+    AerodynamicsDragOnly(double CD, double A);
+    ~AerodynamicsDragOnly();
+
+    void update(double time) override;
+
+};
+
 class AerodynamicsBasic : public Aerodynamics {
 
     double CD0;
@@ -32,10 +45,12 @@ class AerodynamicsBasic : public Aerodynamics {
 
     double stall_angle;
 
+    double ref_area;
+
 public:
 
     AerodynamicsBasic() {}
 
-    void update(double time);
+    void update(double time) override;
 
 };

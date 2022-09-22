@@ -11,9 +11,9 @@ class Vehicle;
 
 using namespace Cartesian;
 
-struct Geodetic {
-    union {
-        double v[3];
+union Geodetic {
+    double v[3];
+    struct {
         double latitude;
         double longitude;
         double altitude;

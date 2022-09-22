@@ -44,6 +44,9 @@ void test_sugar() {
 
 void test() {
 
+    Vehicle rocket;
+
+
 
 }
 
