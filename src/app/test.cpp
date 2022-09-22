@@ -18,7 +18,7 @@ void test_rocket_shape() {
     util::print_table("test/test.txt",out.x,out.y );
 }
 
-void test() {
+void test_sugar() {
     SugarThruster thruster;
 
     thruster.fuel = std::make_unique<Fuel_KNSU>();
@@ -38,6 +38,11 @@ void test() {
     thruster.compute(A,V,M,5e-4);
 
     thruster.save("test_thruster.txt");
+
+
+}
+
+void test() {
 
 
 }

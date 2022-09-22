@@ -5,7 +5,7 @@
 #include <memory>
 #include "../../common/include/Constants.h"
 
-class Thruster {
+class Thruster1D {
 
 protected:
 
@@ -23,10 +23,10 @@ public:
         return this->mass_rate;
     }
 
-    Thruster() {}
-    virtual ~Thruster() {}
+    Thruster1D() {}
+    virtual ~Thruster1D() {}
 
-    virtual void update(double ambient_pressure, double time, double throttle);
+    virtual void update(double ambient_pressure, double time, double throttle) = 0;
 
 };
 
@@ -155,7 +155,7 @@ public:
 
 };
 
-class SolidThruster : public Thruster {
+class SolidThruster : public virtual Thruster1D {
 
 protected:
 

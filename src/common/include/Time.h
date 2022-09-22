@@ -3,9 +3,9 @@
 
 class Time {
 
-    double sec;
-
     int mjd;
+
+    double sec;
 
 public:
 

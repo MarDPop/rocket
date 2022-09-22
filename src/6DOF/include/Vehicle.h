@@ -13,7 +13,6 @@
 
 using namespace Cartesian;
 
-
 struct State {
     std::array<double,14> x;
     double* const position;

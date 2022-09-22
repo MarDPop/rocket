@@ -160,3 +160,161 @@
 
 1661402432 /home/marius/Repos/C++/rocket/src/common/include/Time.h
 
+1662824479 source:c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\1d\src\simulation.cpp
+	<string>
+	<vector>
+	<fstream>
+	<cmath>
+	"../include/thruster.h"
+
+1663816038 c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\1d\include\thruster.h
+	<vector>
+	<cmath>
+	<memory>
+	"../../common/include/Constants.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\common\include\constants.h
+
+1662824479 source:c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\1d\src\physics.cpp
+	"../include/physics.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\1d\include\physics.h
+
+1663814590 source:c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\app\test.cpp
+	<iostream>
+	"../1D/include/structures.h"
+	"../common/include/structures.h"
+	"../common/include/util.h"
+	"../common/include/RocketShape.h"
+	"../common/include/Cartesian.h"
+	"../1D/include/thruster.h"
+	<memory>
+	<cmath>
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\1d\include\structures.h
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\common\include\structures.h
+	<vector>
+	"util.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\common\include\util.h
+	<fstream>
+	<string>
+	<vector>
+	<cmath>
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\common\include\rocketshape.h
+	"structures.h"
+	<cmath>
+	<memory>
+	<fstream>
+	<string>
+	<iostream>
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\common\include\cartesian.h
+	<cmath>
+	<algorithm>
+	"string.h"
+
+1663815850 source:c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\1d\src\thruster.cpp
+	"../include/thruster.h"
+	"../../common/include/fluid.h"
+	"../../common/include/util.h"
+	<fstream>
+	<iostream>
+	<cmath>
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\common\include\fluid.h
+	"Molecule.h"
+	<cmath>
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\common\include\molecule.h
+	<string>
+	<vector>
+
+1662824479 source:c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\6dof\src\stage.cpp
+	"../include/Stage.h"
+	"../include/Vehicle.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\6dof\include\stage.h
+	<array>
+	<memory>
+	"Action.h"
+	"GNC.h"
+	"Aerodynamics.h"
+	"Thruster.h"
+
+1663814896 c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\6dof\include\action.h
+	"../../common/include/Cartesian.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\6dof\include\gnc.h
+	"Action.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\6dof\include\aerodynamics.h
+	"Action.h"
+	"Atmosphere.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\6dof\include\atmosphere.h
+	<array>
+	<cmath>
+	<vector>
+
+1663816120 c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\6dof\include\thruster.h
+	"Component.h"
+	"Action.h"
+	<string>
+
+1663816288 c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\6dof\include\component.h
+	"../../common/include/Cartesian.h"
+
+1663729420 c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\6dof\include\vehicle.h
+	<vector>
+	<memory>
+	<array>
+	<cmath>
+	<functional>
+	"../../common/include/Dynamics.h"
+	"Stage.h"
+	"Planet.h"
+	"../../common/include/Cartesian.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\common\include\dynamics.h
+	<array>
+	<stdint.h>
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\6dof\include\planet.h
+	"Atmosphere.h"
+	"Gravity.h"
+	"Geoid.h"
+	<memory>
+	"../../common/include/Cartesian.h"
+	"../../common/include/Time.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\6dof\include\gravity.h
+	"../../common/include/Cartesian.h"
+	<array>
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\6dof\include\geoid.h
+
+1663815885 c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\common\include\time.h
+
+1662824479 source:c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\6dof\src\stagedynamics.cpp
+	"../include/StageDynamics.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\6dof\include\stagedynamics.h
+	<memory>
+	"../../common/include/Cartesian.h"
+	"../../common/include/Dynamics.h"
+	"Aerodynamics.h"
+	"GNC.h"
+	"Thruster.h"
+
+1663816152 source:c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\6dof\src\thruster.cpp
+	"../include/Thruster.h"
+	"../../common/include/util.h"
+	<fstream>
+
+1662824479 source:c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\6dof\src\vehicle.cpp
+	"../include/Vehicle.h"
+	"../../common/include/util.h"
+
