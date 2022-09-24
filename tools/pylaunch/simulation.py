@@ -28,8 +28,10 @@ class Motor:
         self.chamber_length = 1
         self.nozzle_factor = 1
         self.fuel_density = 1000 #kg / m3
-        self.fuel_burn_rate0 = 0.001 # m/s at 1bar
-        self.fuel_burn_rate_exp = 0.6
+        self.fuel_burn_rate0 = 0.0038 # m/s at 1bar
+        self.fuel_burn_rate_exp = 0.31 # approx for knsu
+        self.fuel_gamma = 1.055
+        self.fuel_MW = 0.041
         self.mass_rates = []
         self.exit_velocity = []
         self.exit_pressure = []
@@ -40,10 +42,63 @@ class Motor:
     def burn_rate(self,pressure): 
         return self.fuel_burn_rate0*(pressure**self.burn_rate_exp)
 
-    def compute(self,dt):
-        t = 0
-        while t < 10000:
+    @staticmethod
+    def aratio(mach,gamma):
+        ex = (gamma+1)*0.5/(gamma-1)
+        num = 2/(gamma+1)*(1 + 0.5*(gamma-1)*mach*mach)
+        return (num**ex) / mach
 
+    @staticmethod
+    def mach_aratio(aratio,gamma):
+        M_lo = 1.001
+        M_hi = 10
+        M = (M_lo + M_hi)*0.5
+        for i in range(10):
+            a = Motor.aratio(M,gamma)
+            if a > aratio:
+                M_hi = M
+            else:
+                M_lo = M
+
+            M = (M_lo + M_hi)*0.5
+
+        return M
+            
+
+    def compute(self,DT):
+        t = 0
+
+        Astar = np.pi*self.throat_radius**2
+        R = 8.31445/self.fuel_MW
+        T0 = 1300 #guess chamber temp
+        rburn = chamber_radius*0.3
+        v0 = np.pi*rburn**2
+        p0 = 1e5
+        rho0 = p0/(R*T0)
+        Aburn = 2*np.pi*rburn*chamber_length
+        const_val = Astar*np.sqrt(self.fuel_gamma/(R*T0) * (2/(self.gamma+1))**((self.gamma+1)/(self.gamma-1)))
+
+        A_ratio = (self.exit_radius/self.throat_radius)**2
+        exit_mach = Motor.mach_aratio(A_ratio,self.fuel_gamma)
+
+        exit_beta = 1 + 0.5*(self.fuel_gamma-1)*exit_mach**2
+
+        supersonic_pressure_ratio = exit_beta**(self.fuel_gamma/(self.fuel_gamma-1))
+        exit_temp = T0/exit_beta
+        exit_speed = exit_mach*np.sqrt(self.fuel_gamma*R*exit_temp)
+
+        self.exit_pressure = [1e5]
+        self.exit_velocity = [0]
+        self.mass_rates = [0]
+        self.times = [0]
+
+        t_record = DT
+        dt = DT/10
+        while t < 10000:
+            burn_rate = self.burn_rate(p0*1e-5)
+
+            if(t > t_record):
+                self.exit_pressure = 
             t+=dt
 
 class Rocket:
