@@ -4,7 +4,7 @@
 
 Stage::Stage(const double& empty_m, const double& full_m, const std::array<double,6>& empty_i, const std::array<double,6>& full_i,const std::array<double,3>& empty_x, const std::array<double,3>& full_x) :
     mass_empty(empty_m), mass_full(full_m), inertia_empty(empty_i), inertia_full(full_i), COG_empty(empty_x), COG_full(full_x) {
-    this->dm = full - empty_m;
+    this->dm = full_m - empty_m;
 
     if(this->dm < 1e-3){
         this->is_ballistic = true;

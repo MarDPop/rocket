@@ -211,7 +211,7 @@
 	<string>
 	<iostream>
 
-1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\common\include\cartesian.h
+1664641777 c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\common\include\cartesian.h
 	<cmath>
 	<algorithm>
 	"string.h"
@@ -232,11 +232,11 @@
 	<string>
 	<vector>
 
-1662824479 source:c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\6dof\src\stage.cpp
+1664641787 source:c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\6dof\src\stage.cpp
 	"../include/Stage.h"
 	"../include/Vehicle.h"
 
-1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\6dof\include\stage.h
+1663817559 c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\6dof\include\stage.h
 	<array>
 	<memory>
 	"Action.h"
@@ -250,7 +250,7 @@
 1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\6dof\include\gnc.h
 	"Action.h"
 
-1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\6dof\include\aerodynamics.h
+1663818196 c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\6dof\include\aerodynamics.h
 	"Action.h"
 	"Atmosphere.h"
 
@@ -282,7 +282,7 @@
 	<array>
 	<stdint.h>
 
-1663816594 c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\6dof\include\planet.h
+1663816639 c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\6dof\include\planet.h
 	"Atmosphere.h"
 	"Gravity.h"
 	"Geoid.h"
@@ -318,9 +318,10 @@
 	"../include/Vehicle.h"
 	"../../common/include/util.h"
 
-1662824479 source:c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\6dof\src\aerodynamics.cpp
+1663819512 source:c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\6dof\src\aerodynamics.cpp
 	"../include/Aerodynamics.h"
 	"../include/Vehicle.h"
+	"../../common/include/Cartesian.h"
 
 1662824479 source:c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\6dof\src\atmosphere.cpp
 	"../include/Atmosphere.h"

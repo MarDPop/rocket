@@ -192,7 +192,7 @@ namespace Cartesian {
                 Vector x;
                 Vector y;
                 Vector z;
-            };
+            } axis;
         };
 
         inline Axis() {}
@@ -274,7 +274,6 @@ namespace Cartesian {
                 x.data[i] = A.data[irow]*b.data[0] + A.data[irow + 1]*b.data[1] + A.data[irow + 2]*b.data[2];
                 irow += 3;
             }
-            return b;
         }
 
         inline Axis get_transpose() const noexcept {
