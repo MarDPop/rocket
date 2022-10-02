@@ -176,7 +176,7 @@
 
 1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\1d\include\physics.h
 
-1664679134 source:c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\app\test.cpp
+1664724924 source:c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\app\test.cpp
 	<iostream>
 	"../1D/include/structures.h"
 	"../common/include/structures.h"
@@ -267,7 +267,7 @@
 1663816288 c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\6dof\include\component.h
 	"../../common/include/Cartesian.h"
 
-1664675016 c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\6dof\include\vehicle.h
+1664725568 c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\6dof\include\vehicle.h
 	<vector>
 	<memory>
 	<array>
@@ -275,7 +275,7 @@
 	<functional>
 	"../../common/include/Dynamics.h"
 	"Stage.h"
-	"Planet.h"
+	"Body.h"
 	"../../common/include/Cartesian.h"
 
 1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\common\include\dynamics.h
@@ -314,11 +314,11 @@
 	"../../common/include/util.h"
 	<fstream>
 
-1662824479 source:c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\6dof\src\vehicle.cpp
+1664725637 source:c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\6dof\src\vehicle.cpp
 	"../include/Vehicle.h"
 	"../../common/include/util.h"
 
-1663819512 source:c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\6dof\src\aerodynamics.cpp
+1664725616 source:c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\6dof\src\aerodynamics.cpp
 	"../include/Aerodynamics.h"
 	"../include/Vehicle.h"
 	"../../common/include/Cartesian.h"
@@ -334,7 +334,7 @@
 
 1664670086 c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\1d\include\simulation.h
 
-1664679662 source:c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\1d\src\vehicle.cpp
+1664679929 source:c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\1d\src\vehicle.cpp
 	"../include/Vehicle.h"
 	<iostream>
 	<cmath>
@@ -343,4 +343,27 @@
 	"thruster.h"
 	<memory>
 	<vector>
+
+1664725338 c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\6dof\include\body.h
+	"Atmosphere.h"
+	"Gravity.h"
+	<memory>
+	"../../common/include/Planet.h"
+	"../../common/include/Cartesian.h"
+	"../../common/include/Time.h"
+
+1664725559 c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\common\include\planet.h
+	"Ellipsoid.h"
+	"Geoid.h"
+	"Orthometric.h"
+	<memory>
+
+1664725178 c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\common\include\ellipsoid.h
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\common\include\geoid.h
+
+1664725589 c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\common\include\orthometric.h
+
+1664725546 source:c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\6dof\src\body.cpp
+	"../include/Body.h"
 

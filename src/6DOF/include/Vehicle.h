@@ -8,7 +8,7 @@
 
 #include "../../common/include/Dynamics.h"
 #include "Stage.h"
-#include "Planet.h"
+#include "Body.h"
 #include "../../common/include/Cartesian.h"
 
 using namespace Cartesian;
@@ -61,7 +61,7 @@ public:
     /**
     * Reference of planet in which vehicle is traveling
     */
-    Planet planet;
+    Body_Reference body;
 
     Vehicle();
     virtual ~Vehicle();

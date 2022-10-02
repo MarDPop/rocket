@@ -12,7 +12,7 @@
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Compiler>
-					<Add option="std=c++20" />
+					<Add option="-std=c++17" />
 					<Add option="-g" />
 				</Compiler>
 			</Target>
@@ -423,31 +423,35 @@
 		<Unit filename="src/6DOF/include/Action.h" />
 		<Unit filename="src/6DOF/include/Aerodynamics.h" />
 		<Unit filename="src/6DOF/include/Atmosphere.h" />
+		<Unit filename="src/6DOF/include/Body.h" />
 		<Unit filename="src/6DOF/include/Component.h" />
 		<Unit filename="src/6DOF/include/Control.h" />
 		<Unit filename="src/6DOF/include/GNC.h" />
-		<Unit filename="src/6DOF/include/Geoid.h" />
 		<Unit filename="src/6DOF/include/Gravity.h" />
-		<Unit filename="src/6DOF/include/Planet.h" />
 		<Unit filename="src/6DOF/include/Stage.h" />
 		<Unit filename="src/6DOF/include/StageDynamics.h" />
 		<Unit filename="src/6DOF/include/Thruster.h" />
 		<Unit filename="src/6DOF/include/Vehicle.h" />
 		<Unit filename="src/6DOF/src/Aerodynamics.cpp" />
 		<Unit filename="src/6DOF/src/Atmosphere.cpp" />
-		<Unit filename="src/6DOF/src/Planet.cpp" />
+		<Unit filename="src/6DOF/src/Body.cpp" />
 		<Unit filename="src/6DOF/src/Stage.cpp" />
 		<Unit filename="src/6DOF/src/StageDynamics.cpp" />
 		<Unit filename="src/6DOF/src/Thruster.cpp" />
 		<Unit filename="src/6DOF/src/Vehicle.cpp" />
+		<Unit filename="src/app/Scenario.h" />
 		<Unit filename="src/app/test.cpp" />
 		<Unit filename="src/common/include/Cartesian.h" />
 		<Unit filename="src/common/include/Constants.h" />
 		<Unit filename="src/common/include/Dynamics.h" />
+		<Unit filename="src/common/include/Ellipsoid.h" />
+		<Unit filename="src/common/include/Geoid.h" />
 		<Unit filename="src/common/include/Math.h" />
 		<Unit filename="src/common/include/Matrix.h" />
 		<Unit filename="src/common/include/Molecule.h" />
 		<Unit filename="src/common/include/ODE.h" />
+		<Unit filename="src/common/include/Orthometric.h" />
+		<Unit filename="src/common/include/Planet.h" />
 		<Unit filename="src/common/include/RocketShape.h" />
 		<Unit filename="src/common/include/Table.h" />
 		<Unit filename="src/common/include/Time.h" />

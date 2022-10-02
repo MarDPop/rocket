@@ -19,7 +19,7 @@ void Vehicle::get_state_rate(std::array<double,14>& x, double t, std::array<doub
 
     this->set_orientation(&x[6]);
 
-    this->planet.update(this,t);
+    this->body.update(this,t);
 
     this->current_stage->set_mass(x[13]);
 
@@ -32,7 +32,7 @@ void Vehicle::get_state_rate(std::array<double,14>& x, double t, std::array<doub
     double x_inv = 1.0/x[13];
     for(int i = 0; i < 3; i++) {
         dx[i] = x[i+3];
-        dx[i+3] = Force_in_inertial.data[i]*x_inv + this->planet.gravity->acceleration[i];
+        dx[i+3] = Force_in_inertial.data[i]*x_inv + this->body.gravity->acceleration[i];
     }
 
     // Integration of quaternion

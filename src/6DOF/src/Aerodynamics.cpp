@@ -6,7 +6,7 @@ using namespace Cartesian;
 
 void Aerodynamics::set_vehicle(Vehicle* vehicle) {
     this->vehicle = vehicle;
-    this->air = &(vehicle->planet.atmosphere->air);
+    this->air = &(vehicle->body.atmosphere->air);
 }
 
 AerodynamicsDragOnly::AerodynamicsDragOnly(double CD, double A) : CD_A(CD*A*-0.5) {}
@@ -15,7 +15,7 @@ AerodynamicsDragOnly::~AerodynamicsDragOnly() {}
 
 void AerodynamicsDragOnly::update(double time) {
 
-    Vector air_vel_in_body = this->vehicle->planet.ECEF * this->vehicle->planet.body_fixed_velocity;
+    Vector air_vel_in_body = this->vehicle->body.body_fixed_CS * this->vehicle->body.body_fixed_velocity;
 
     double drag_v = this->CD_A*this->air->density*air_vel_in_body.norm();
 

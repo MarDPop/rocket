@@ -51,15 +51,9 @@ void test_sugar() {
 
 void test() {
 
-    Vehicle_1D rocket;
+    Vehicle rocket;
 
-    rocket.launch();
 
-    std::cout << "num points = " << rocket.heights.size() << std::endl;
-
-    for(int i = 0; i < rocket.heights.size(); i++) {
-        std::cout << i*rocket.recording_interval << " " << rocket.heights[i] << std::endl;
-    }
 }
 
 int main(int argc, char *argv[]) {
