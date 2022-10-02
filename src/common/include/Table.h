@@ -101,7 +101,6 @@ public:
 
 }
 
-
 struct NestedEntry {
 
     int level;
