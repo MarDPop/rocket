@@ -163,7 +163,7 @@
 1664670045 source:c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\1d\src\simulation.cpp
 	"../include/simulation.h"
 
-1664673192 c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\1d\include\thruster.h
+1664677052 c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\1d\include\thruster.h
 	<vector>
 	<cmath>
 	<memory>
@@ -176,7 +176,7 @@
 
 1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\1d\include\physics.h
 
-1663814590 source:c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\app\test.cpp
+1664679134 source:c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\app\test.cpp
 	<iostream>
 	"../1D/include/structures.h"
 	"../common/include/structures.h"
@@ -184,6 +184,9 @@
 	"../common/include/RocketShape.h"
 	"../common/include/Cartesian.h"
 	"../1D/include/thruster.h"
+	"../1D/include/Vehicle.h"
+	"../6DOF/include/Vehicle.h"
+	"../6DOF/include/Stage.h"
 	<memory>
 	<cmath>
 
@@ -212,7 +215,7 @@
 	<algorithm>
 	"string.h"
 
-1664672609 source:c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\1d\src\thruster.cpp
+1664677180 source:c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\1d\src\thruster.cpp
 	"../include/thruster.h"
 	"../../common/include/fluid.h"
 	"../../common/include/util.h"
@@ -250,14 +253,15 @@
 	"Action.h"
 	"Atmosphere.h"
 
-1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\6dof\include\atmosphere.h
+1664679349 c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\6dof\include\atmosphere.h
 	<array>
 	<cmath>
 	<vector>
 
-1663816120 c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\6dof\include\thruster.h
+1664678868 c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\6dof\include\thruster.h
 	"Component.h"
 	"Action.h"
+	<vector>
 	<string>
 
 1663816288 c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\6dof\include\component.h
@@ -319,7 +323,7 @@
 	"../include/Vehicle.h"
 	"../../common/include/Cartesian.h"
 
-1662824479 source:c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\6dof\src\atmosphere.cpp
+1664679390 source:c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\6dof\src\atmosphere.cpp
 	"../include/Atmosphere.h"
 	"../../common/include/util.h"
 	<fstream>
@@ -330,11 +334,12 @@
 
 1664670086 c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\1d\include\simulation.h
 
-1664674822 source:c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\1d\src\vehicle.cpp
+1664679662 source:c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\1d\src\vehicle.cpp
 	"../include/Vehicle.h"
+	<iostream>
 	<cmath>
 
-1664674817 c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\1d\include\vehicle.h
+1664677274 c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\1d\include\vehicle.h
 	"thruster.h"
 	<memory>
 	<vector>

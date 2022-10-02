@@ -7,6 +7,15 @@
 #include <iostream>
 #include <cmath>
 
+
+void TimedThruster::update(double ambient_pressure, double time) {
+    // super simple, doesn't work with anything with backwards integration
+    if(time > this->final_time) {
+        this->mass_rate = 0;
+        this->thrust = 0;
+    }
+};
+
 Combustor::Combustor(){}
 
 Combustor::~Combustor(){}

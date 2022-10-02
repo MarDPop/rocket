@@ -13,10 +13,17 @@ public:
 
     double mass_rate;
 
-    Thruster1D() {}
-    virtual ~Thruster1D() {}
-
     virtual void update(double ambient_pressure, double time) = 0;
+
+};
+
+class TimedThruster : public virtual Thruster1D {
+
+public:
+
+    double final_time = 1;
+
+    void update(double ambient_pressure, double time);
 
 };
 

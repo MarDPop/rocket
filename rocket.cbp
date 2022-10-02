@@ -12,6 +12,7 @@
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Compiler>
+					<Add option="std=c++20" />
 					<Add option="-g" />
 				</Compiler>
 			</Target>
@@ -410,6 +411,7 @@
 		<Unit filename="lib/Eigen/src/plugins/MatrixCwiseUnaryOps.h" />
 		<Unit filename="lib/Eigen/src/plugins/ReshapedMethods.h" />
 		<Unit filename="resources/reactions/reactions.json" />
+		<Unit filename="src/1D/include/Vehicle.h" />
 		<Unit filename="src/1D/include/physics.h" />
 		<Unit filename="src/1D/include/simulation.h" />
 		<Unit filename="src/1D/include/structures.h" />
@@ -417,6 +419,7 @@
 		<Unit filename="src/1D/src/physics.cpp" />
 		<Unit filename="src/1D/src/simulation.cpp" />
 		<Unit filename="src/1D/src/thruster.cpp" />
+		<Unit filename="src/1D/src/vehicle.cpp" />
 		<Unit filename="src/6DOF/include/Action.h" />
 		<Unit filename="src/6DOF/include/Aerodynamics.h" />
 		<Unit filename="src/6DOF/include/Atmosphere.h" />

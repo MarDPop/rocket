@@ -3,6 +3,7 @@
 #include "Component.h"
 #include "Action.h"
 
+#include <vector>
 #include <string>
 
 class Thruster : public virtual Action ,  public virtual Component {

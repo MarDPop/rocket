@@ -18,11 +18,11 @@ public:
 
     double CD0 = 0.7;
 
-    double Aref = 0.01;
+    double Aref = 0.001;
 
-    double recording_interval = 1;
+    double recording_interval = 0.1;
 
-    double time_step = 0.01;
+    double time_step = 0.001;
 
     std::vector<double> heights;
 
