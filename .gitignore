@@ -4,3 +4,4 @@
 *.a
 *.save
 *.log
+/gui/rocketgui/target/
