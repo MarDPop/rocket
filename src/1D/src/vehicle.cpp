@@ -1,6 +1,6 @@
-#include "../include/../include/Vehicle.h
+#include "../include/Vehicle.h"
 
-#include <math>
+#include <cmath>
 
 Vehicle_1D::Vehicle_1D() {
 
@@ -11,7 +11,7 @@ Vehicle_1D::~Vehicle_1D() {
 }
 
 void Vehicle_1D::launch() {
-    this->height.clear();
+    this->heights.clear();
 
     double dt_half = this->time_step*0.5;
 
@@ -20,7 +20,7 @@ void Vehicle_1D::launch() {
     double drag_const = 0.5*this->CD0*this->Aref / gas_const;
 
     double time = 0;
-    double time_record = this->record_interval;
+    double time_record = this->recording_interval;
 
     this->heights.push_back(0);
 
@@ -58,7 +58,7 @@ void Vehicle_1D::launch() {
 
         if(time > time_record) {
             this->heights.push_back(height);
-            time_record += this->record_interval;
+            time_record += this->recording_interval;
         }
     }
 }

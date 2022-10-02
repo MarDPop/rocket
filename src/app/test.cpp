@@ -5,6 +5,7 @@
 #include "../common/include/RocketShape.h"
 #include "../common/include/Cartesian.h"
 #include "../1D/include/thruster.h"
+#include "../1D/include/Vehicle.h"
 #include "../6DOF/include/Vehicle.h"
 #include "../6DOF/include/Stage.h"
 #include <memory>
@@ -46,9 +47,7 @@ void test_sugar() {
 
 void test() {
 
-    Vehicle rocket;
-
-    Stage stage;
+    Vehicle_1D rocket;
 
 
 }

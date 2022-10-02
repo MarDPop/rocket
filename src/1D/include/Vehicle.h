@@ -24,7 +24,7 @@ public:
 
     double time_step = 0.01;
 
-    std::vector<double> height;
+    std::vector<double> heights;
 
     Vehicle_1D();
     virtual ~Vehicle_1D();

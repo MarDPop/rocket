@@ -44,7 +44,7 @@ void Stage::set_mass(double mass) {
 
     unsigned int i = 0;
     while(i < 3) {
-        this->vehicle->center[i] = this->COG_empty[i] + this->dCGdm[i]*dm;
+        this->vehicle->COM[i] = this->COG_empty[i] + this->dCGdm[i]*dm;
         this->vehicle->inertia[i] = this->inertia_empty[i] + this->dIdm[i]*dm;
         i++;
     }
@@ -65,7 +65,7 @@ void Stage::compute() {
     this->vehicle->moment.zero();
 
     for(auto& a : this->actions) {
-        a->update(this->vehicle->Talo);
+        a->update(this->vehicle->TALO);
         Vector torque = a->center.cross(a->force);
         for(int i = 0; i < 3; i++) {
             this->vehicle->force.data[i] += a->force.data[i];

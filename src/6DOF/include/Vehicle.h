@@ -26,7 +26,7 @@ struct State {
 
 typedef std::array<double,6> Inertia;
 
-class Vehicle : public virtual Dynamics<14>, public virtual Action {
+class Vehicle : public virtual Dynamics<14> {
     unsigned int current_stage_idx;
 
     std::vector< std::unique_ptr< Stage > > stages;
@@ -35,24 +35,38 @@ class Vehicle : public virtual Dynamics<14>, public virtual Action {
 
 public:
 
-    double Talo;
+    double TALO;
 
     /**
     * Standard State of Vehicle
     */
     State state;
 
+    Vector force;
+
+    Vector moment;
+
+    Vector COM;
+
     /**
      * Moments of Inertia at Center of Mass
      */
     Inertia inertia;
 
+    /**
+    * Coordinate Frame of the Vehicle in inertial frame
+    */
     Axis inertial_CS;
 
+    /**
+    * Reference of planet in which vehicle is traveling
+    */
     Planet planet;
 
     Vehicle();
     virtual ~Vehicle();
+
+    void update(double time);
 
     void set_orientation(double* q);
 
