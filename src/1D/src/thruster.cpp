@@ -80,7 +80,7 @@ SolidThruster::SolidThruster() {}
 
 SolidThruster::~SolidThruster() {}
 
-void SolidThruster::update(double ambient_pressure, double time, double throttle) {
+void SolidThruster::update(double ambient_pressure, double time) {
     unsigned int idx = util::bisection_search(this->times.data(),time,this->times.size());
 
     this->mass_rate = this->mass_rates[idx];

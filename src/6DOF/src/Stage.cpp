@@ -44,7 +44,7 @@ void Stage::set_mass(double mass) {
 
     unsigned int i = 0;
     while(i < 3) {
-        this->vehicle->COG[i] = this->COG_empty[i] + this->dCGdm[i]*dm;
+        this->vehicle->center[i] = this->COG_empty[i] + this->dCGdm[i]*dm;
         this->vehicle->inertia[i] = this->inertia_empty[i] + this->dIdm[i]*dm;
         i++;
     }

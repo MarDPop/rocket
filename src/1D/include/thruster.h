@@ -7,26 +7,16 @@
 
 class Thruster1D {
 
-protected:
+public:
 
     double thrust;
 
     double mass_rate;
 
-public:
-
-    inline double get_thrust() {
-        return this->thrust;
-    }
-
-    inline double get_mass_rate() {
-        return this->mass_rate;
-    }
-
     Thruster1D() {}
     virtual ~Thruster1D() {}
 
-    virtual void update(double ambient_pressure, double time, double throttle) = 0;
+    virtual void update(double ambient_pressure, double time) = 0;
 
 };
 
@@ -184,7 +174,7 @@ public:
         this->area_throat = area_throat;
     }
 
-    virtual void update(double ambient_pressure, double time, double throttle);
+    virtual void update(double ambient_pressure, double time);
 
     void save(std::string fn);
 
