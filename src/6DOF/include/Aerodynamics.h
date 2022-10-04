@@ -54,3 +54,33 @@ public:
     void update(double time) override;
 
 };
+
+class SingleStageRocket;
+
+struct SingleStageAerodynamics {
+
+    double CD0;
+
+    double K;
+
+    double CL_alpha;
+
+    double CM_alpha;
+
+    double stall_angle;
+
+    double ref_area;
+
+    Vector force;
+
+    Vector moment;
+
+    SingleStageRocket& rocket;
+
+    SingleStageAerodynamics(SingleStageRocket& r);
+
+    void set_coef(double* coef);
+
+    void update();
+
+};

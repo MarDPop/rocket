@@ -99,3 +99,82 @@ void Vehicle::compute_full_moment(double* w, double* dw){
     dw[1] = (A[3]*Iw[0] + A[4]*Iw[1] + A[5]*Iw[2])*det;
     dw[2] = (A[6]*Iw[0] + A[7]*Iw[1] + A[8]*Iw[2])*det;
 }
+
+void SingleStageRocket::compute_acceleration() {
+
+    if(this->mass > this->mass_empty) {
+        this->thruster.set(this->pressure);
+        this->acceleration = this->CS.axis.z * this->thruster.thrust;
+    }
+
+    this->aero.update();
+
+    this->acceleration += this->aero.force;
+
+    this->torque = this->aero.moment;
+
+    this->acceleration.data[2] -= this->grav;
+
+}
+
+void SingleStageRocket::set_mass(double empty_mass, double full_mass, double Izz_ratio, double Ixx_ratio) {
+    this->mass_empty = empty_mass;
+    this->mass_full = full_mass;
+    this->Izz_ratio = Izz_ratio;
+    this->Ixx_ratio = Ixx_ratio;
+}
+
+void SingleStageRocket::set_ground(double ground_altitude,double ground_pressure,double ground_temperature, double lapse_rate) {
+    this->ground_altitude = ground_altitude;
+    this->ground_pressure = ground_pressure;
+    this->ground_temperature = ground_temperature;
+    this->lapse_rate = lapse_rate;
+}
+
+void SingleStageRocket::launch(double dt) {
+    double time = 0;
+    double time_record = 0;
+    double dt_half = dt*0.5;
+
+    double g;
+    while(time < 10000) {
+
+        this->compute_acceleration();
+
+        Vector p0 = this->position;
+        Vector v0 = this->velocity;
+        Vector a0 = this->acceleration;
+
+        this->position += this->velocity*dt;
+        this->velocity += this->acceleration*dt;
+        Vector rotation = this->angular_velocity*dt;
+        double angle = rotation.norm();
+        rotation *= (1.0/angle);
+        Axis rot_mat = Cartesian::rotation_matrix_angle_axis(angle,)
+        this->angular_velocity += this->angular_acceleration*dt;
+
+        if(this->mass > this->mass_empty) {
+            this->mass -= this->thruster.mass_rate*dt;
+        }
+
+        this->compute_acceleration();
+
+        this->position = p0 + (v0 + this->velocity)*dt_half;
+        this->velocity = v0 + (a0 + this->acceleration)*dt_half;
+
+        if(time > time_record){
+            time_record += this->record.t_interval;
+
+            if(this->position.z() < -0.5) {
+                break;
+            }
+
+            double r = (this->position.z() + 6371000 + this->ground_altitude)*1.56961e-7;
+            this->grav = 9.806*r*r;
+
+            this->sound_speed_inv = 1.0/sqrt(air_const*(this->ground_temperature + this->lapse_rate*this->position.z()));
+        }
+
+        time += dt;
+    }
+}

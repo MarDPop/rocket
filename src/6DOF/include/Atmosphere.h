@@ -4,6 +4,8 @@
 #include <cmath>
 #include <vector>
 
+#include "../../common/include/Geodesy.h"
+
 struct Air {
     static constexpr double GAMMA = 1.4;
     static constexpr double R_GAS = 8.31446261815324;
@@ -40,7 +42,7 @@ public:
     /**
     * returns false if air was computed
     */
-    virtual bool get_air(const std::array<double,3>& LLA, double time) = 0;
+    virtual bool get_air(const Geodetic& LLA, double time) = 0;
 
     Atmosphere(){}
     virtual ~Atmosphere(){}
@@ -56,7 +58,7 @@ class AtmosphereBasic : public Atmosphere {
 public:
     AtmosphereBasic() : scale_height(8.4), sea_pressure(101325), sea_density(1.22), sea_temp(297), R_gas(Air::R_DRY_AIR)  {}
 
-    bool get_air(const std::array<double,3>& LLA, double time) override;
+    bool get_air(const Geodetic& LLA, double time) override;
 };
 
 class AtmosphereTable : public Atmosphere {
@@ -79,7 +81,7 @@ public:
 
     void add(double alt, const std::array< double, 5 >& values);
 
-    bool get_air(const std::array<double,3>& LLA, double time) override;
+    bool get_air(const Geodetic& LLA, double time) override;
 
 };
 
@@ -95,7 +97,7 @@ public:
 
     AtmosphereUS1976() {}
 
-    bool get_air(const std::array<double,3>& LLA, double time) override;
+    bool get_air(const Geodetic& LLA, double time) override;
 
 };
 

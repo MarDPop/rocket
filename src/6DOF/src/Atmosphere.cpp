@@ -4,8 +4,8 @@
 #include <fstream>
 #include <string>
 
-bool AtmosphereBasic::get_air(const std::array<double,3>& LLA, double time) {
-    double factor = exp(-LLA[2]/scale_height);
+bool AtmosphereBasic::get_air(const Geodetic& LLA, double time) {
+    double factor = exp(-LLA.altitude/scale_height);
     this->air.density = sea_density*factor;
     this->air.pressure = sea_pressure*factor;
     return true;
@@ -257,12 +257,13 @@ const double AtmosphereUS1976::delta[86][5] = {{-1.1450e+04,-1.1336e-01,-3.8600e
 {-6.0697e-02,-1.1311e-06,0.0000e+00,0.0000e+00,0.0000e+00}};
 
 
-bool AtmosphereTable::get_air(const std::array<double,3>& LLA, double time) {
-    if(LLA[2] > this->altitudes.back()) {
+bool AtmosphereTable::get_air(const Geodetic& LLA, double time) {
+
+    if(LLA.altitude > this->altitudes.back()) {
         return false;
     }
 
-    if(LLA[2] < this->altitudes[0]) {
+    if(LLA.altitude < this->altitudes[0]) {
         this->air.density = this->data[0][1];
         this->air.pressure = this->data[0][0];
         this->air.speed_of_sound = this->data[0][2];
@@ -271,15 +272,15 @@ bool AtmosphereTable::get_air(const std::array<double,3>& LLA, double time) {
         return true;
     }
 
-    while(this->altitudes[this->idx] > LLA[2]) {
+    while(this->altitudes[this->idx] > LLA.altitude) {
         this->idx--;
     }
 
-    while(this->altitudes[this->idx + 1] < LLA[2]) {
+    while(this->altitudes[this->idx + 1] < LLA.altitude) {
         this->idx++;
     }
 
-    double factor = LLA[2] - this->altitudes[idx];
+    double factor = LLA.altitude - this->altitudes[idx];
 
     const double* row = this->data[idx].data();
     const double* d = this->delta[idx].data();
@@ -290,12 +291,12 @@ bool AtmosphereTable::get_air(const std::array<double,3>& LLA, double time) {
     return true;
 }
 
-bool AtmosphereUS1976::get_air(const std::array<double,3>& LLA, double time) {
-    if(LLA[2] > 86) {
+bool AtmosphereUS1976::get_air(const Geodetic& LLA, double time) {
+    if(LLA.altitude > 86) {
         return false;
     }
 
-    if(LLA[2] <= 0) {
+    if(LLA.altitude <= 0) {
         this->air.density = this->data[0][1];
         this->air.pressure = this->data[0][0];
         this->air.speed_of_sound = this->data[0][2];
@@ -304,9 +305,11 @@ bool AtmosphereUS1976::get_air(const std::array<double,3>& LLA, double time) {
         return true;
     }
 
-    int idx = int(LLA[2]);
+    double geo_potential_alt = LLA.altitude*6371000.0/(LLA.altitude + 6371000.0);
 
-    double factor = LLA[2] - idx;
+    int idx = int(geo_potential_alt);
+
+    double factor = geo_potential_alt - idx;
 
     const double* row = AtmosphereUS1976::data[idx];
     const double* d = AtmosphereUS1976::delta[idx];

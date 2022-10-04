@@ -30,7 +30,17 @@ void SingleSimulation::load(const std::string& fn) {
     this->type = static_cast<SIMULATION_TYPE>(std::stoi(line));
     std::getline(file, line);
     this->unix_ms = std::stol(line);
-    this->J2000 = static_cast<double>(this->unix_timestamp - Time::J2000_UNIX)/static_cast<double>(Time::JULIAN_DAY);
+    this->JD2000 = static_cast<double>(this->unix_ms - Time::J2000_UNIX)/static_cast<double>(Time::JULIAN_DAY);
+    std::getline(file, line);
+    this->lla.latitude = std::stod(line);
+    std::getline(file, line);
+    this->lla.longitude = std::stod(line);
+    std::getline(file, line);
+    this->lla.altitude = std::stod(line);
+
+    this->position_ecef = Ellipsoid::geodetic2ecef(this->lla);
+
+
 
     while (std::getline(file, line)){
 

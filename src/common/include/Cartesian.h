@@ -389,4 +389,27 @@ namespace Cartesian {
 
     };
 
+    inline void rotation_matrix_angle_axis(const double angle, const Vector& axis, Axis& mat) {
+        double c = cos(angle);
+        double s = sin(angle);
+        double c1 = 1 - c;
+        double xc = axis.x()*c1;
+        double yc = axis.y()*c1;
+        mat.data[0] = c + axis.x()*xc;
+        mat.data[4] = c + axis.y()*yc;
+        mat.data[8] = c + axis.z()*axis.z()*c1;
+        double uc = axis.x()*yc;
+        double us = axis.z()*s;
+        mat.data[1] = uc - us;
+        mat.data[3] = uc + us;
+        uc = axis.z()*xc;
+        us = axis.y()*s;
+        mat.data[1] = uc + us;
+        mat.data[6] = uc - us;
+        uc = axis.z()*yc;
+        us = axis.x()*s;
+        mat.data[5] = uc - us;
+        mat.data[7] = uc + us;
+    }
+
 }

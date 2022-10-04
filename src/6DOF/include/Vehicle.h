@@ -3,6 +3,7 @@
 #include <vector>
 #include <memory>
 #include <array>
+#include <map>
 #include <cmath>
 #include <functional>
 
@@ -138,7 +139,31 @@ public:
 
 };
 
-class Vehicle_Simplified {
+class SingleStageControl {
+
+};
+
+class WindHistory {
+
+};
+
+class SingleStageRocket {
+
+public:
+
+    static constexpr double R_gas = 287.54;
+
+    static constexpr double air_const = 287.54*1.4;
+
+    double mass_empty;
+
+    double mass_full;
+
+    double Izz_ratio;
+
+    double Ixx_ratio;
+
+    double mass;
 
     Vector position;
 
@@ -148,11 +173,52 @@ class Vehicle_Simplified {
 
     Axis CS;
 
-public:
+    Vector angular_velocity;
 
-    std::unique_ptr< Aerodynamics > aero;
+    Vector angular_acceleration;
 
-    std::unique_ptr< Thruster > thruster;
+    double ground_altitude = 0.0;
+
+    double ground_pressure = 101325;
+
+    double ground_temperature = 297;
+
+    double lapse_rate = 0;
+
+    void compute_acceleration();
+
+    double grav;
+
+    double pressure;
+
+    double density;
+
+    double sound_speed_inv;
+
+    struct Recording {
+        double t_interval;
+        std::vector<Vector> position;
+        std::vector<Axis> orientation;
+    };
+
+    Recording record;
+
+    WindHistory wind;
+
+    SingleStageAerodynamics aero;
+
+    SingleStageThruster thruster;
+
+    SingleStageControl control;
+
+    SingleStageRocket();
+
+    void set_mass(double empty_mass, double full_mass, double Izz_ratio, double Ixx_ratio);
+
+    void set_ground(double ground_altitude,double ground_pressure,double ground_temperature, double lapse_rate);
+
+    void launch(double dt);
+
 
 };
 
