@@ -2,15 +2,17 @@
 
 #include <string>
 
-class Scenario {
+class SingleSimulation {
 
 public:
+
+    std::unique_ptr<Vehicle> vehicle;
 
     struct start {
 
         struct time {
             double JD2000;
-            long unix_timestamp;
+            unsigned long unix_timestamp;
         };
 
         struct location {
@@ -26,17 +28,17 @@ public:
 
     };
 
-    enum SCENARIO_TYPE {
+    enum SIMULATION_TYPE {
         LAUNCH, FLIGHT, ORBIT, RISK_ANALYSIS
     };
 
-    SCENARIO_TYPE type;
+    SIMULATION_TYPE type;
 
-    Scenario();
+    SingleSimulation();
 
     void load(const std::string& fn);
 
-    void set_time(int year, int month, int day, int hour, int minute, double sec);
+    void set_gmt(int year, int month, int day, int hour, int minute, double sec, double time_zone);
 
     void set_location(double latitude, double longitude, double altitude);
 

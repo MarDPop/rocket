@@ -53,6 +53,8 @@ void test() {
 
     Vehicle rocket;
 
+    Scenario scenario;
+
 
 }
 

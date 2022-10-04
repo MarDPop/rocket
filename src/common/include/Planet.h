@@ -27,6 +27,28 @@ public:
 
     virtual Axis get_axis(double time) = 0;
 
+    static double trueAnomalyFromEccentricAnomaly(const double EA, const double eccentricity);
+
+    static double trueAnomalyFromMeanAnomaly(const double MA, const double eccentricity);
+
+    static double trueAnomalyFromMeanAnomalyApprox(const double MA, const double eccentricity);
+
+    static double meanAnomalyFromTrueAnomalyApprox(const double f, const double eccentricity);
+
+    static double eccentricAnomalyFromMeanAnomaly(const double MA, const double eccentricity);
+
+    static double meanAnomalyFromEccentricAnomaly(const double EA, const double eccentricity);
+
+    static double eccentricAnomalyFromTrueAnomaly(const double TA, const double eccentricity);
+
+    static double meanAnomalyFromTrueAnomaly(const double f, const double eccentricity);
+
+    static std::array<double,6> kepler2cartesian(const std::array<double,7>& oe); // final position is mu
+
+    static std::array<double,3> kepler2position(const std::array<double,6>& oe);
+
+    static std::array<double,6> cartesian2kepler(const std::array<double,7>& state);
+
 };
 
 class Ephemeris_Standard : public Ephemeris {
