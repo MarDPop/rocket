@@ -147,10 +147,15 @@ void SingleStageRocket::launch(double dt) {
 
         this->position += this->velocity*dt;
         this->velocity += this->acceleration*dt;
+
         Vector rotation = this->angular_velocity*dt;
         double angle = rotation.norm();
         rotation *= (1.0/angle);
-        Axis rot_mat = Cartesian::rotation_matrix_angle_axis(angle,)
+        Axis rot_mat;
+        Cartesian::rotation_matrix_angle_axis(angle,rotation,rot_mat);
+
+
+
         this->angular_velocity += this->angular_acceleration*dt;
 
         if(this->mass > this->mass_empty) {

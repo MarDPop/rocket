@@ -258,14 +258,12 @@ namespace Cartesian {
             return b;
         }
 
-        inline Axis operator*(const Axis& a) const noexcept {
-            Axis b((char)0);
+        inline static void mult(const Axis& A, const Axis& b, Axis& c) noexcept {
+            int irow = 0;
             for(int i = 0; i < 3; i++){
-                for(int j = 0; j < 3; j++){
-                    b.data[i] += this->data[i]*a.data[j];
-                }
+                x.data[i] = A.data[irow]*b.data[0] + A.data[irow + 1]*b.data[1] + A.data[irow + 2]*b.data[2];
+                irow += 3;
             }
-            return b;
         }
 
         inline static void mult(const Axis& A, const Vector& b, Vector& x) noexcept {
