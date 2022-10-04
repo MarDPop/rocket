@@ -8,6 +8,7 @@
 #include "../1D/include/Vehicle.h"
 #include "../6DOF/include/Vehicle.h"
 #include "../6DOF/include/Stage.h"
+#include "Simulation.h"
 #include <memory>
 #include <cmath>
 
@@ -53,7 +54,7 @@ void test() {
 
     Vehicle rocket;
 
-    Scenario scenario;
+    SingleSimulation sim;
 
 
 }

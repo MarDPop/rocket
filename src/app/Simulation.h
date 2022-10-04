@@ -1,31 +1,22 @@
 #pragma once
 
-#include "Geodesy.h"
+#include "../common/include/Geodesy.h"
 #include <string>
+#include <memory>
+#include "../6DOF/include/Vehicle.h"
 
 class SingleSimulation {
 
-public:
-
     std::unique_ptr<Vehicle> vehicle;
 
-    struct start {
+    /* starting */
+    double JD2000;
+    unsigned long unix_timestamp;
+    Geodetic lla;
+    Vector position_ecef;
+    Axis orientation_ecef;
 
-        struct time {
-            double JD2000;
-            unsigned long unix_timestamp;
-        };
-
-        struct location {
-            Geodetic lla;
-            Vector ecef;
-        };
-
-        struct orientation {
-            Axis ECEF;
-        };
-
-    };
+public:
 
     enum SIMULATION_TYPE {
         LAUNCH, FLIGHT, ORBIT, RISK_ANALYSIS

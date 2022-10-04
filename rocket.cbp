@@ -439,8 +439,8 @@
 		<Unit filename="src/6DOF/src/StageDynamics.cpp" />
 		<Unit filename="src/6DOF/src/Thruster.cpp" />
 		<Unit filename="src/6DOF/src/Vehicle.cpp" />
-		<Unit filename="src/app/Scenario.cpp" />
-		<Unit filename="src/app/Scenario.h" />
+		<Unit filename="src/app/Simulation.cpp" />
+		<Unit filename="src/app/Simulation.h" />
 		<Unit filename="src/app/test.cpp" />
 		<Unit filename="src/common/include/Cartesian.h" />
 		<Unit filename="src/common/include/Constants.h" />
@@ -457,6 +457,8 @@
 		<Unit filename="src/common/include/fluid.h" />
 		<Unit filename="src/common/include/structures.h" />
 		<Unit filename="src/common/include/util.h" />
+		<Unit filename="src/common/src/Geodesy.cpp" />
+		<Unit filename="src/common/src/Planet.cpp" />
 		<Extensions />
 	</Project>
 </CodeBlocks_project_file>

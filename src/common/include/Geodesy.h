@@ -13,8 +13,8 @@ union Geodetic {
         double altitude;
     };
 
-    void operator=(const Geodetic& lla) {
-        memcopy(lla.v,this->v,3*sizeof(double));
+    void operator=(const Geodetic* lla) {
+        memcpy(&lla,this,3*sizeof(double));
     }
 };
 

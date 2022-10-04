@@ -78,24 +78,24 @@ struct Planet {
 
 };
 
-class Earth {
+struct Earth {
 
-    static const double EARTH_MU = 3.986004418e14; // m3 s-2
-    static const double EARTH_AVG_R = 6371000; // m
-    static const double EARTH_AVG_D = 12742000; // m
-    static const double EARTH_POLAR_R = 6356752.314; // m
-    static const double EARTH_SIDEREAL = 86164.1; // m
-    static const double EARTH_FLATTENING = 0.003352810664747;
-    static const double EARTH_EQUATOR_R = 6378137; // m
-    static const double EARTH_ROT = 7.29211505392569E-5; // rad/s
+    static constexpr double EARTH_MU = 3.986004418e14; // m3 s-2
+    static constexpr double EARTH_AVG_R = 6371000; // m
+    static constexpr double EARTH_AVG_D = 12742000; // m
+    static constexpr double EARTH_POLAR_R = 6356752.314; // m
+    static constexpr double EARTH_SIDEREAL = 86164.1; // m
+    static constexpr double EARTH_FLATTENING = 0.003352810664747;
+    static constexpr double EARTH_EQUATOR_R = 6378137; // m
+    static constexpr double EARTH_ROT = 7.29211505392569E-5; // rad/s
 
-    static const double a1 = 42697.67270715754; //a1 = a*e2
-    static const double a2 = 1.8230912546075456E9; //a2 = a1*a1
-    static const double a3 = 142.91722289812412; //a3 = a1*e2/2
-    static const double a4 = 4.557728136518864E9; //a4 = 2.5*a2
-    static const double a5 = 42840.589930055656; //a5 = a1+a3
-    static const double a6 = 0.9933056200098622; //a6 = 1-e2
-    static const double e2 = 0.006694380066765; //WGS-84 first eccentricity squared
-    static const double e2prime = 0.006739496819936; // second eccentricity
+    static constexpr double a1 = 42697.67270715754; //a1 = a*e2
+    static constexpr double a2 = 1.8230912546075456E9; //a2 = a1*a1
+    static constexpr double a3 = 142.91722289812412; //a3 = a1*e2/2
+    static constexpr double a4 = 4.557728136518864E9; //a4 = 2.5*a2
+    static constexpr double a5 = 42840.589930055656; //a5 = a1+a3
+    static constexpr double a6 = 0.9933056200098622; //a6 = 1-e2
+    static constexpr double e2 = 0.006694380066765; //WGS-84 first eccentricity squared
+    static constexpr double e2prime = 0.006739496819936; // second eccentricity
 
 };

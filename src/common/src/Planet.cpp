@@ -147,7 +147,7 @@ std::array<double,6> Ephemeris::cartesian2kepler(const std::array<double,7>& sta
     if ( fabs(oe[2]) > 1e-9){
         nmag = 1.0/sqrt(nmag);
         oe[3] = acos(h[1]*nmag);
-        if (n[1] < 0){
+        if (h[0] > 0){
             oe[3] = TWOPI - oe[3];
         }
 

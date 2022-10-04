@@ -1,8 +1,10 @@
 #include "Simulation.h"
-#include "Geodesy.h"
 
 #include <fstream>
 #include <stdexcept>
+
+SingleSimulation::SingleSimulation() {
+}
 
 void SingleSimulation::load(const std::string& fn) {
 
@@ -24,9 +26,9 @@ void SingleSimulation::load(const std::string& fn) {
     std::string line;
 
     std::getline(file, line);
-    this->type = std::stoi(line);
+    this->type = static_cast<SIMULATION_TYPE>(std::stoi(line));
     std::getline(file, line);
-    this->start.time.unix_timestamp = std::stol(line);
+    this->unix_timestamp = std::stol(line);
 
     while (std::getline(file, line)){
 
@@ -49,12 +51,12 @@ void SingleSimulation::set_gmt(int year, int month, int day, int hour, int minut
 
     double seconds_unix = difftime(mktime(&tm),0);
 
-    this->start.time.unix_timestamp = mktime(&tm);
+    this->unix_timestamp = mktime(&tm);
 }
 
 void SingleSimulation::set_location(Geodetic& lla) {
-    this->start.location.lla = lla;
-    this->start.location.ECEF = Ellipsoid::geodetic2ecef(lla);
+    this->lla = lla;
+    this->position_ecef = Ellipsoid::geodetic2ecef(lla);
 }
 
 void SingleSimulation::run() {
