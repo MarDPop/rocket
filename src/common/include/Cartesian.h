@@ -30,7 +30,7 @@ namespace Cartesian {
 
     struct Vector {
 
-        alignas(32) double data[3];
+        double data[3];
 
         inline Vector() {}
 
@@ -187,7 +187,7 @@ namespace Cartesian {
     struct Axis {
 
         union {
-            alignas(32) double data[9];
+            double data[9];
             struct {
                 Vector x;
                 Vector y;

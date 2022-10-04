@@ -1,5 +1,10 @@
 #pragma once
 
+#include "Cartesian.h"
+#include <cstring>
+
+using namespace Cartesian;
+
 union Geodetic {
     double v[3];
     struct {
@@ -7,6 +12,10 @@ union Geodetic {
         double longitude;
         double altitude;
     };
+
+    void operator=(const Geodetic& lla) {
+        memcopy(lla.v,this->v,3*sizeof(double));
+    }
 };
 
 struct Ellipsoid {
@@ -18,6 +27,12 @@ struct Ellipsoid {
     virtual double get_radius_by_latitude(double latitude) = 0;
 
     virtual double get_radius_by_z(double z) = 0;
+
+    static double vincentyFormulae(double long1, double lat1, double long2, double lat2);
+
+    static Vector geodetic2ecef(const Geodetic& lla);
+
+    static Geodetic ecef2geodetic(const Vector& ecef);
 
 };
 
@@ -69,3 +84,4 @@ class Orthometric {
 
 
 };
+

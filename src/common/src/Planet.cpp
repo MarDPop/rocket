@@ -1,5 +1,7 @@
 #include "../include/Planet.h"
 
+#define TWOPI 6.28318530717958647692528676655
+
 double Ephemeris::trueAnomalyFromEccentricAnomaly( const double EA, const double eccentricity ){
     double beta = eccentricity/(1 + sqrt(1 - eccentricity*eccentricity));
     double s = sin(EA);
@@ -124,7 +126,7 @@ std::array<double,6> Ephemeris::cartesian2kepler(const std::array<double,7>& sta
     std::array<double,6> oe;
     std::array<double,3> h = {state[1]*state[5] - state[2]*state[4], state[2]*state[3] - state[0]*state[5], state[0]*state[4] - state[1]*state[3]};
 
-    std::array<double,2> n = {h[1],-h[0]}; // z is implicit 0
+    // std::array<double,2> n = {h[1],-h[0]}; // z is implicit 0
     double v2 = state[3]*state[3] + state[4]*state[4] + state[5]*state[5];
     double r_inv = 1/sqrt(state[0]*state[0] + state[1]*state[1] + state[2]*state[2]);
     double rv = state[0]*state[3] + state[1]*state[4] + state[2]*state[5];
@@ -138,23 +140,24 @@ std::array<double,6> Ephemeris::cartesian2kepler(const std::array<double,7>& sta
 
     oe[0] = -state[6]/(2*egy);
     oe[1] = sqrt(e[0]*e[0] + e[1]*e[1] + e[2]*e[2]);
-    double nmag = n[0]*n[0]+n[1]*n[1];
+    double inv_e = 1/oe[1];
+    double nmag = h[0]*h[0]+h[1]*h[1];
     oe[2] = acos(h[2]/sqrt(nmag + h[2]*h[2]));
 
     if ( fabs(oe[2]) > 1e-9){
-        nmag = sqrt(nmag);
-        oe[3] = acos(n[0]/nmag);
+        nmag = 1.0/sqrt(nmag);
+        oe[3] = acos(h[1]*nmag);
         if (n[1] < 0){
             oe[3] = TWOPI - oe[3];
         }
 
-        oe[4] = acos((n[0]*e[0]+n[1]*e[1])/(nmag*oe[1]));
+        oe[4] = acos((h[1]*e[0] - h[0]*e[1])*nmag*inv_e);
         if (e[2] < 0){
             oe[4] = TWOPI - oe[4];
         }
     }
 
-    oe[5] = acos((e[0]*state[0]+e[1]*state[1]+e[2]*state[2])*r_inv/oe[1]);
+    oe[5] = acos((e[0]*state[0]+e[1]*state[1]+e[2]*state[2])*r_inv*inv_e);
     if (rv < 0){
         oe[5] = TWOPI - oe[5];
     }

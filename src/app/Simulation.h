@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Geodesy.h"
 #include <string>
 
 class SingleSimulation {
@@ -16,14 +17,12 @@ public:
         };
 
         struct location {
-            double latitude;
-            double longitude;
-            double altitude;
-            double ECEF[3];
+            Geodetic lla;
+            Vector ecef;
         };
 
         struct orientation {
-            double ECEF[3][3];
+            Axis ECEF;
         };
 
     };
@@ -40,7 +39,7 @@ public:
 
     void set_gmt(int year, int month, int day, int hour, int minute, double sec, double time_zone);
 
-    void set_location(double latitude, double longitude, double altitude);
+    void set_location(Geodetic& lla);
 
     void run();
 

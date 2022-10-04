@@ -1,4 +1,5 @@
 #include "Simulation.h"
+#include "Geodesy.h"
 
 #include <fstream>
 #include <stdexcept>
@@ -51,11 +52,9 @@ void SingleSimulation::set_gmt(int year, int month, int day, int hour, int minut
     this->start.time.unix_timestamp = mktime(&tm);
 }
 
-void SingleSimulation::set_location(double latitude, double longitude, double altitude) {
-    this->start.location.altitude = altitude;
-    this->start.location.latitude = latitude;
-    this->start.location.longtiude = longitude;
-
+void SingleSimulation::set_location(Geodetic& lla) {
+    this->start.location.lla = lla;
+    this->start.location.ECEF = Ellipsoid::geodetic2ecef(lla);
 }
 
 void SingleSimulation::run() {
