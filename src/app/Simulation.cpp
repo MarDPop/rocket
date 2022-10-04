@@ -2,6 +2,7 @@
 
 #include <fstream>
 #include <stdexcept>
+#include <ctime>
 
 SingleSimulation::SingleSimulation() {
 }
@@ -28,7 +29,8 @@ void SingleSimulation::load(const std::string& fn) {
     std::getline(file, line);
     this->type = static_cast<SIMULATION_TYPE>(std::stoi(line));
     std::getline(file, line);
-    this->unix_timestamp = std::stol(line);
+    this->unix_ms = std::stol(line);
+    this->J2000 = static_cast<double>(this->unix_timestamp - Time::J2000_UNIX)/static_cast<double>(Time::JULIAN_DAY);
 
     while (std::getline(file, line)){
 
@@ -51,7 +53,7 @@ void SingleSimulation::set_gmt(int year, int month, int day, int hour, int minut
 
     double seconds_unix = difftime(mktime(&tm),0);
 
-    this->unix_timestamp = mktime(&tm);
+    this->unix_ms = static_cast<unsigned long>(seconds_unix*1000);
 }
 
 void SingleSimulation::set_location(Geodetic& lla) {

@@ -11,7 +11,7 @@ class SingleSimulation {
 
     /* starting */
     double JD2000;
-    unsigned long unix_timestamp;
+    unsigned long unix_ms;
     Geodetic lla;
     Vector position_ecef;
     Axis orientation_ecef;

@@ -1,6 +1,5 @@
 #pragma once
 
-
 class Time {
 
     int mjd;
@@ -8,6 +7,9 @@ class Time {
     double sec;
 
 public:
+
+    static constexpr int J2000_UNIX = 946728000;
+    static constexpr int JULIAN_DAY = 86400;
 
     Time(){}
     virtual ~Time(){}
