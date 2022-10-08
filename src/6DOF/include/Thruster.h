@@ -84,9 +84,9 @@ class SingleStageThruster {
 
 public:
 
-    double thrust;
+    double thrust = 1000;
 
-    double mass_rate;
+    double mass_rate = 1;
 
     void add_thrust_point(double pressure, double thrust, double mass_rate);
 

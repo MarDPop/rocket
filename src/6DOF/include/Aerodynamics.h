@@ -61,15 +61,17 @@ struct SingleStageAerodynamics {
 
     double CD0;
 
-    double K;
-
     double CL_alpha;
 
     double CM_alpha;
 
-    double stall_angle;
+    double K;
 
     double ref_area;
+
+    double ref_length;
+
+    double stall_angle;
 
     Vector force;
 

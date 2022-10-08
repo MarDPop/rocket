@@ -12,7 +12,7 @@ void Vehicle::set_orientation(double* q) {
     q[1] *= mag;
     q[2] *= mag;
     q[3] *= mag;
-    util::q2rotm(q,this->inertial_CS.data);
+    Cartesian::q2rotm(q,this->inertial_CS.data);
 }
 
 void Vehicle::get_state_rate(std::array<double,14>& x, double t, std::array<double,14>& dx) {
@@ -101,12 +101,23 @@ void Vehicle::compute_full_moment(double* w, double* dw){
 }
 
 SingleStageRocket::SingleStageRocket() : aero(*this) {
+    this->init();
+}
+
+void SingleStageRocket::init() {
+    this->CS.identity();
+    this->position.zero();
+    this->velocity.zero();
+    this->angular_velocity.zero();
+    this->set_ground(0,101000,297,0);
 }
 
 void SingleStageRocket::compute_acceleration() {
 
+    this->get_air_properties();
+
     if(this->mass > this->mass_empty) {
-        this->thruster.set(this->pressure);
+        this->thruster.set(this->air_pressure);
         this->acceleration = this->CS.axis.z * this->thruster.thrust;
     }
 
@@ -129,19 +140,56 @@ void SingleStageRocket::set_mass(double empty_mass, double full_mass, double Izz
     this->Ixx_ratio = Ixx_ratio;
 }
 
-void SingleStageRocket::set_ground(double ground_altitude,double ground_pressure,double ground_temperature, double lapse_rate) {
+void SingleStageRocket::set_ground(double ground_altitude, double ground_pressure ,double ground_temperature, double lapse_rate) {
     this->ground_altitude = ground_altitude;
     this->ground_pressure = ground_pressure;
     this->ground_temperature = ground_temperature;
     this->lapse_rate = lapse_rate;
+
+    this->compute_atmosphere();
+}
+
+void SingleStageRocket::compute_atmosphere() {
+    double pressure = this->ground_pressure;
+    this->air_pressure_table.reserve(40000);
+    this->air_density_table.reserve(40000);
+    this->air_sound_speed_table.reserve(40000);
+    this->grav_table.reserve(40000);
+    double R0 = 6371000 + this->ground_altitude + 0.5;
+    for(int i = 0; i < 40000; i++){
+        double temperature = this->ground_temperature + i*lapse_rate;
+        double density = pressure/(R_GAS*temperature);
+        double r = 6371000.0/(R0 + i);
+        double g = 9.806*r*r;
+        this->air_pressure_table.push_back(pressure);
+        this->air_density_table.push_back(density);
+        this->air_sound_speed_table.push_back(1.0/sqrt(AIR_CONST*temperature));
+        this->grav_table.push_back(g);
+
+        pressure -= g*density; // dz = 1 meter
+    }
+}
+
+void SingleStageRocket::get_air_properties() {
+    int idx = static_cast<int>(this->position.z());
+    if(idx > 39999) {
+        idx = 39999;
+    }
+    if(idx < 0) {
+        idx = 0;
+    }
+    this->air_density = this->air_density_table[idx];
+    this->air_pressure = this->air_pressure_table[idx];
+    this->sound_speed_inv = this->air_sound_speed_table[idx];
+    this->grav = this->grav_table[idx];
 }
 
 void SingleStageRocket::launch(double dt) {
     double time = 0;
     double time_record = 0;
     double dt_half = dt*0.5;
+    this->mass = this->mass_full;
 
-    double g;
     Axis mat;
     while(time < 10000) {
 
@@ -155,11 +203,12 @@ void SingleStageRocket::launch(double dt) {
         this->velocity += this->acceleration*dt;
 
         Vector w = this->angular_velocity*dt;
-        double angle = 1.0/w.norm();
-        w *= angle;
-        Cartesian::rotation_matrix_angle_axis(angle,w,mat);
-
-        this->CS = mat*(this->CS);
+        double angle = w.norm();
+        if(angle > 1e-6) {
+            w *= (1.0/angle);
+            Cartesian::rotation_matrix_angle_axis(angle,w,mat);
+            this->CS = mat*(this->CS);
+        }
 
         this->angular_velocity += this->angular_acceleration*dt;
 
@@ -173,16 +222,14 @@ void SingleStageRocket::launch(double dt) {
         this->velocity = v0 + (a0 + this->acceleration)*dt_half;
 
         if(time > time_record){
+            this->record.position.push_back(this->position);
+            this->record.orientation.push_back(this->CS);
+
             time_record += this->record.t_interval;
 
             if(this->position.z() < -0.5) {
                 break;
             }
-
-            double r = (this->position.z() + 6371000 + this->ground_altitude)*1.56961e-7;
-            this->grav = 9.806*r*r;
-
-            this->sound_speed_inv = 1.0/sqrt(air_const*(this->ground_temperature + this->lapse_rate*this->position.z()));
         }
 
         time += dt;

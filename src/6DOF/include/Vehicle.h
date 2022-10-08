@@ -151,11 +151,21 @@ class WindHistory {
 
 class SingleStageRocket {
 
+    std::vector<double> air_density_table;
+
+    std::vector<double> air_pressure_table;
+
+    std::vector<double> air_sound_speed_table;
+
+    std::vector<double> grav_table;
+
+    void init();
+
 public:
 
-    static constexpr double R_gas = 287.54;
+    static constexpr double R_GAS = 287.052874;
 
-    static constexpr double air_const = 287.54*1.4;
+    static constexpr double AIR_CONST = 287.052874*1.4;
 
     double mass_empty;
 
@@ -179,21 +189,21 @@ public:
 
     Vector angular_acceleration;
 
-    double ground_altitude = 0.0;
+    double ground_altitude;
 
-    double ground_pressure = 101325;
+    double ground_pressure;
 
-    double ground_temperature = 297;
+    double ground_temperature;
 
-    double lapse_rate = 0;
+    double lapse_rate;
 
     void compute_acceleration();
 
     double grav;
 
-    double pressure;
+    double air_pressure;
 
-    double density;
+    double air_density;
 
     double sound_speed_inv;
 
@@ -217,7 +227,11 @@ public:
 
     void set_mass(double empty_mass, double full_mass, double Izz_ratio, double Ixx_ratio);
 
-    void set_ground(double ground_altitude,double ground_pressure,double ground_temperature, double lapse_rate);
+    void set_ground(double ground_altitude, double ground_pressure, double ground_temperature, double lapse_rate);
+
+    void compute_atmosphere();
+
+    void get_air_properties();
 
     void launch(double dt);
 
