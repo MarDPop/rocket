@@ -36,7 +36,7 @@ void Vehicle::get_state_rate(std::array<double,14>& x, double t, std::array<doub
     }
 
     // Integration of quaternion
-    dx[6] = -0.5*(x[10]*x[7] + x[11]*x[8] + x[12]*x[9]);
+    dx[6] = -0.5*Cartesian::dot(&x[10],&x[7]);
     dx[7] = 0.5*(x[10]*x[6] + x[12]*x[8] - x[11]*x[9]);
     dx[8] = 0.5*(x[10]*x[7] - x[12]*x[7] + x[10]*x[9]);
     dx[9] = 0.5*(x[10]*x[8] + x[11]*x[7] - x[10]*x[9]);
@@ -100,6 +100,9 @@ void Vehicle::compute_full_moment(double* w, double* dw){
     dw[2] = (A[6]*Iw[0] + A[7]*Iw[1] + A[8]*Iw[2])*det;
 }
 
+SingleStageRocket::SingleStageRocket() : aero(*this) {
+}
+
 void SingleStageRocket::compute_acceleration() {
 
     if(this->mass > this->mass_empty) {
@@ -111,7 +114,9 @@ void SingleStageRocket::compute_acceleration() {
 
     this->acceleration += this->aero.force;
 
-    this->torque = this->aero.moment;
+    this->acceleration *= (1.0/this->mass);
+
+    this->angular_acceleration = this->aero.moment / (this->mass*this->Izz_ratio);
 
     this->acceleration.data[2] -= this->grav;
 
@@ -137,6 +142,7 @@ void SingleStageRocket::launch(double dt) {
     double dt_half = dt*0.5;
 
     double g;
+    Axis mat;
     while(time < 10000) {
 
         this->compute_acceleration();
@@ -148,13 +154,12 @@ void SingleStageRocket::launch(double dt) {
         this->position += this->velocity*dt;
         this->velocity += this->acceleration*dt;
 
-        Vector rotation = this->angular_velocity*dt;
-        double angle = rotation.norm();
-        rotation *= (1.0/angle);
-        Axis rot_mat;
-        Cartesian::rotation_matrix_angle_axis(angle,rotation,rot_mat);
+        Vector w = this->angular_velocity*dt;
+        double angle = 1.0/w.norm();
+        w *= angle;
+        Cartesian::rotation_matrix_angle_axis(angle,w,mat);
 
-
+        this->CS = mat*(this->CS);
 
         this->angular_velocity += this->angular_acceleration*dt;
 

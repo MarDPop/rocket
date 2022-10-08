@@ -41,22 +41,22 @@ namespace Cartesian {
         }
 
         inline Vector(const Vector& b) {
-            std::copy(b.data,b.data + 3,this->data);
+            memcpy(data,b.data,sizeof(data));
         }
 
         inline Vector(const double* b) {
-            std::copy(b,b+3,this->data);
+            memcpy(data,b,sizeof(data));
         }
 
         inline Vector(double x, double y ,double z) : data{x,y,z} {
         }
 
         inline void operator=(const double* b) {
-            std::copy_n(b,3,this->data);
+            memcpy(data,b,sizeof(data));
         }
 
         inline void operator=(const Vector& b) {
-            std::copy_n(b.data,3,this->data);
+            memcpy(data,b.data,sizeof(data));
         }
 
         inline void zero() {
@@ -203,15 +203,19 @@ namespace Cartesian {
         }
 
         inline Axis(double b[9]) {
-            std::copy_n(b,9,this->data);
+            memcpy(this->data,b,sizeof(this->data));
         }
 
         inline Axis(const Axis& b) {
-            std::copy_n(b.data,9,this->data);
+            memcpy(this->data,b.data,sizeof(this->data));
         }
 
         inline void zero() {
             memset(this->data,0,sizeof(this->data));
+        }
+
+        inline void operator=(const Axis& b) {
+            memcpy(this->data,b.data,sizeof(this->data));
         }
 
         inline Axis operator+(const Axis& b) const noexcept {
@@ -258,12 +262,30 @@ namespace Cartesian {
             return b;
         }
 
-        inline static void mult(const Axis& A, const Axis& b, Axis& c) noexcept {
-            int irow = 0;
-            for(int i = 0; i < 3; i++){
-                x.data[i] = A.data[irow]*b.data[0] + A.data[irow + 1]*b.data[1] + A.data[irow + 2]*b.data[2];
-                irow += 3;
-            }
+        inline Axis operator*(const Axis& B) const noexcept {
+            Axis C;
+            C.data[0] = data[0]*B.data[0] + data[1]*B.data[3] + data[2]*B.data[6];
+            C.data[1] = data[0]*B.data[1] + data[1]*B.data[4] + data[2]*B.data[7];
+            C.data[2] = data[0]*B.data[2] + data[1]*B.data[5] + data[2]*B.data[8];
+            C.data[3] = data[0]*B.data[0] + data[1]*B.data[3] + data[2]*B.data[6];
+            C.data[4] = data[0]*B.data[1] + data[1]*B.data[4] + data[2]*B.data[7];
+            C.data[5] = data[0]*B.data[2] + data[1]*B.data[5] + data[2]*B.data[8];
+            C.data[6] = data[0]*B.data[0] + data[1]*B.data[3] + data[2]*B.data[6];
+            C.data[7] = data[0]*B.data[1] + data[1]*B.data[4] + data[2]*B.data[7];
+            C.data[8] = data[0]*B.data[2] + data[1]*B.data[5] + data[2]*B.data[8];
+            return C;
+        }
+
+        inline static void mult(const Axis& A, const Axis& B, Axis& C) noexcept {
+            C.data[0] = A.data[0]*B.data[0] + A.data[1]*B.data[3] + A.data[2]*B.data[6];
+            C.data[1] = A.data[0]*B.data[1] + A.data[1]*B.data[4] + A.data[2]*B.data[7];
+            C.data[2] = A.data[0]*B.data[2] + A.data[1]*B.data[5] + A.data[2]*B.data[8];
+            C.data[3] = A.data[0]*B.data[0] + A.data[1]*B.data[3] + A.data[2]*B.data[6];
+            C.data[4] = A.data[0]*B.data[1] + A.data[1]*B.data[4] + A.data[2]*B.data[7];
+            C.data[5] = A.data[0]*B.data[2] + A.data[1]*B.data[5] + A.data[2]*B.data[8];
+            C.data[6] = A.data[0]*B.data[0] + A.data[1]*B.data[3] + A.data[2]*B.data[6];
+            C.data[7] = A.data[0]*B.data[1] + A.data[1]*B.data[4] + A.data[2]*B.data[7];
+            C.data[8] = A.data[0]*B.data[2] + A.data[1]*B.data[5] + A.data[2]*B.data[8];
         }
 
         inline static void mult(const Axis& A, const Vector& b, Vector& x) noexcept {
@@ -384,6 +406,88 @@ namespace Cartesian {
         alignas(32) double data[4];
 
         Quaternion() {}
+
+        Quaternion(const double* v) {
+            memcpy(data,v,sizeof(data));
+        }
+
+        Quaternion(const Quaternion& v) {
+            memcpy(data,v.data,sizeof(data));
+        }
+
+        Quaternion(double a, double i, double j, double k) : data{a,i,j,k} {
+        }
+
+        Quaternion conjugate() {
+            Quaternion q;
+            q.data[0] = this->data[0];
+            q.data[1] = -this->data[1];
+            q.data[2] = -this->data[2];
+            q.data[3] = -this->data[3];
+            return q;
+        }
+
+        inline Vector get_vector() {
+            return Vector(data + 1);
+        }
+
+        inline double get_scalar() {
+            return data[0];
+        }
+
+        inline double mag() {
+            return data[0]*data[0] + data[1]*data[1] + data[2]*data[2] + data[3]*data[3];
+        }
+
+        inline void normalize() {
+            double n = 1.0/sqrt(this->mag());
+            data[0] *= n;
+            data[1] *= n;
+            data[2] *= n;
+            data[3] *= n;
+        }
+
+        inline Axis to_rotation_matrix(){
+            Axis out;
+            double i2 = 2*data[1];
+            double j2 = 2*data[2];
+            double k2 = 2*data[3];
+
+            out.data[0] = 1.0 - j2*data[2] - k2*data[3];
+            out.data[4] = 1.0 - i2*data[1] - k2*data[3];
+            out.data[8] = 1.0 - i2*data[1] - j2*data[2];
+            double tmp = k2*data[0];
+            out.data[1] = out.data[3] = i2*data[2];
+            out.data[1] -= tmp;
+            out.data[3] += tmp;
+
+            tmp = j2*data[0];
+            out.data[2] = out.data[6] = i2*data[3];
+            out.data[2] += tmp;
+            out.data[6] -= tmp;
+
+            tmp = i2*data[0];
+            out.data[5] = out.data[7] = j2*data[3];
+            out.data[1] -= tmp;
+            out.data[3] += tmp;
+            return out;
+        }
+
+        inline double w() {
+            return data[0];
+        }
+
+        inline double x() {
+            return data[1];
+        }
+
+        inline double y() {
+            return data[2];
+        }
+
+        inline double z() {
+            return data[3];
+        }
 
     };
 

@@ -7,6 +7,8 @@
 #include <cmath>
 #include <functional>
 
+//#include "../../../lib/Eigen/Dense"
+
 #include "../../common/include/Dynamics.h"
 #include "Stage.h"
 #include "Body.h"
@@ -196,7 +198,7 @@ public:
     double sound_speed_inv;
 
     struct Recording {
-        double t_interval;
+        double t_interval = 1;
         std::vector<Vector> position;
         std::vector<Axis> orientation;
     };

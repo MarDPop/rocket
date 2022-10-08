@@ -176,7 +176,7 @@
 
 1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\1d\include\physics.h
 
-1664857086 source:c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\app\test.cpp
+1665207107 source:c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\app\test.cpp
 	<iostream>
 	"../1D/include/structures.h"
 	"../common/include/structures.h"
@@ -211,7 +211,7 @@
 	<string>
 	<iostream>
 
-1664856361 c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\common\include\cartesian.h
+1665207065 c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\common\include\cartesian.h
 	<cmath>
 	<algorithm>
 	"string.h"
@@ -250,16 +250,17 @@
 1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\6dof\include\gnc.h
 	"Action.h"
 
-1663818196 c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\6dof\include\aerodynamics.h
+1665201265 c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\6dof\include\aerodynamics.h
 	"Action.h"
 	"Atmosphere.h"
 
-1664679349 c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\6dof\include\atmosphere.h
+1665201265 c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\6dof\include\atmosphere.h
 	<array>
 	<cmath>
 	<vector>
+	"../../common/include/Geodesy.h"
 
-1664678868 c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\6dof\include\thruster.h
+1665201265 c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\6dof\include\thruster.h
 	"Component.h"
 	"Action.h"
 	<vector>
@@ -268,10 +269,11 @@
 1663816288 c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\6dof\include\component.h
 	"../../common/include/Cartesian.h"
 
-1664726425 c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\6dof\include\vehicle.h
+1665206836 c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\6dof\include\vehicle.h
 	<vector>
 	<memory>
 	<array>
+	<map>
 	<cmath>
 	<functional>
 	"../../common/include/Dynamics.h"
@@ -297,7 +299,7 @@
 
 1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\6dof\include\geoid.h
 
-1664858207 c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\common\include\time.h
+1664859316 c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\common\include\time.h
 
 1662824479 source:c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\6dof\src\stagedynamics.cpp
 	"../include/StageDynamics.h"
@@ -310,21 +312,21 @@
 	"GNC.h"
 	"Thruster.h"
 
-1663816152 source:c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\6dof\src\thruster.cpp
+1665201265 source:c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\6dof\src\thruster.cpp
 	"../include/Thruster.h"
 	"../../common/include/util.h"
 	<fstream>
 
-1664725637 source:c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\6dof\src\vehicle.cpp
+1665206841 source:c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\6dof\src\vehicle.cpp
 	"../include/Vehicle.h"
 	"../../common/include/util.h"
 
-1664725616 source:c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\6dof\src\aerodynamics.cpp
+1665206642 source:c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\6dof\src\aerodynamics.cpp
 	"../include/Aerodynamics.h"
 	"../include/Vehicle.h"
 	"../../common/include/Cartesian.h"
 
-1664679390 source:c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\6dof\src\atmosphere.cpp
+1665201265 source:c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\6dof\src\atmosphere.cpp
 	"../include/Atmosphere.h"
 	"../../common/include/util.h"
 	<fstream>
@@ -380,12 +382,13 @@
 1664856657 source:c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\common\src\planet.cpp
 	"../include/Planet.h"
 
-1664857042 source:c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\app\simulation.cpp
+1665201265 source:c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\app\simulation.cpp
 	"Simulation.h"
 	<fstream>
 	<stdexcept>
+	<ctime>
 
-1664857024 c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\app\simulation.h
+1664859225 c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\app\simulation.h
 	"../common/include/Geodesy.h"
 	<string>
 	<memory>
@@ -605,4 +608,1132 @@
 	<fstream>
 	<stdexcept>
 	<ctime>
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\dense
+	"Core"
+	"LU"
+	"Cholesky"
+	"QR"
+	"SVD"
+	"Geometry"
+	"Eigenvalues"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\core
+	"src/Core/util/DisableStupidWarnings.h"
+	"src/Core/util/Macros.h"
+	"src/Core/util/ConfigureVectorization.h"
+	<cuda_runtime.h>
+	<hip/hip_runtime.h>
+	<new>
+	<complex>
+	"src/Core/util/MKL_support.h"
+	<atomic>
+	<omp.h>
+	<cerrno>
+	<cstddef>
+	<cstdlib>
+	<cmath>
+	<cassert>
+	<functional>
+	<sstream>
+	<iosfwd>
+	<cstring>
+	<string>
+	<limits>
+	<climits>
+	<algorithm>
+	<array>
+	<type_traits>
+	<iostream>
+	<intrin.h>
+	<CL/sycl.hpp>
+	<map>
+	<memory>
+	<utility>
+	<thread>
+	"src/Core/util/Constants.h"
+	"src/Core/util/Meta.h"
+	"src/Core/util/ForwardDeclarations.h"
+	"src/Core/util/StaticAssert.h"
+	"src/Core/util/XprHelper.h"
+	"src/Core/util/Memory.h"
+	"src/Core/util/IntegralConstant.h"
+	"src/Core/util/Serializer.h"
+	"src/Core/util/SymbolicIndex.h"
+	"src/Core/NumTraits.h"
+	"src/Core/MathFunctions.h"
+	"src/Core/GenericPacketMath.h"
+	"src/Core/MathFunctionsImpl.h"
+	"src/Core/arch/Default/ConjHelper.h"
+	"src/Core/arch/Default/Half.h"
+	"src/Core/arch/Default/BFloat16.h"
+	"src/Core/arch/Default/TypeCasting.h"
+	"src/Core/arch/Default/GenericPacketMathFunctionsFwd.h"
+	"src/Core/arch/SSE/PacketMath.h"
+	"src/Core/arch/SSE/TypeCasting.h"
+	"src/Core/arch/SSE/Complex.h"
+	"src/Core/arch/AVX/PacketMath.h"
+	"src/Core/arch/AVX/TypeCasting.h"
+	"src/Core/arch/AVX/Complex.h"
+	"src/Core/arch/AVX512/PacketMath.h"
+	"src/Core/arch/AVX512/TypeCasting.h"
+	"src/Core/arch/AVX512/Complex.h"
+	"src/Core/arch/SSE/MathFunctions.h"
+	"src/Core/arch/AVX/MathFunctions.h"
+	"src/Core/arch/AVX512/MathFunctions.h"
+	"src/Core/arch/AVX512/TrsmKernel.h"
+	"src/Core/arch/SSE/PacketMath.h"
+	"src/Core/arch/SSE/TypeCasting.h"
+	"src/Core/arch/SSE/Complex.h"
+	"src/Core/arch/AVX/PacketMath.h"
+	"src/Core/arch/AVX/TypeCasting.h"
+	"src/Core/arch/AVX/Complex.h"
+	"src/Core/arch/SSE/MathFunctions.h"
+	"src/Core/arch/AVX/MathFunctions.h"
+	"src/Core/arch/SSE/PacketMath.h"
+	"src/Core/arch/SSE/TypeCasting.h"
+	"src/Core/arch/SSE/MathFunctions.h"
+	"src/Core/arch/SSE/Complex.h"
+	"src/Core/arch/AltiVec/PacketMath.h"
+	"src/Core/arch/AltiVec/MathFunctions.h"
+	"src/Core/arch/AltiVec/Complex.h"
+	"src/Core/arch/NEON/PacketMath.h"
+	"src/Core/arch/NEON/TypeCasting.h"
+	"src/Core/arch/NEON/MathFunctions.h"
+	"src/Core/arch/NEON/Complex.h"
+	"src/Core/arch/SVE/PacketMath.h"
+	"src/Core/arch/SVE/TypeCasting.h"
+	"src/Core/arch/SVE/MathFunctions.h"
+	"src/Core/arch/ZVector/PacketMath.h"
+	"src/Core/arch/ZVector/MathFunctions.h"
+	"src/Core/arch/ZVector/Complex.h"
+	"src/Core/arch/MSA/PacketMath.h"
+	"src/Core/arch/MSA/MathFunctions.h"
+	"src/Core/arch/MSA/Complex.h"
+	"src/Core/arch/GPU/PacketMath.h"
+	"src/Core/arch/GPU/MathFunctions.h"
+	"src/Core/arch/GPU/TypeCasting.h"
+	"src/Core/arch/SYCL/SyclMemoryModel.h"
+	"src/Core/arch/SYCL/InteropHeaders.h"
+	"src/Core/arch/SYCL/PacketMath.h"
+	"src/Core/arch/SYCL/MathFunctions.h"
+	"src/Core/arch/SYCL/TypeCasting.h"
+	"src/Core/arch/Default/Settings.h"
+	"src/Core/arch/Default/GenericPacketMathFunctions.h"
+	"src/Core/functors/TernaryFunctors.h"
+	"src/Core/functors/BinaryFunctors.h"
+	"src/Core/functors/UnaryFunctors.h"
+	"src/Core/functors/NullaryFunctors.h"
+	"src/Core/functors/StlFunctors.h"
+	"src/Core/functors/AssignmentFunctors.h"
+	"src/Core/arch/GPU/Complex.h"
+	"src/Core/arch/NEON/UnaryFunctors.h"
+	"src/Core/util/IndexedViewHelper.h"
+	"src/Core/util/ReshapedHelper.h"
+	"src/Core/ArithmeticSequence.h"
+	"src/Core/IO.h"
+	"src/Core/DenseCoeffsBase.h"
+	"src/Core/DenseBase.h"
+	"src/Core/MatrixBase.h"
+	"src/Core/EigenBase.h"
+	"src/Core/Product.h"
+	"src/Core/CoreEvaluators.h"
+	"src/Core/AssignEvaluator.h"
+	"src/Core/Assign.h"
+	"src/Core/ArrayBase.h"
+	"src/Core/util/BlasUtil.h"
+	"src/Core/DenseStorage.h"
+	"src/Core/NestByValue.h"
+	"src/Core/ReturnByValue.h"
+	"src/Core/NoAlias.h"
+	"src/Core/PlainObjectBase.h"
+	"src/Core/Matrix.h"
+	"src/Core/Array.h"
+	"src/Core/CwiseTernaryOp.h"
+	"src/Core/CwiseBinaryOp.h"
+	"src/Core/CwiseUnaryOp.h"
+	"src/Core/CwiseNullaryOp.h"
+	"src/Core/CwiseUnaryView.h"
+	"src/Core/SelfCwiseBinaryOp.h"
+	"src/Core/Dot.h"
+	"src/Core/StableNorm.h"
+	"src/Core/Stride.h"
+	"src/Core/MapBase.h"
+	"src/Core/Map.h"
+	"src/Core/Ref.h"
+	"src/Core/Block.h"
+	"src/Core/VectorBlock.h"
+	"src/Core/IndexedView.h"
+	"src/Core/Reshaped.h"
+	"src/Core/Transpose.h"
+	"src/Core/DiagonalMatrix.h"
+	"src/Core/Diagonal.h"
+	"src/Core/DiagonalProduct.h"
+	"src/Core/Redux.h"
+	"src/Core/Visitor.h"
+	"src/Core/Fuzzy.h"
+	"src/Core/Swap.h"
+	"src/Core/CommaInitializer.h"
+	"src/Core/GeneralProduct.h"
+	"src/Core/Solve.h"
+	"src/Core/Inverse.h"
+	"src/Core/SolverBase.h"
+	"src/Core/PermutationMatrix.h"
+	"src/Core/Transpositions.h"
+	"src/Core/TriangularMatrix.h"
+	"src/Core/SelfAdjointView.h"
+	"src/Core/products/GeneralBlockPanelKernel.h"
+	"src/Core/products/Parallelizer.h"
+	"src/Core/ProductEvaluators.h"
+	"src/Core/products/GeneralMatrixVector.h"
+	"src/Core/products/GeneralMatrixMatrix.h"
+	"src/Core/SolveTriangular.h"
+	"src/Core/products/GeneralMatrixMatrixTriangular.h"
+	"src/Core/products/SelfadjointMatrixVector.h"
+	"src/Core/products/SelfadjointMatrixMatrix.h"
+	"src/Core/products/SelfadjointProduct.h"
+	"src/Core/products/SelfadjointRank2Update.h"
+	"src/Core/products/TriangularMatrixVector.h"
+	"src/Core/products/TriangularMatrixMatrix.h"
+	"src/Core/products/TriangularSolverMatrix.h"
+	"src/Core/products/TriangularSolverVector.h"
+	"src/Core/BandMatrix.h"
+	"src/Core/CoreIterators.h"
+	"src/Core/ConditionEstimator.h"
+	"src/Core/arch/AltiVec/MatrixProduct.h"
+	"src/Core/arch/NEON/GeneralBlockPanelKernel.h"
+	"src/Core/arch/AVX512/GemmKernel.h"
+	"src/Core/BooleanRedux.h"
+	"src/Core/Select.h"
+	"src/Core/VectorwiseOp.h"
+	"src/Core/PartialReduxEvaluator.h"
+	"src/Core/Random.h"
+	"src/Core/Replicate.h"
+	"src/Core/Reverse.h"
+	"src/Core/ArrayWrapper.h"
+	"src/Core/StlIterators.h"
+	"src/Core/products/GeneralMatrixMatrix_BLAS.h"
+	"src/Core/products/GeneralMatrixVector_BLAS.h"
+	"src/Core/products/GeneralMatrixMatrixTriangular_BLAS.h"
+	"src/Core/products/SelfadjointMatrixMatrix_BLAS.h"
+	"src/Core/products/SelfadjointMatrixVector_BLAS.h"
+	"src/Core/products/TriangularMatrixMatrix_BLAS.h"
+	"src/Core/products/TriangularMatrixVector_BLAS.h"
+	"src/Core/products/TriangularSolverMatrix_BLAS.h"
+	"src/Core/Assign_MKL.h"
+	"src/Core/GlobalFunctions.h"
+	"src/Core/util/ReenableStupidWarnings.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\util\disablestupidwarnings.h
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\util\macros.h
+	"../InternalHeaderCheck.h"
+	<cuda.h>
+	<hip/hip_runtime.h>
+	<cmath>
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\internalheadercheck.h
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\util\configurevectorization.h
+	<malloc.h>
+	<immintrin.h>
+	<mmintrin.h>
+	<emmintrin.h>
+	<xmmintrin.h>
+	<pmmintrin.h>
+	<tmmintrin.h>
+	<smmintrin.h>
+	<nmmintrin.h>
+	<immintrin.h>
+	<altivec.h>
+	<altivec.h>
+	<arm_neon.h>
+	<arm_sve.h>
+	<vecintrin.h>
+	<msa.h>
+	<arm_fp16.h>
+	<immintrin.h>
+	<vector_types.h>
+	<cuda_runtime_api.h>
+	<cuda_fp16.h>
+	<hip/hip_vector_types.h>
+	<hip/hip_fp16.h>
+	<hip/hip_bfloat16.h>
+	"../InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\util\mkl_support.h
+	<mkl.h>
+	"../../misc/blas.h"
+	"../InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\misc\blas.h
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\util\constants.h
+	"../InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\util\meta.h
+	"../InternalHeaderCheck.h"
+	<cfloat>
+	<math_constants.h>
+	"Eigen/src/Core/arch/HIP/hcc/math_constants.h"
+	<cstdint>
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\util\forwarddeclarations.h
+	"../InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\util\staticassert.h
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\util\xprhelper.h
+	"../InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\util\memory.h
+	"../InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\util\integralconstant.h
+	"../InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\util\serializer.h
+	<type_traits>
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\util\symbolicindex.h
+	"../InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\numtraits.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\mathfunctions.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\genericpacketmath.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\mathfunctionsimpl.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\arch\default\conjhelper.h
+	"../../InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\arch\default\half.h
+	"../../InternalHeaderCheck.h"
+	<sstream>
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\arch\default\bfloat16.h
+	"../../InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\arch\default\typecasting.h
+	"../../InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\arch\default\genericpacketmathfunctionsfwd.h
+	"../../InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\arch\sse\packetmath.h
+	"../../InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\arch\sse\typecasting.h
+	"../../InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\arch\sse\complex.h
+	"../../InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\arch\avx\packetmath.h
+	"../../InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\arch\avx\typecasting.h
+	"../../InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\arch\avx\complex.h
+	"../../InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\arch\avx512\packetmath.h
+	"../../InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\arch\avx512\typecasting.h
+	"../../InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\arch\avx512\complex.h
+	"../../InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\arch\sse\mathfunctions.h
+	"../../InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\arch\avx\mathfunctions.h
+	"../../InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\arch\avx512\mathfunctions.h
+	"../../InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\arch\avx512\trsmkernel.h
+	"../../InternalHeaderCheck.h"
+	"TrsmUnrolls.inc"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\arch\avx512\trsmunrolls.inc
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\arch\altivec\packetmath.h
+	"../../InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\arch\altivec\mathfunctions.h
+	"../../InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\arch\altivec\complex.h
+	"../../InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\arch\neon\packetmath.h
+	"../../InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\arch\neon\typecasting.h
+	"../../InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\arch\neon\mathfunctions.h
+	"../../InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\arch\neon\complex.h
+	"../../InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\arch\sve\packetmath.h
+	"../../InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\arch\sve\typecasting.h
+	"../../InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\arch\sve\mathfunctions.h
+	"../../InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\arch\zvector\packetmath.h
+	"../../InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\arch\zvector\mathfunctions.h
+	"../../InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\arch\zvector\complex.h
+	"../../InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\arch\msa\packetmath.h
+	<iostream>
+	<string>
+	"../../InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\arch\msa\mathfunctions.h
+	"../../InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\arch\msa\complex.h
+	<iostream>
+	"../../InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\arch\gpu\packetmath.h
+	"../../InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\arch\gpu\mathfunctions.h
+	"../../InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\arch\gpu\typecasting.h
+	"../../InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\arch\sycl\syclmemorymodel.h
+	<CL/sycl.hpp>
+	<stdexcept>
+	<cstddef>
+	<queue>
+	<set>
+	<unordered_map>
+	"../../InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\arch\sycl\interopheaders.h
+	"../../InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\arch\sycl\packetmath.h
+	<type_traits>
+	"../../InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\arch\sycl\mathfunctions.h
+	"../../InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\arch\sycl\typecasting.h
+	"../../InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\arch\default\settings.h
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\arch\default\genericpacketmathfunctions.h
+	"../../InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\functors\ternaryfunctors.h
+	"../InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\functors\binaryfunctors.h
+	"../InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\functors\unaryfunctors.h
+	"../InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\functors\nullaryfunctors.h
+	"../InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\functors\stlfunctors.h
+	"../InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\functors\assignmentfunctors.h
+	"../InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\arch\gpu\complex.h
+	"../../InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\arch\neon\unaryfunctors.h
+	"../../InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\util\indexedviewhelper.h
+	"../InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\util\reshapedhelper.h
+	"../InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\arithmeticsequence.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\io.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\densecoeffsbase.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\densebase.h
+	"./InternalHeaderCheck.h"
+	"../plugins/CommonCwiseUnaryOps.h"
+	"../plugins/BlockMethods.h"
+	"../plugins/IndexedViewMethods.h"
+	"../plugins/ReshapedMethods.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\plugins\commoncwiseunaryops.h
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\plugins\blockmethods.h
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\plugins\indexedviewmethods.h
+	"IndexedViewMethods.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\plugins\reshapedmethods.h
+	"ReshapedMethods.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\matrixbase.h
+	"./InternalHeaderCheck.h"
+	"../plugins/CommonCwiseBinaryOps.h"
+	"../plugins/MatrixCwiseUnaryOps.h"
+	"../plugins/MatrixCwiseBinaryOps.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\plugins\commoncwisebinaryops.h
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\plugins\matrixcwiseunaryops.h
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\plugins\matrixcwisebinaryops.h
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\eigenbase.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\product.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\coreevaluators.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\assignevaluator.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\assign.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\arraybase.h
+	"./InternalHeaderCheck.h"
+	"../plugins/MatrixCwiseUnaryOps.h"
+	"../plugins/ArrayCwiseUnaryOps.h"
+	"../plugins/CommonCwiseBinaryOps.h"
+	"../plugins/MatrixCwiseBinaryOps.h"
+	"../plugins/ArrayCwiseBinaryOps.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\plugins\arraycwiseunaryops.h
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\plugins\arraycwisebinaryops.h
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\util\blasutil.h
+	"../InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\densestorage.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\nestbyvalue.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\returnbyvalue.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\noalias.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\plainobjectbase.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\matrix.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\array.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\cwiseternaryop.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\cwisebinaryop.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\cwiseunaryop.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\cwisenullaryop.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\cwiseunaryview.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\selfcwisebinaryop.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\dot.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\stablenorm.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\stride.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\mapbase.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\map.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\ref.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\block.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\vectorblock.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\indexedview.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\reshaped.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\transpose.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\diagonalmatrix.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\diagonal.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\diagonalproduct.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\redux.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\visitor.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\fuzzy.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\swap.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\commainitializer.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\generalproduct.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\solve.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\inverse.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\solverbase.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\permutationmatrix.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\transpositions.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\triangularmatrix.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\selfadjointview.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\products\generalblockpanelkernel.h
+	"../InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\products\parallelizer.h
+	"../InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\productevaluators.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\products\generalmatrixvector.h
+	"../InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\products\generalmatrixmatrix.h
+	"../InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\solvetriangular.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\products\generalmatrixmatrixtriangular.h
+	"../InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\products\selfadjointmatrixvector.h
+	"../InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\products\selfadjointmatrixmatrix.h
+	"../InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\products\selfadjointproduct.h
+	"../InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\products\selfadjointrank2update.h
+	"../InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\products\triangularmatrixvector.h
+	"../InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\products\triangularmatrixmatrix.h
+	"../InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\products\triangularsolvermatrix.h
+	"../InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\products\triangularsolvervector.h
+	"../InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\bandmatrix.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\coreiterators.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\conditionestimator.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\arch\altivec\matrixproduct.h
+	"MatrixProductCommon.h"
+	"MatrixProductMMA.h"
+	"../../InternalHeaderCheck.h"
+	"MatrixVectorProduct.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\arch\altivec\matrixproductcommon.h
+	"../../InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\arch\altivec\matrixproductmma.h
+	"../../InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\arch\altivec\matrixvectorproduct.h
+	"../../InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\arch\neon\generalblockpanelkernel.h
+	"../../InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\arch\avx512\gemmkernel.h
+	<intrin.h>
+	<x86intrin.h>
+	<immintrin.h>
+	<type_traits>
+	"../../InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\booleanredux.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\select.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\vectorwiseop.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\partialreduxevaluator.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\random.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\replicate.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\reverse.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\arraywrapper.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\stliterators.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\products\generalmatrixmatrix_blas.h
+	"../InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\products\generalmatrixvector_blas.h
+	"../InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\products\generalmatrixmatrixtriangular_blas.h
+	"../InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\products\selfadjointmatrixmatrix_blas.h
+	"../InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\products\selfadjointmatrixvector_blas.h
+	"../InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\products\triangularmatrixmatrix_blas.h
+	"../InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\products\triangularmatrixvector_blas.h
+	"../InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\products\triangularsolvermatrix_blas.h
+	"../InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\assign_mkl.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\globalfunctions.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\core\util\reenablestupidwarnings.h
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\lu
+	"Core"
+	"src/Core/util/DisableStupidWarnings.h"
+	"src/misc/Kernel.h"
+	"src/misc/Image.h"
+	"src/LU/FullPivLU.h"
+	"src/LU/PartialPivLU.h"
+	"src/misc/lapacke_helpers.h"
+	"src/LU/PartialPivLU_LAPACKE.h"
+	"src/LU/Determinant.h"
+	"src/LU/InverseImpl.h"
+	"src/LU/arch/InverseSize4.h"
+	"src/Core/util/ReenableStupidWarnings.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\misc\kernel.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\misc\internalheadercheck.h
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\misc\image.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\lu\fullpivlu.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\lu\internalheadercheck.h
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\lu\partialpivlu.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\misc\lapacke_helpers.h
+	"./InternalHeaderCheck.h"
+	"mkl_lapacke.h"
+	"lapacke.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\misc\lapacke.h
+	"lapacke_config.h"
+	<stdlib.h>
+	<complex.h>
+	<complex.h>
+	"lapacke_mangling.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\misc\lapacke_mangling.h
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\lu\partialpivlu_lapacke.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\lu\determinant.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\lu\inverseimpl.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\lu\arch\inversesize4.h
+	"../InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\cholesky
+	"Core"
+	"Jacobi"
+	"src/Core/util/DisableStupidWarnings.h"
+	"src/Cholesky/LLT.h"
+	"src/Cholesky/LDLT.h"
+	"src/misc/lapacke_helpers.h"
+	"src/Cholesky/LLT_LAPACKE.h"
+	"src/Core/util/ReenableStupidWarnings.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\jacobi
+	"Core"
+	"src/Core/util/DisableStupidWarnings.h"
+	"src/Jacobi/Jacobi.h"
+	"src/Core/util/ReenableStupidWarnings.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\jacobi\jacobi.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\jacobi\internalheadercheck.h
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\cholesky\llt.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\cholesky\internalheadercheck.h
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\cholesky\ldlt.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\cholesky\llt_lapacke.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\qr
+	"Core"
+	"Cholesky"
+	"Jacobi"
+	"Householder"
+	"src/Core/util/DisableStupidWarnings.h"
+	"src/QR/HouseholderQR.h"
+	"src/QR/FullPivHouseholderQR.h"
+	"src/QR/ColPivHouseholderQR.h"
+	"src/QR/CompleteOrthogonalDecomposition.h"
+	"src/misc/lapacke_helpers.h"
+	"src/QR/HouseholderQR_LAPACKE.h"
+	"src/QR/ColPivHouseholderQR_LAPACKE.h"
+	"src/Core/util/ReenableStupidWarnings.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\householder
+	"Core"
+	"src/Core/util/DisableStupidWarnings.h"
+	"src/Householder/Householder.h"
+	"src/Householder/HouseholderSequence.h"
+	"src/Householder/BlockHouseholder.h"
+	"src/Core/util/ReenableStupidWarnings.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\householder\householder.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\householder\internalheadercheck.h
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\householder\householdersequence.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\householder\blockhouseholder.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\qr\householderqr.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\qr\internalheadercheck.h
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\qr\fullpivhouseholderqr.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\qr\colpivhouseholderqr.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\qr\completeorthogonaldecomposition.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\qr\householderqr_lapacke.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\qr\colpivhouseholderqr_lapacke.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\svd
+	"QR"
+	"Householder"
+	"Jacobi"
+	"src/Core/util/DisableStupidWarnings.h"
+	"src/misc/RealSvd2x2.h"
+	"src/SVD/UpperBidiagonalization.h"
+	"src/SVD/SVDBase.h"
+	"src/SVD/JacobiSVD.h"
+	"src/SVD/BDCSVD.h"
+	"mkl_lapacke.h"
+	"src/misc/lapacke.h"
+	"src/SVD/JacobiSVD_LAPACKE.h"
+	"src/Core/util/ReenableStupidWarnings.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\misc\realsvd2x2.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\svd\upperbidiagonalization.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\svd\internalheadercheck.h
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\svd\svdbase.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\svd\jacobisvd.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\svd\bdcsvd.h
+	"./InternalHeaderCheck.h"
+	<iostream>
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\svd\jacobisvd_lapacke.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\geometry
+	"Core"
+	"SVD"
+	"LU"
+	<limits>
+	"src/Core/util/DisableStupidWarnings.h"
+	"src/Geometry/OrthoMethods.h"
+	"src/Geometry/EulerAngles.h"
+	"src/Geometry/Homogeneous.h"
+	"src/Geometry/RotationBase.h"
+	"src/Geometry/Rotation2D.h"
+	"src/Geometry/Quaternion.h"
+	"src/Geometry/AngleAxis.h"
+	"src/Geometry/Transform.h"
+	"src/Geometry/Translation.h"
+	"src/Geometry/Scaling.h"
+	"src/Geometry/Hyperplane.h"
+	"src/Geometry/ParametrizedLine.h"
+	"src/Geometry/AlignedBox.h"
+	"src/Geometry/Umeyama.h"
+	"src/Geometry/arch/Geometry_SIMD.h"
+	"src/Core/util/ReenableStupidWarnings.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\geometry\orthomethods.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\geometry\internalheadercheck.h
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\geometry\eulerangles.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\geometry\homogeneous.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\geometry\rotationbase.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\geometry\rotation2d.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\geometry\quaternion.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\geometry\angleaxis.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\geometry\transform.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\geometry\translation.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\geometry\scaling.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\geometry\hyperplane.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\geometry\parametrizedline.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\geometry\alignedbox.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\geometry\umeyama.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\geometry\arch\geometry_simd.h
+	"../InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\eigenvalues
+	"Core"
+	"Cholesky"
+	"Jacobi"
+	"Householder"
+	"LU"
+	"Geometry"
+	"src/Core/util/DisableStupidWarnings.h"
+	"src/misc/RealSvd2x2.h"
+	"src/Eigenvalues/Tridiagonalization.h"
+	"src/Eigenvalues/RealSchur.h"
+	"src/Eigenvalues/EigenSolver.h"
+	"src/Eigenvalues/SelfAdjointEigenSolver.h"
+	"src/Eigenvalues/GeneralizedSelfAdjointEigenSolver.h"
+	"src/Eigenvalues/HessenbergDecomposition.h"
+	"src/Eigenvalues/ComplexSchur.h"
+	"src/Eigenvalues/ComplexEigenSolver.h"
+	"src/Eigenvalues/RealQZ.h"
+	"src/Eigenvalues/GeneralizedEigenSolver.h"
+	"src/Eigenvalues/MatrixBaseEigenvalues.h"
+	"mkl_lapacke.h"
+	"src/misc/lapacke.h"
+	"src/Eigenvalues/RealSchur_LAPACKE.h"
+	"src/Eigenvalues/ComplexSchur_LAPACKE.h"
+	"src/Eigenvalues/SelfAdjointEigenSolver_LAPACKE.h"
+	"src/Core/util/ReenableStupidWarnings.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\eigenvalues\tridiagonalization.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\eigenvalues\internalheadercheck.h
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\eigenvalues\realschur.h
+	"./HessenbergDecomposition.h"
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\eigenvalues\hessenbergdecomposition.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\eigenvalues\eigensolver.h
+	"./RealSchur.h"
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\eigenvalues\selfadjointeigensolver.h
+	"./Tridiagonalization.h"
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\eigenvalues\generalizedselfadjointeigensolver.h
+	"./Tridiagonalization.h"
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\eigenvalues\complexschur.h
+	"./HessenbergDecomposition.h"
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\eigenvalues\complexeigensolver.h
+	"./ComplexSchur.h"
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\eigenvalues\realqz.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\eigenvalues\generalizedeigensolver.h
+	"./RealQZ.h"
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\eigenvalues\matrixbaseeigenvalues.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\eigenvalues\realschur_lapacke.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\eigenvalues\complexschur_lapacke.h
+	"./InternalHeaderCheck.h"
+
+1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\eigenvalues\selfadjointeigensolver_lapacke.h
+	"./InternalHeaderCheck.h"
 

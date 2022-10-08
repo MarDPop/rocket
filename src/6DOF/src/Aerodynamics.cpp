@@ -74,6 +74,9 @@ void SingleStageAerodynamics::update() {
 
     v2 *= this->ref_area*rocket.density*0.5;
 
+    Vector lift = unit_v.cross(arm);
+    lift.normalize();
+
     this->moment = arm*(CM*v2);
-    this->force =
+    this->force = (unit_v*CD + lift*CL)*v2;
 }

@@ -52,9 +52,19 @@ void test_sugar() {
 
 void test() {
 
-    Vehicle rocket;
+    SingleStageRocket rocket;
 
     SingleSimulation sim;
+
+    double mass_full = 1000;
+    double volume = 1;
+    double aspect_ratio = 10;
+    double r = cbrt(volume/(aspect_ratio*M_PI));
+    double h = aspect_ratio*r;
+
+    rocket.set_mass(mass_full*0.5,mass_full,0.5*r*r,(3*r*r + h*h)/12.0);
+
+    rocket.launch(0.1);
 
 
 }
