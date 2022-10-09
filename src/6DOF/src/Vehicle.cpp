@@ -3,6 +3,7 @@
 #include "../../common/include/util.h"
 
 #include <stdexcept>
+#include <iostream>
 
 Vehicle::Vehicle() {}
 
@@ -255,7 +256,7 @@ SingleStageRocket::SingleStageRocket(const std::string& fn) : aero(*this) {
         this->thruster.add_thrust_point(std::stod(data[0]),std::stod(data[1]),std::stod(data[2]));
     }
 
-    if(std::getline(file, line)) {
+    if(!std::getline(file, line)) {
         return;
     }
     while(line.size() == 0 || line[0] == '#') {
@@ -384,6 +385,8 @@ void SingleStageRocket::launch(double dt) {
 
     this->init();
 
+    bool burnout = false;
+
     Axis mat;
     while(time < 10000) {
 
@@ -427,6 +430,11 @@ void SingleStageRocket::launch(double dt) {
 
             if(this->position.z() < -0.5) {
                 break;
+            }
+
+            if(!burnout && this->mass <= this->mass_empty) {
+                std::cout << "Burnout time: " << time << std::endl;
+                burnout = true;
             }
         }
 

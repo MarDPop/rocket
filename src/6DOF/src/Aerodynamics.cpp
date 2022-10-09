@@ -103,5 +103,5 @@ void SingleStageAerodynamics::update() {
     }
 
     this->moment = arm*(CM*v2); // arm length build into CM
-    this->force = (unit_v*CD + lift*CL)*v2;
+    this->force = (lift*CL - unit_v*CD)*v2;
 }

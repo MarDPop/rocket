@@ -319,9 +319,10 @@ public:
     * Internal struct definition to record states
     */
     struct Recording {
-        double t_interval = 1;
+        double t_interval = 0.5;
         std::vector<Vector> position;
         std::vector<Axis> orientation;
+        std::vector<double> test_value;
     };
 
     Recording record;
