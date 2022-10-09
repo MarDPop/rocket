@@ -52,46 +52,10 @@ void test_sugar() {
 
 void test() {
 
-    std::cout << "begin" << std::endl;
 
-    SingleStageRocket rocket;
-
-    SingleSimulation sim;
-
-    double mass_full = 100;
-    double aspect_ratio = 10;
-    double volume = mass_full / 1000;
-    double r = cbrt(volume/(aspect_ratio*M_PI));
-    double h = aspect_ratio*r;
-
-    rocket.set_mass(mass_full*0.5,mass_full,0.5*r*r,(3*r*r + h*h)/12.0);
-
-    double twr = 3;
-    double isp = 110;
-
-    rocket.thruster.thrust = twr*mass_full*9.806;
-    rocket.thruster.mass_rate = rocket.thruster.thrust/(isp*9.806);
-
-    rocket.aero.ref_area = r*r*M_PI;
-    rocket.aero.ref_length = h;
-    rocket.aero.CD0 = 0.7*rocket.aero.ref_area;
-    rocket.aero.CL_alpha = 4*rocket.aero.ref_area;
-    rocket.aero.CM_alpha = -0.1*rocket.aero.ref_area*h;
-    rocket.aero.K = 0.01;
-    rocket.aero.stall_angle = 10.0*M_PI/180.0;
-
-    std::cout << rocket.mass_empty << std::endl;
-
-    rocket.launch(0.1);
-
-    std::cout << "Done." << std::endl;
-
-    for( int i = 0; i < rocket.record.position.size();i++) {
-        std::cout << i*rocket.record.t_interval << " " << util::to_string(rocket.record.position[i].data,3) << std::endl;
-    }
 }
 
-int main(int argc, char *argv[]) {
+int main_test(int argc, char *argv[]) {
 
     test();
 

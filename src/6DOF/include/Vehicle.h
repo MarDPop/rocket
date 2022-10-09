@@ -147,19 +147,96 @@ class SingleStageControl {
 
 class WindHistory {
 
+    std::vector<double> times;
+    std::vector<Vector> speed;
+    double* titer;
+    Vector* siter;
+public:
+
+    inline void reset() {
+        this->titer = times.data();
+        this->siter = speed.data();
+    }
+
+    WindHistory(std::string fn);
+
+    WindHistory(std::vector<double> t, std::vector<Vector> s) : times(t) , speed(s) {
+        this->reset();
+    }
+
+    inline Vector* get(double time) {
+        while(time < *titer) {
+            titer++;
+            siter++;
+        }
+        return siter;
+    }
 };
 
 class SingleStageRocket {
 
+    /**
+    * Mass dry (kg)
+    */
+    double mass_empty;
+
+    /**
+    * Mass with propellant (kg)
+    */
+    double mass_full;
+
+    /**
+    * Inertia properties : Ixx, Izz, COG
+    */
+    double I_empty[3];
+
+    /**
+    * change in Inertia vs mass
+    */
+    double dIdm[3];
+
+    /**
+    * Heading to which the rocket z axis is pointed (rad)
+    */
+    double launch_heading;
+
+    /**
+    * The angle away from UP that the z axis of the rocket is tilted (rad)
+    */
+    double launch_angle = 0;
+
+    /**
+    * ground altitude from MSL (m)
+    */
+    double ground_altitude;
+
+    /**
+    * Ground measured pressure (Pa)
+    */
+    double ground_pressure;
+
+    /**
+    * Ground measured temperature (K)
+    */
+    double ground_temperature;
+
+    /**
+    * Lapse rate (K/m), assumed constant for flight (invalid after 10km)
+    */
+    double lapse_rate;
+
+    /* ATMOSPHERE TABLE */
+    // values are precomputed to speed processing
+    // values for every meter
+    // nearest neighbor is used for interpolation
     std::vector<double> air_density_table;
-
     std::vector<double> air_pressure_table;
-
     std::vector<double> air_sound_speed_table;
-
     std::vector<double> grav_table;
 
     void init();
+
+    void compute_acceleration();
 
 public:
 
@@ -167,46 +244,80 @@ public:
 
     static constexpr double AIR_CONST = 287.052874*1.4;
 
-    double mass_empty;
-
-    double mass_full;
-
-    double Izz_ratio;
-
-    double Ixx_ratio;
-
+    /**
+    * current mass  (kg)
+    */
     double mass;
 
+    /**
+    * current principal moment of inertia cross axially (kg m2)
+    */
+    double Ixx;
+
+    /**
+    * current principal moment of inertia along axis  (kg m2)
+    */
+    double Izz;
+
+    /**
+    * current center of mass location from nose (m)
+    */
+    double COG;
+
+    /**
+    * Current position in ENU (m)
+    */
     Vector position;
 
+    /**
+    * Current velocity in ENU (m/s)
+    */
     Vector velocity;
 
+    /**
+    * Current position in ENU (m/s2)
+    */
     Vector acceleration;
 
+    /**
+    * Current body frame in ENU (z axis is axial)
+    */
     Axis CS;
 
+    /**
+    * Current angular speed (rad/s)
+    */
     Vector angular_velocity;
 
+    /**
+    * Current angular acceleration (rad/s)
+    */
     Vector angular_acceleration;
 
-    double ground_altitude;
-
-    double ground_pressure;
-
-    double ground_temperature;
-
-    double lapse_rate;
-
-    void compute_acceleration();
-
+    /* USEFUL EXPORTED VALUES */
+    /**
+    * current gravity (m/s2)
+    */
     double grav;
 
+    /**
+    * current air pressure (Pa)
+    */
     double air_pressure;
 
+    /**
+    * current air density (kg/m3)
+    */
     double air_density;
 
+    /**
+    * current inverse of sound speend  ((m/s) ^ -1)
+    */
     double sound_speed_inv;
 
+    /**
+    * Internal struct definition to record states
+    */
     struct Recording {
         double t_interval = 1;
         std::vector<Vector> position;
@@ -215,17 +326,21 @@ public:
 
     Recording record;
 
-    WindHistory wind;
+    std::unique_ptr<WindHistory> wind;
 
     SingleStageAerodynamics aero;
 
     SingleStageThruster thruster;
 
-    SingleStageControl control;
+    std::unique_ptr<SingleStageControl> control;
 
     SingleStageRocket();
 
-    void set_mass(double empty_mass, double full_mass, double Izz_ratio, double Ixx_ratio);
+    SingleStageRocket(const std::string& fn);
+
+    void set_launch(double launch_heading, double launch_angle);
+
+    void set_mass(double empty_mass, double full_mass, double I_empty[3], double I_full[3]);
 
     void set_ground(double ground_altitude, double ground_pressure, double ground_temperature, double lapse_rate);
 

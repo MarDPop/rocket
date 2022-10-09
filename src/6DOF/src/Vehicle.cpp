@@ -2,6 +2,8 @@
 
 #include "../../common/include/util.h"
 
+#include <stdexcept>
+
 Vehicle::Vehicle() {}
 
 Vehicle::~Vehicle() {}
@@ -100,16 +102,199 @@ void Vehicle::compute_full_moment(double* w, double* dw){
     dw[2] = (A[6]*Iw[0] + A[7]*Iw[1] + A[8]*Iw[2])*det;
 }
 
+WindHistory::WindHistory(std::string fn) {
+
+    std::ifstream file(fn);
+
+    if(!file.is_open()) {
+        throw std::invalid_argument("could not open file.");
+    }
+
+    std::string line;
+
+    while(std::getline(file, line)) {
+
+        std::vector<std::string> data = util::split(line);
+
+        this->times.push_back(std::stod(data[0]));
+        this->speed.emplace_back(std::stod(data[1]),std::stod(data[2]),std::stod(data[3]));
+    }
+
+    file.close();
+}
+
 SingleStageRocket::SingleStageRocket() : aero(*this) {
-    this->init();
+}
+
+SingleStageRocket::SingleStageRocket(const std::string& fn) : aero(*this) {
+
+    if(fn.size() < 8) {
+        throw std::invalid_argument("invalid filename.");
+    }
+
+    std::string ext = fn.substr(fn.size() - 8);
+    if(ext.compare(".srocket")) {
+        throw std::invalid_argument("not a rocket file.");
+    }
+
+    std::ifstream file(fn);
+
+    if(!file.is_open()) {
+        throw std::invalid_argument("could not open file.");
+    }
+
+    std::string line;
+    std::vector<std::string> data;
+
+    if(!std::getline(file, line)) {
+        throw std::runtime_error("file length invalid");
+    }
+    while(line.size() == 0 || line[0] == '#') {
+        std::getline(file, line);
+    }
+    data = util::split(line);
+
+    if(data.size() < 4) {
+        throw std::runtime_error("Not enough empty mass information: " + std::to_string(data.size()) + " < 4. Reminder: {mass,Ixx,Izz,COG}");
+    }
+
+    double m_empty = std::stod(data[0]);
+    double I_empty[3] = {std::stod(data[1]),std::stod(data[2]),std::stod(data[3])};
+
+    if(!std::getline(file, line)) {
+        throw std::runtime_error("file length invalid");
+    }
+    while(line.size() == 0 || line[0] == '#') {
+        std::getline(file, line);
+    }
+    data = util::split(line);
+
+    if(data.size() < 4) {
+        throw std::runtime_error("Not enough full mass information: " + std::to_string(data.size()) + " < 4. Reminder: {mass,Ixx,Izz,COG}");
+    }
+
+    double m_full = std::stod(data[0]);
+    double I_full[3] = {std::stod(data[1]),std::stod(data[2]),std::stod(data[3])};
+
+    this->set_mass(m_empty,m_full,I_empty,I_full);
+
+    if(!std::getline(file, line)) {
+        throw std::runtime_error("file length invalid");
+    }
+    while(line.size() == 0 || line[0] == '#') {
+        std::getline(file, line);
+    }
+    data = util::split(line);
+
+    if(data.size() < 4) {
+        throw std::runtime_error("Not enough ground information: " + std::to_string(data.size()) + " < 4. Reminder: {altitude,pressure,temperature,lapse rate}");
+    }
+
+    this->set_ground(std::stod(data[0]),std::stod(data[1]),std::stod(data[2]),std::stod(data[3]));
+
+    if(!std::getline(file, line)) {
+        throw std::runtime_error("file length invalid");
+    }
+    while(line.size() == 0 || line[0] == '#') {
+        std::getline(file, line);
+    }
+    data = util::split(line);
+
+    if(data.size() < 2) {
+        throw std::runtime_error("Not enough launch information: " + std::to_string(data.size()) + " < 2. Reminder: {heading,angle, (optional) wind_file}");
+    }
+
+    this->set_launch(std::stod(data[0]),std::stod(data[1]));
+
+    if(data.size() == 3) {
+        try {
+            this->wind = std::make_unique<WindHistory>(data[2]);
+        } catch(...) {
+        }
+    }
+
+    if(!std::getline(file, line)) {
+        throw std::runtime_error("file length invalid");
+    }
+    while(line.size() == 0 || line[0] == '#') {
+        std::getline(file, line);
+    }
+    data = util::split(line);
+
+    if(data.size() < 7) {
+        throw std::runtime_error("Not enough aerodynamic coefficients: " + std::to_string(data.size()) + " < 7. Reminder: {CD0,CL_a,CM_a,K,area,length,stall}");
+    }
+
+    double coef[7];
+    for(int i = 0; i < 7; i++) {
+        coef[i] = std::stod(data[i]);
+    }
+
+    this->aero.set_coef(coef);
+
+    if(!std::getline(file, line)) {
+        throw std::runtime_error("file length invalid");
+    }
+    while(line.size() == 0 || line[0] == '#') {
+        std::getline(file, line);
+    }
+    data = util::split(line);
+
+    if(data.size() < 2) {
+        throw std::runtime_error("Need to Set Thruster Points");
+    }
+
+    int nPoints = std::stoi(data[1]);
+
+    for(int i = 0; i < nPoints; i++) {
+        std::getline(file, line);
+        data = util::split(line);
+        if(data.size() < 3) {
+            throw std::runtime_error("Not enough thruster data in row");
+        }
+        this->thruster.add_thrust_point(std::stod(data[0]),std::stod(data[1]),std::stod(data[2]));
+    }
+
+    if(std::getline(file, line)) {
+        return;
+    }
+    while(line.size() == 0 || line[0] == '#') {
+        std::getline(file, line);
+    }
+    data = util::split(line);
+
+    if(data.size() > 0) {
+        this->record.t_interval = std::stod(data[0]);
+    }
+
+    if(data.size() > 1) {
+        // load control here
+    }
 }
 
 void SingleStageRocket::init() {
-    this->CS.identity();
+    if(this->launch_angle == 0) {
+        this->CS.identity();
+    } else {
+        double cphi = cos(this->launch_heading);
+        double sphi = sin(this->launch_heading);
+        double ctheta = cos(this->launch_angle);
+        double stheta = sqrt(1 - ctheta*ctheta);
+        this->CS.axis.x.x(cphi);
+        this->CS.axis.x.y(-sphi);
+        this->CS.axis.x.z(0);
+        this->CS.axis.z.x(stheta*sphi);
+        this->CS.axis.z.y(stheta*cphi);
+        this->CS.axis.z.z(ctheta);
+        Cartesian::cross(this->CS.axis.x.data,this->CS.axis.z.data,this->CS.axis.y.data);
+    }
     this->position.zero();
     this->velocity.zero();
     this->angular_velocity.zero();
     this->set_ground(0,101000,297,0);
+    this->mass = this->mass_full;
+    this->Ixx = this->I_empty[1] + this->dIdm[1]*(this->mass - this->mass_empty);
+    this->Izz = this->I_empty[1] + this->dIdm[1]*(this->mass - this->mass_empty);
 }
 
 void SingleStageRocket::compute_acceleration() {
@@ -124,20 +309,28 @@ void SingleStageRocket::compute_acceleration() {
     this->aero.update();
 
     this->acceleration += this->aero.force;
-
     this->acceleration *= (1.0/this->mass);
-
-    this->angular_acceleration = this->aero.moment / (this->mass*this->Izz_ratio);
-
     this->acceleration.data[2] -= this->grav;
 
+    this->angular_acceleration.data[0] = this->aero.moment.data[0] / this->Ixx;
+    this->angular_acceleration.data[1] = this->aero.moment.data[1] / this->Ixx;
+    this->angular_acceleration.data[2] = this->aero.moment.data[2] / this->Izz;
 }
 
-void SingleStageRocket::set_mass(double empty_mass, double full_mass, double Izz_ratio, double Ixx_ratio) {
+void SingleStageRocket::set_launch(double launch_heading, double launch_angle) {
+    this->launch_heading = launch_heading;
+    this->launch_angle = launch_angle;
+}
+
+void SingleStageRocket::set_mass(double empty_mass, double full_mass, double I_empty[3], double I_full[3]) {
     this->mass_empty = empty_mass;
     this->mass_full = full_mass;
-    this->Izz_ratio = Izz_ratio;
-    this->Ixx_ratio = Ixx_ratio;
+    this->I_empty[0] = I_empty[0];
+    this->I_empty[1] = I_empty[1];
+    double dm = full_mass - empty_mass;
+    this->dIdm[0] = (I_full[0] - I_empty[0])/dm;
+    this->dIdm[1] = (I_full[1] - I_empty[1])/dm;
+    this->dIdm[2] = (I_full[2] - I_empty[2])/dm;
 }
 
 void SingleStageRocket::set_ground(double ground_altitude, double ground_pressure ,double ground_temperature, double lapse_rate) {
@@ -188,7 +381,8 @@ void SingleStageRocket::launch(double dt) {
     double time = 0;
     double time_record = 0;
     double dt_half = dt*0.5;
-    this->mass = this->mass_full;
+
+    this->init();
 
     Axis mat;
     while(time < 10000) {
@@ -214,6 +408,10 @@ void SingleStageRocket::launch(double dt) {
 
         if(this->mass > this->mass_empty) {
             this->mass -= this->thruster.mass_rate*dt;
+            double dm = this->mass - this->mass_empty;
+            this->Ixx = this->I_empty[0] + this->dIdm[0]*dm;
+            this->Izz = this->I_empty[1] + this->dIdm[1]*dm;
+            this->COG = this->I_empty[2] + this->dIdm[2]*dm;
         }
 
         this->compute_acceleration();
