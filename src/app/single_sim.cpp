@@ -43,7 +43,7 @@ int main(int argc, char *argv[]) {
     std::string fn = argv[1];
     SingleStageRocket rocket(fn);
 
-    double dt = 1.0/16.0;
+    double dt = 1.0/32.0;
     if (argc > 3) {
         dt = std::stod(argv[3]);
     }

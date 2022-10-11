@@ -113,11 +113,11 @@ namespace Cartesian {
         }
 
         inline void operator=(const double* b) {
-            memcpy(data,b,sizeof(data));
+            memcpy(this->data,b,sizeof(data));
         }
 
         inline void operator=(const Vector& b) {
-            memcpy(data,b.data,sizeof(data));
+            memcpy(this->data,b.data,sizeof(this->data));
         }
 
         inline void zero() {
@@ -338,12 +338,12 @@ namespace Cartesian {
             C.data[0] = data[0]*B.data[0] + data[1]*B.data[3] + data[2]*B.data[6];
             C.data[1] = data[0]*B.data[1] + data[1]*B.data[4] + data[2]*B.data[7];
             C.data[2] = data[0]*B.data[2] + data[1]*B.data[5] + data[2]*B.data[8];
-            C.data[3] = data[0]*B.data[0] + data[1]*B.data[3] + data[2]*B.data[6];
-            C.data[4] = data[0]*B.data[1] + data[1]*B.data[4] + data[2]*B.data[7];
-            C.data[5] = data[0]*B.data[2] + data[1]*B.data[5] + data[2]*B.data[8];
-            C.data[6] = data[0]*B.data[0] + data[1]*B.data[3] + data[2]*B.data[6];
-            C.data[7] = data[0]*B.data[1] + data[1]*B.data[4] + data[2]*B.data[7];
-            C.data[8] = data[0]*B.data[2] + data[1]*B.data[5] + data[2]*B.data[8];
+            C.data[3] = data[3]*B.data[0] + data[4]*B.data[3] + data[5]*B.data[6];
+            C.data[4] = data[3]*B.data[1] + data[4]*B.data[4] + data[5]*B.data[7];
+            C.data[5] = data[3]*B.data[2] + data[4]*B.data[5] + data[5]*B.data[8];
+            C.data[6] = data[6]*B.data[0] + data[7]*B.data[3] + data[8]*B.data[6];
+            C.data[7] = data[6]*B.data[1] + data[7]*B.data[4] + data[8]*B.data[7];
+            C.data[8] = data[6]*B.data[2] + data[7]*B.data[5] + data[8]*B.data[8];
             return C;
         }
 
@@ -351,12 +351,12 @@ namespace Cartesian {
             C.data[0] = A.data[0]*B.data[0] + A.data[1]*B.data[3] + A.data[2]*B.data[6];
             C.data[1] = A.data[0]*B.data[1] + A.data[1]*B.data[4] + A.data[2]*B.data[7];
             C.data[2] = A.data[0]*B.data[2] + A.data[1]*B.data[5] + A.data[2]*B.data[8];
-            C.data[3] = A.data[0]*B.data[0] + A.data[1]*B.data[3] + A.data[2]*B.data[6];
-            C.data[4] = A.data[0]*B.data[1] + A.data[1]*B.data[4] + A.data[2]*B.data[7];
-            C.data[5] = A.data[0]*B.data[2] + A.data[1]*B.data[5] + A.data[2]*B.data[8];
-            C.data[6] = A.data[0]*B.data[0] + A.data[1]*B.data[3] + A.data[2]*B.data[6];
-            C.data[7] = A.data[0]*B.data[1] + A.data[1]*B.data[4] + A.data[2]*B.data[7];
-            C.data[8] = A.data[0]*B.data[2] + A.data[1]*B.data[5] + A.data[2]*B.data[8];
+            C.data[3] = A.data[3]*B.data[0] + A.data[4]*B.data[3] + A.data[5]*B.data[6];
+            C.data[4] = A.data[3]*B.data[1] + A.data[4]*B.data[4] + A.data[5]*B.data[7];
+            C.data[5] = A.data[3]*B.data[2] + A.data[4]*B.data[5] + A.data[5]*B.data[8];
+            C.data[6] = A.data[6]*B.data[0] + A.data[7]*B.data[3] + A.data[8]*B.data[6];
+            C.data[7] = A.data[6]*B.data[1] + A.data[7]*B.data[4] + A.data[8]*B.data[7];
+            C.data[8] = A.data[6]*B.data[2] + A.data[7]*B.data[5] + A.data[8]*B.data[8];
         }
 
         inline static void mult(const Axis& A, const Vector& b, Vector& x) noexcept {
@@ -577,7 +577,7 @@ namespace Cartesian {
         mat.data[3] = uc + us;
         uc = axis.z()*xc;
         us = axis.y()*s;
-        mat.data[1] = uc + us;
+        mat.data[2] = uc + us;
         mat.data[6] = uc - us;
         uc = axis.z()*yc;
         us = axis.x()*s;

@@ -387,14 +387,18 @@ void SingleStageRocket::launch(double dt) {
 
     bool burnout = false;
 
-    Axis mat;
+    Axis mat,M0;
+    Vector p0,v0,a0,w0,t0;
     while(time < 10000) {
 
         this->compute_acceleration();
 
-        Vector p0 = this->position;
-        Vector v0 = this->velocity;
-        Vector a0 = this->acceleration;
+        p0 = this->position;
+        v0 = this->velocity;
+        a0 = this->acceleration;
+        w0 = this->angular_velocity;
+        t0 = this->angular_acceleration;
+        M0 = this->CS;
 
         this->position += this->velocity*dt;
         this->velocity += this->acceleration*dt;
@@ -404,7 +408,7 @@ void SingleStageRocket::launch(double dt) {
         if(angle > 1e-6) {
             w *= (1.0/angle);
             Cartesian::rotation_matrix_angle_axis(angle,w,mat);
-            this->CS = mat*(this->CS);
+            this->CS = mat*M0;
         }
 
         this->angular_velocity += this->angular_acceleration*dt;
@@ -421,6 +425,16 @@ void SingleStageRocket::launch(double dt) {
 
         this->position = p0 + (v0 + this->velocity)*dt_half;
         this->velocity = v0 + (a0 + this->acceleration)*dt_half;
+
+        w = (w0 + this->angular_velocity)*dt_half;
+        angle = w.norm();
+        if(angle > 1e-6) {
+            w *= (1.0/angle);
+            Cartesian::rotation_matrix_angle_axis(angle,w,mat);
+            this->CS = mat*M0;
+        }
+
+        this->angular_velocity = w0 + (t0 + this->angular_acceleration)*dt_half;
 
         if(time > time_record){
             this->record.position.push_back(this->position);

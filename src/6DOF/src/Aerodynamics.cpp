@@ -74,34 +74,44 @@ void SingleStageAerodynamics::update() {
 
     double proj = rocket.CS.axis.z.dot(unit_v);
 
-    if (proj > 0.9999) {
+    v2 *= rocket.air_density*0.5;
+
+    if (proj > 0.99998) {
         this->moment.zero();
-        this->force = unit_v*(CD0_compressible*-0.5*rocket.air_density*v2);
+        this->force = unit_v*(CD0_compressible*-v2);
         return;
     }
 
-    double AoA = acos(rocket.CS.axis.z.dot(unit_v));
+    double AoA;
+    if(proj > 0.9) {
+        AoA = sqrt(2 - 2*proj);
+    } else {
+        AoA = acos(proj);
+    }
 
-    Vector arm = rocket.CS.axis.z.cross(unit_v);
+    Vector arm = unit_v.cross(rocket.CS.axis.z);
 
-    double CM;
     double CL = this->CL_alpha*AoA;
     double CD = CD0_compressible + this->K*CL*CL;
     if(AoA < this->stall_angle) {
-        CM = AoA*this->CM_alpha;
+        this->moment = arm*(this->CM_alpha*v2); // reference length build into CM, arm length is approximately AoA for small angles ( actually a better approx)
     } else {
-        CM = 0;
-        CL = 0;
+        if(AoA > 2*this->stall_angle) {
+            this->moment.zero();
+            this->force = unit_v*(-CD*v2);
+            return;
+        } else {
+            double frac = 1.0/(AoA - this->stall_angle + 1.0);
+            this->moment = arm*(this->CM_alpha*v2*frac);
+            CL = frac*this->CL_alpha*this->stall_angle;
+        }
     }
 
-    v2 *= rocket.air_density*0.5;
-
-    Vector lift = unit_v.cross(arm);
+    Vector lift = arm.cross(unit_v);
     double v = lift.norm();
     if(v > 1e-6) {
-        lift *= (1.0/v);
+        CL /= v;
     }
 
-    this->moment = arm*(CM*v2); // arm length build into CM
     this->force = (lift*CL - unit_v*CD)*v2;
 }
