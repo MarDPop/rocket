@@ -143,6 +143,11 @@ public:
 
 class SingleStageControl {
 
+    SingleStageRocket& rocket;
+public:
+
+    SingleStageControl(SingleStageRocket& r);
+
 };
 
 class WindHistory {
@@ -151,11 +156,13 @@ class WindHistory {
     std::vector<Vector> speed;
     double* titer;
     Vector* siter;
+    double* tend;
 public:
 
     inline void reset() {
         this->titer = times.data();
         this->siter = speed.data();
+        this->tend = this->titer + times.size();
     }
 
     WindHistory(std::string fn);
@@ -165,7 +172,7 @@ public:
     }
 
     inline Vector* get(double time) {
-        while(time < *titer) {
+        while(titer < tend && time < *titer) {
             titer++;
             siter++;
         }
