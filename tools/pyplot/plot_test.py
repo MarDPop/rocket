@@ -21,6 +21,8 @@ class App(tk.Tk):
         self.position = np.zeros((1,3))
         self.velocity = np.zeros((1,3))
         self.acceleration = np.zeros((1,3))
+        self.speed = np.zeros((1,1))
+        self.gforce = np.zeros((1,1))
         self.xAxis = np.zeros((1,3))
         self.yAxis = np.zeros((1,3))
         self.zAxis = np.zeros((1,3))
@@ -33,13 +35,13 @@ class App(tk.Tk):
         figure_canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
         #figure_canvas.get_tk_widget().grid(row=2,column=1)
 
-        self.dataframe = tk.Frame(self)
+        self.dataframe = tk.Frame(tk.Tk())
         self.dataframe.pack()    
 
-        label = tk.Label(self.dataframe,text="file location")
-        label.grid(row=1,column=1)
+        lbl = tk.Label(self.dataframe,text="file location")
+        lbl.grid(row=1,column=1)
 
-        self.filename = tk.Entry(self.dataframe)
+        self.filename = tk.Entry(self.dataframe, width=8)
         self.filename.grid(row=1,column=2)
 
         btn = tk.Button(self.dataframe,text="load", command=self.load)
@@ -47,6 +49,32 @@ class App(tk.Tk):
 
         btn = tk.Button(self.dataframe,text="animate", command=self.animate)
         btn.grid(row=1,column=4)
+
+        lbl = tk.Label(self.dataframe,text="Stats at Time (s): ")
+        lbl.grid(row=2,column=1,columnspan=3)
+
+        self.tlbl = tk.Label(self.dataframe,text = "")
+        self.tlbl.grid(row=2,column=4)
+
+        lbl = tk.Label(self.dataframe,text="Position (m):")
+        lbl.grid(row=3,column=1)
+
+        self.posxlbl = tk.Label(self.dataframe,text = "")
+        self.posxlbl.grid(row=3,column=2)
+        self.posylbl = tk.Label(self.dataframe,text = "")
+        self.posylbl.grid(row=3,column=3)
+        self.poszlbl = tk.Label(self.dataframe,text = "")
+        self.poszlbl.grid(row=3,column=4)
+
+        lbl = tk.Label(self.dataframe,text="Speed (m/s):")
+        lbl.grid(row=4,column=1)
+        self.speedlbl = tk.Label(self.dataframe,text = "")
+        self.speedlbl.grid(row=4,column=2)
+        lbl = tk.Label(self.dataframe,text="Accel (g):")
+        lbl.grid(row=4,column=3)
+        self.acclbl = tk.Label(self.dataframe,text = "")
+        self.acclbl.grid(row=4,column=4)
+        
 
     def load(self):
         fn = self.filename.get()
@@ -62,6 +90,8 @@ class App(tk.Tk):
         self.position = np.zeros((self.nData,3))
         self.velocity = np.zeros((self.nData,3))
         self.acceleration = np.zeros((self.nData,3))
+        self.speed = np.zeros(self.nData)
+        self.gforce = np.zeros(self.nData)
         self.xAxis = np.zeros((self.nData,3))
         self.yAxis = np.zeros((self.nData,3))
         self.zAxis = np.zeros((self.nData,3))
@@ -87,9 +117,14 @@ class App(tk.Tk):
         for i in range(1,self.nData-1):
             dt = 1.0/(self.times[i+1] - self.times[i-1])
             self.velocity[i] = (self.position[i+1] - self.position[i-1])*dt
-            self.acceleration[i] = (self.position[i+1] - 2*self.position[i-1] + self.position[i-1])*dt*2
-            if self.t_burnout > 0:
-                pass
+            self.acceleration[i] = (self.position[i+1] - 2*self.position[i] + self.position[i-1])*dt*2
+            self.speed[i] = np.linalg.norm(self.velocity[i])
+            self.gforce[i] = np.linalg.norm(self.acceleration[i])/9.806
+
+            if self.t_burnout == 0:
+                if np.dot(self.acceleration[i],self.velocity[i]) < -0.1:
+                    self.t_burnout = i
+                    print("T burnout = " + str(i))
 
 
         self.plot_path()
@@ -98,20 +133,26 @@ class App(tk.Tk):
     def plot_path(self):
         self.axes.clear()
         self.axes.plot(self.position[:,0],self.position[:,1],self.position[:,2],':k')
-        maxz = np.amax(self.position)
-        self.axes.set_zlim([0,maxz])
-        self.axes.set_xlim([maxz*-0.5,maxz*0.5])
-        self.axes.set_ylim([maxz*-0.5,maxz*0.5])
+        maxz = np.amax(self.position[:,2])
+        maxx = np.amax(np.absolute(self.position[:,0]))*2
+        maxy = np.amax(np.absolute(self.position[:,1]))*2
+        maxa = max(max(maxx,maxy),maxz)
+        self.axes.set_zlim([0,maxa])
+        self.axes.set_xlim([maxa*-0.5,maxa*0.5])
+        self.axes.set_ylim([maxa*-0.5,maxa*0.5])
+        self.figure.canvas.draw()
+        self.figure.canvas.flush_events()
         
 
     def animate(self):
         nData = len(self.times)
         scale = 500
+        flame_scale = -0.5*scale
         
         x_axis, = self.axes.plot([0,scale*self.xAxis[0,0]],[0,scale*self.xAxis[0,1]],[0,scale*self.xAxis[0,2]],'r')
         y_axis, = self.axes.plot([0,scale*self.yAxis[0,0]],[0,scale*self.yAxis[0,1]],[0,scale*self.yAxis[0,2]],'g')
         z_axis, = self.axes.plot([0,scale*self.zAxis[0,0]],[0,scale*self.zAxis[0,1]],[0,scale*self.zAxis[0,2]],'b')
-        #flame = 
+        flame, = self.axes.plot([0,flame_scale*self.zAxis[0,0]],[0,flame_scale*self.zAxis[0,1]],[0,flame_scale*self.zAxis[0,2]],'m')
         start_time = time.time()
         for i in range(nData):
             px = self.position[i,0]
@@ -126,10 +167,24 @@ class App(tk.Tk):
             z_axis.set_xdata([px,px + scale*self.zAxis[i,0]])
             z_axis.set_ydata([py,py + scale*self.zAxis[i,1]])
             z_axis.set_3d_properties([pz,pz + scale*self.zAxis[i,2]])
+
+            if i < self.t_burnout:
+                flame.set_xdata([px,px + flame_scale*self.zAxis[i,0]])
+                flame.set_ydata([py,py + flame_scale*self.zAxis[i,1]])
+                flame.set_3d_properties([pz,pz + flame_scale*self.zAxis[i,2]])
+            if i == self.t_burnout:
+                self.axes.lines.remove(flame)
+            
             self.figure.canvas.draw()
             self.figure.canvas.flush_events()
+
+            self.posxlbl.configure(text="{:6.1f}".format(px))
+            self.posylbl.configure(text="{:6.1f}".format(py))
+            self.poszlbl.configure(text="{:6.1f}".format(pz))
+            self.speedlbl.configure(text="{:6.1f}".format(self.speed[i]))
+            self.acclbl.configure(text="{:6.3f}".format(self.gforce[i]))
+            self.tlbl.configure(text=str(self.times[i]));
             time.sleep(max(start_time + self.times[i] - time.time(),0))
-            print(self.times[i])
                 
 
 if __name__ == '__main__':

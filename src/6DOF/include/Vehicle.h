@@ -157,27 +157,22 @@ class WindHistory {
     double* titer;
     Vector* siter;
     double* tend;
+
+    Vector dvdt;
+
+    bool constant = true;
+
 public:
 
-    inline void reset() {
-        this->titer = times.data();
-        this->siter = speed.data();
-        this->tend = this->titer + times.size();
-    }
+    Vector wind;
+
+    void reset();
+
+    void set(double time);
 
     WindHistory(std::string fn);
 
-    WindHistory(std::vector<double> t, std::vector<Vector> s) : times(t) , speed(s) {
-        this->reset();
-    }
-
-    inline Vector* get(double time) {
-        while(titer < tend && time < *titer) {
-            titer++;
-            siter++;
-        }
-        return siter;
-    }
+    WindHistory(std::vector<double> t, std::vector<Vector> s);
 };
 
 class SingleStageRocket {
@@ -243,7 +238,7 @@ class SingleStageRocket {
 
     void init();
 
-    void compute_acceleration();
+    void compute_acceleration(double time);
 
 public:
 
@@ -326,7 +321,7 @@ public:
     * Internal struct definition to record states
     */
     struct Recording {
-        double t_interval = 0.5;
+        double t_interval = 0.25;
         std::vector<Vector> position;
         std::vector<Axis> orientation;
         std::vector<double> test_value;

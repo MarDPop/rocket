@@ -122,6 +122,57 @@ WindHistory::WindHistory(std::string fn) {
     }
 
     file.close();
+
+    this->reset();
+
+    this->constant = this->times.size() < 2;
+    if(this->constant){
+        if(this->times.size() == 1) {
+            this->wind = this->speed[0];
+        } else {
+            this->wind.zero();
+        }
+    }
+}
+
+WindHistory::WindHistory(std::vector<double> t, std::vector<Vector> s) : times(t) , speed(s) {
+    this->reset();
+    this->constant = t.size() == 1;
+    if(this->constant){
+        this->wind = this->speed[0];
+    }
+}
+
+void WindHistory::reset() {
+    this->titer = times.data();
+    this->siter = speed.data();
+    this->tend = this->titer + times.size() - 1;
+    this->constant = times.size() == 1;
+    if(!this->constant) {
+        double dt = 1.0/(*(titer + 1) - *titer);
+        this->dvdt = (*(siter + 1) - *siter)*dt;
+    }
+}
+
+ void WindHistory::set(double time) {
+    if(this->constant){
+        return;
+    }
+    if(titer < tend && time > *(titer+1)) {
+        titer++;
+        siter++;
+        if(titer == tend) {
+            this->dvdt.zero();
+            this->constant = true;
+        } else {
+            double dt = 1.0/(*(titer + 1) - *titer);
+            this->dvdt = (*(siter + 1) - *siter)*dt;
+        }
+    }
+    double dt = time - *titer;
+    this->wind.data[0] = siter->data[0] + this->dvdt.data[0]*dt;
+    this->wind.data[1] = siter->data[1] + this->dvdt.data[1]*dt;
+    this->wind.data[2] = siter->data[2] + this->dvdt.data[2]*dt;
 }
 
 SingleStageRocket::SingleStageRocket() : aero(*this) {
@@ -207,7 +258,7 @@ SingleStageRocket::SingleStageRocket(const std::string& fn) : aero(*this) {
 
     this->set_launch(std::stod(data[0]),std::stod(data[1]));
 
-    if(data.size() == 3) {
+    if(data.size() == 3 && data[2].compare("skip") != 0) {
         try {
             this->wind = std::make_unique<WindHistory>(data[2]);
         } catch(...) {
@@ -222,12 +273,12 @@ SingleStageRocket::SingleStageRocket(const std::string& fn) : aero(*this) {
     }
     data = util::split(line);
 
-    if(data.size() < 7) {
-        throw std::runtime_error("Not enough aerodynamic coefficients: " + std::to_string(data.size()) + " < 7. Reminder: {CD0,CL_a,CM_a,K,area,length,stall}");
+    if(data.size() < 8) {
+        throw std::runtime_error("Not enough aerodynamic coefficients: " + std::to_string(data.size()) + " < 7. Reminder: {CD0,CL_a,CM_a,CM_a_dot,K,area,length,stall}");
     }
 
-    double coef[7];
-    for(int i = 0; i < 7; i++) {
+    double coef[8];
+    for(int i = 0; i < 8; i++) {
         coef[i] = std::stod(data[i]);
     }
 
@@ -298,9 +349,13 @@ void SingleStageRocket::init() {
     this->Izz = this->I_empty[1] + this->dIdm[1]*(this->mass - this->mass_empty);
 }
 
-void SingleStageRocket::compute_acceleration() {
+void SingleStageRocket::compute_acceleration(double time) {
 
     this->get_air_properties();
+
+    if(this->wind){
+        this->wind->set(time);
+    }
 
     if(this->mass > this->mass_empty) {
         this->thruster.set(this->air_pressure);
@@ -326,12 +381,13 @@ void SingleStageRocket::set_launch(double launch_heading, double launch_angle) {
 void SingleStageRocket::set_mass(double empty_mass, double full_mass, double I_empty[3], double I_full[3]) {
     this->mass_empty = empty_mass;
     this->mass_full = full_mass;
-    this->I_empty[0] = I_empty[0];
-    this->I_empty[1] = I_empty[1];
+    this->I_empty[0] = I_empty[0]; // Ixx
+    this->I_empty[1] = I_empty[1]; // Izz
+    this->I_empty[2] = I_empty[2]; // COG
     double dm = full_mass - empty_mass;
     this->dIdm[0] = (I_full[0] - I_empty[0])/dm;
     this->dIdm[1] = (I_full[1] - I_empty[1])/dm;
-    this->dIdm[2] = (I_full[2] - I_empty[2])/dm;
+    this->dIdm[2] = (I_full[2] - I_empty[2])/dm; // dCOG
 }
 
 void SingleStageRocket::set_ground(double ground_altitude, double ground_pressure ,double ground_temperature, double lapse_rate) {
@@ -391,7 +447,7 @@ void SingleStageRocket::launch(double dt) {
     Vector p0,v0,a0,w0,t0;
     while(time < 10000) {
 
-        this->compute_acceleration();
+        this->compute_acceleration(time);
 
         p0 = this->position;
         v0 = this->velocity;
@@ -403,6 +459,7 @@ void SingleStageRocket::launch(double dt) {
         this->position += this->velocity*dt;
         this->velocity += this->acceleration*dt;
 
+        //Vector w = M0.transpose_mult(this->angular_velocity*dt);
         Vector w = this->angular_velocity*dt;
         double angle = w.norm();
         if(angle > 1e-6) {
@@ -421,7 +478,7 @@ void SingleStageRocket::launch(double dt) {
             this->COG = this->I_empty[2] + this->dIdm[2]*dm;
         }
 
-        this->compute_acceleration();
+        this->compute_acceleration(time);
 
         this->position = p0 + (v0 + this->velocity)*dt_half;
         this->velocity = v0 + (a0 + this->acceleration)*dt_half;

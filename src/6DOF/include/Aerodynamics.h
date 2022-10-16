@@ -65,6 +65,8 @@ struct SingleStageAerodynamics {
 
     double CM_alpha;
 
+    double CM_alpha_dot;
+
     double K;
 
     double ref_area;

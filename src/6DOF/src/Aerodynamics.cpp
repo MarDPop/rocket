@@ -35,18 +35,24 @@ SingleStageAerodynamics::SingleStageAerodynamics(SingleStageRocket& r) : rocket(
 
 void SingleStageAerodynamics::set_coef(double* coef) {
 
-    this->CD0 = coef[0]*coef[4];
-    this->CL_alpha = coef[1]*coef[4];
-    this->CM_alpha = coef[2]*coef[4]*coef[5];
-    this->K = coef[3] / coef[4];
-    this->ref_area = coef[4];
-    this->ref_length = coef[5];
-    this->stall_angle = coef[6];
+    this->CD0 = coef[0]*coef[5];
+    this->CL_alpha = coef[1]*coef[5];
+    this->CM_alpha = coef[2]*coef[5]*coef[6];
+    this->CM_alpha_dot = coef[3]*coef[5]*coef[6];
+    this->K = coef[4] / coef[5];
+    this->ref_area = coef[5];
+    this->ref_length = coef[6];
+    this->stall_angle = coef[7];
 
 }
 
 void SingleStageAerodynamics::update() {
-    double v2 = rocket.velocity.dot(rocket.velocity);
+    Vector airspeed_vec = rocket.velocity;
+    if(rocket.wind){
+        airspeed_vec -= rocket.wind->wind;
+    }
+
+    double v2 = airspeed_vec.dot(airspeed_vec);
 
     if(v2 < 1e-2){
         this->force.zero();
@@ -70,14 +76,15 @@ void SingleStageAerodynamics::update() {
         }
     }
 
-    Vector unit_v = rocket.velocity * (1.0/airspeed);
+    Vector unit_v = airspeed_vec * (1.0/airspeed);
 
     double proj = rocket.CS.axis.z.dot(unit_v);
 
     v2 *= rocket.air_density*0.5;
 
+    this->moment = rocket.angular_velocity*(this->CM_alpha_dot*rocket.air_density);
+
     if (proj > 0.99998) {
-        this->moment.zero();
         this->force = unit_v*(CD0_compressible*-v2);
         return;
     }
@@ -87,6 +94,9 @@ void SingleStageAerodynamics::update() {
         AoA = sqrt(2 - 2*proj);
     } else {
         AoA = acos(proj);
+        if(AoA > 1.5) {
+            AoA = 1.5;
+        }
     }
 
     Vector arm = unit_v.cross(rocket.CS.axis.z);
@@ -94,22 +104,22 @@ void SingleStageAerodynamics::update() {
     double CL = this->CL_alpha*AoA;
     double CD = CD0_compressible + this->K*CL*CL;
     if(AoA < this->stall_angle) {
-        this->moment = arm*(this->CM_alpha*v2); // reference length build into CM, arm length is approximately AoA for small angles ( actually a better approx)
+        this->moment += arm*(this->CM_alpha*v2); // reference length build into CM, arm length is approximately AoA for small angles ( actually a better approx)
     } else {
         if(AoA > 2*this->stall_angle) {
-            this->moment.zero();
-            this->force = unit_v*(-CD*v2);
+            this->moment += arm*(this->CM_alpha*v2*0.005);
+            this->force = unit_v*(-2*v2);
             return;
         } else {
             double frac = 1.0/(AoA - this->stall_angle + 1.0);
-            this->moment = arm*(this->CM_alpha*v2*frac);
+            this->moment += arm*(this->CM_alpha*v2*frac);
             CL = frac*this->CL_alpha*this->stall_angle;
         }
     }
 
     Vector lift = arm.cross(unit_v);
     double v = lift.norm();
-    if(v > 1e-6) {
+    if(v > 1e-8) {
         CL /= v;
     }
 
