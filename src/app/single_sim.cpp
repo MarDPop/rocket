@@ -1,11 +1,7 @@
 #include <iostream>
 #include "../common/include/util.h"
 #include "../common/include/Cartesian.h"
-#include "../6DOF/include/Vehicle.h"
-#include "../6DOF/include/Stage.h"
-#include "Simulation.h"
-#include <memory>
-#include <cmath>
+#include "../6DOF/include/SingleStageRocket.h"
 #include <string>
 #include <cstdio>
 
