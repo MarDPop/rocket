@@ -345,6 +345,8 @@ public:
 
     void set_mass(double empty_mass, double full_mass, double I_empty[3], double I_full[3]);
 
+    void get_inertia();
+
     void set_ground(double ground_altitude, double ground_pressure, double ground_temperature, double lapse_rate);
 
     void compute_atmosphere();

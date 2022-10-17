@@ -140,13 +140,15 @@ class App(tk.Tk):
         self.axes.set_zlim([0,maxa])
         self.axes.set_xlim([maxa*-0.5,maxa*0.5])
         self.axes.set_ylim([maxa*-0.5,maxa*0.5])
+        self.axes.set_xlabel('x')
+        self.axes.set_ylabel('y')
         self.figure.canvas.draw()
         self.figure.canvas.flush_events()
         
 
     def animate(self):
         nData = len(self.times)
-        scale = 500
+        scale = np.amax(self.position[:,2]) / 5
         flame_scale = -0.5*scale
         
         x_axis, = self.axes.plot([0,scale*self.xAxis[0,0]],[0,scale*self.xAxis[0,1]],[0,scale*self.xAxis[0,2]],'r')

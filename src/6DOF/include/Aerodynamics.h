@@ -77,7 +77,9 @@ struct SingleStageAerodynamics {
 
     double CL_max;
 
-    double CD_induced_max;
+    double constant_term;
+
+    double CM_max;
 
     Vector force;
 
