@@ -368,9 +368,21 @@ void SingleStageRocket::compute_acceleration(double time) {
     this->acceleration *= (1.0/this->mass);
     this->acceleration.data[2] -= this->grav;
 
-    this->angular_acceleration.data[0] = this->aero.moment.data[0] / this->Ixx;
-    this->angular_acceleration.data[1] = this->aero.moment.data[1] / this->Ixx;
-    this->angular_acceleration.data[2] = this->aero.moment.data[2] / this->Izz;
+    Axis IcRT; // inertia in body, multiplied by CS
+    int i = 0;
+    while(i < 6) {
+        IcRT.data[i] = this->Ixx * this->CS.data[i];
+        i++;
+    }
+    while(i < 9) {
+        IcRT.data[i] = this->Izz * this->CS.data[i];
+        i++;
+    }
+    Axis I = this->CS.transpose_mult(IcRT);
+    Vector Iw = I*this->angular_velocity;
+    Vector wIw = this->angular_velocity.cross(Iw);
+    Vector rhs = this->aero.moment - wIw;
+    this->angular_acceleration = I.get_inverse() * rhs;
 }
 
 void SingleStageRocket::set_launch(double launch_heading, double launch_angle) {
@@ -388,6 +400,9 @@ void SingleStageRocket::set_mass(double empty_mass, double full_mass, double I_e
     this->dIdm[0] = (I_full[0] - I_empty[0])/dm;
     this->dIdm[1] = (I_full[1] - I_empty[1])/dm;
     this->dIdm[2] = (I_full[2] - I_empty[2])/dm; // dCOG
+    this->Ixx = I_full[0];
+    this->Izz = I_full[1];
+    this->COG = I_full[2];
 }
 
 void SingleStageRocket::set_ground(double ground_altitude, double ground_pressure ,double ground_temperature, double lapse_rate) {

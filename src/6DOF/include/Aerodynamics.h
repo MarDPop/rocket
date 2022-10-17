@@ -75,6 +75,10 @@ struct SingleStageAerodynamics {
 
     double stall_angle;
 
+    double CL_max;
+
+    double CD_induced_max;
+
     Vector force;
 
     Vector moment;

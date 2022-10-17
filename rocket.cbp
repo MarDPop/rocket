@@ -11,6 +11,7 @@
 				<Option object_output="obj/Debug/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
+				<Option parameters="test/test_rocket.srocket test/out.txt" />
 				<Compiler>
 					<Add option="-std=c++17" />
 					<Add option="-g" />
@@ -441,6 +442,7 @@
 		<Unit filename="src/6DOF/src/Vehicle.cpp" />
 		<Unit filename="src/app/Simulation.cpp" />
 		<Unit filename="src/app/Simulation.h" />
+		<Unit filename="src/app/single_sim.cpp" />
 		<Unit filename="src/app/test.cpp" />
 		<Unit filename="src/common/include/Cartesian.h" />
 		<Unit filename="src/common/include/Constants.h" />

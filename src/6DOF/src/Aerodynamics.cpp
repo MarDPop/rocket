@@ -43,6 +43,8 @@ void SingleStageAerodynamics::set_coef(double* coef) {
     this->ref_area = coef[5];
     this->ref_length = coef[6];
     this->stall_angle = coef[7];
+    this->CL_max = this->CL_alpha*this->stall_angle;
+    this->CD_induced_max = this->K*this->CL_max*this->CL_max;
 
 }
 
@@ -102,18 +104,21 @@ void SingleStageAerodynamics::update() {
     Vector arm = unit_v.cross(rocket.CS.axis.z);
 
     double CL = this->CL_alpha*AoA;
+    if(CL > this->CL_max) {
+        CL = this->CL_max;
+    }
     double CD = CD0_compressible + this->K*CL*CL;
     if(AoA < this->stall_angle) {
         this->moment += arm*(this->CM_alpha*v2); // reference length build into CM, arm length is approximately AoA for small angles ( actually a better approx)
     } else {
         if(AoA > 2*this->stall_angle) {
-            this->moment += arm*(this->CM_alpha*v2*0.005);
-            this->force = unit_v*(-2*v2);
+            this->moment += arm*(this->CM_alpha*v2*0.2);
+            this->force = unit_v*(-CD*v2);
             return;
         } else {
-            double frac = 1.0/(AoA - this->stall_angle + 1.0);
+            double frac = 1.0/(5*(AoA - this->stall_angle) + 1.0);
             this->moment += arm*(this->CM_alpha*v2*frac);
-            CL = frac*this->CL_alpha*this->stall_angle;
+            CL = frac*this->CL_max;
         }
     }
 

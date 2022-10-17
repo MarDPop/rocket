@@ -389,6 +389,20 @@ namespace Cartesian {
             return b;
         }
 
+        inline Axis transpose_mult(const Axis& B) const noexcept {
+            Axis C;
+            C.data[0] = data[0]*B.data[0] + data[3]*B.data[3] + data[6]*B.data[6];
+            C.data[1] = data[0]*B.data[1] + data[3]*B.data[4] + data[6]*B.data[7];
+            C.data[2] = data[0]*B.data[2] + data[3]*B.data[5] + data[6]*B.data[8];
+            C.data[3] = data[1]*B.data[0] + data[4]*B.data[3] + data[7]*B.data[6];
+            C.data[4] = data[1]*B.data[1] + data[4]*B.data[4] + data[7]*B.data[7];
+            C.data[5] = data[1]*B.data[2] + data[4]*B.data[5] + data[7]*B.data[8];
+            C.data[6] = data[2]*B.data[0] + data[5]*B.data[3] + data[8]*B.data[6];
+            C.data[7] = data[2]*B.data[1] + data[5]*B.data[4] + data[8]*B.data[7];
+            C.data[8] = data[2]*B.data[2] + data[5]*B.data[5] + data[8]*B.data[8];
+            return C;
+        }
+
         inline Axis get_inverse() const noexcept {
             Axis Inv;
             Inv.data[0] = this->data[4]*this->data[8] - this->data[5]*this->data[7];
