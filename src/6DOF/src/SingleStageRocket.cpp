@@ -181,7 +181,43 @@ void WindHistory::load(std::string fn) {
     }
 }
 
-SingleStageControl::SingleStageControl(SingleStageRocket& r) : rocket(r) {
+template<unsigned int NFINS>
+SingleStageControl<NFINS>::SingleStageControl(SingleStageRocket& r) : rocket(r) {
+    for(unsigned int i = 1; i < NFINS;i++){
+        this->fin_direction[i].zero();
+        this->fin_angle[i] = 0;
+    }
+
+    this->fin_direction[0].data[0] = 1;
+    double dtheta = 6.283185307179586476925286766559/NFINS;
+    for(unsigned int i = 1; i < NFINS;i++){
+        this->fin_direction[i].data[0] = cos(i*dtheta);
+        this->fin_direction[i].data[1] = sin(i*dtheta);
+    }
+}
+
+template<unsigned int NFINS>
+void SingleStageControl<NFINS>::update(double time){
+
+    this->CS_measured = rocket.CS;
+    this->angular_velocity_measured = rocket.angular_velocity;
+
+    Vector arm_inertial(-this->CS_measured.axis.z.y(),this->CS_measured.axis.z.x(),0); // rocket.z cross z to get correct sign
+
+    Vector commanded_angular_rate = arm_inertial*this->K1;
+
+    Vector angular_err = commanded_angular_rate - this->angular_velocity_measured;
+
+    Vector commanded_torque = angular_err*this->K2 - this->angular_velocity_measured*this->C2;
+
+    commanded_torque = this->CS_measured * commanded_torque;
+
+    for(unsigned int i = 0; i < NFINS; i++) {
+        double torque_fin = this->fin_direction[i].dot(commanded_torque);
+
+
+    }
+
 }
 
 void WindHistory::load(std::vector<double> t, std::vector<Vector> s) {
@@ -406,6 +442,8 @@ void SingleStageRocket::compute_acceleration(double time) {
 
     this->wind.set(time);
 
+    this->control.update(time);
+
     if(this->mass > this->mass_empty) {
         this->thruster.set(this->air_pressure);
         this->acceleration = this->CS.axis.z * this->thruster.thrust;
@@ -413,7 +451,7 @@ void SingleStageRocket::compute_acceleration(double time) {
 
     this->aero.update();
 
-    this->acceleration += this->aero.force;
+    this->acceleration += this->aero.force + this->control.dForce;
     this->acceleration *= (1.0/this->mass);
     this->acceleration.data[2] -= this->grav;
 
@@ -429,7 +467,7 @@ void SingleStageRocket::compute_acceleration(double time) {
     Axis I = this->CS.transpose_mult(I_bodyR);
     Vector Iw = I*this->angular_velocity;
     Vector wIw = this->angular_velocity.cross(Iw);
-    Vector rhs = this->aero.moment - wIw;
+    Vector rhs = this->aero.moment + this->control.dMoment - wIw;
     this->angular_acceleration = I.get_inverse() * rhs;
 }
 
@@ -517,6 +555,7 @@ void SingleStageRocket::launch(double dt) {
     Vector p0,v0,a0,w0,t0;
     while(time < 10000) {
 
+        // Get initial state
         this->compute_acceleration(time);
 
         p0 = this->position;
@@ -526,10 +565,11 @@ void SingleStageRocket::launch(double dt) {
         t0 = this->angular_acceleration;
         M0 = this->CS;
 
+        // propagate to time + dt
+
         this->position += this->velocity*dt;
         this->velocity += this->acceleration*dt;
 
-        //Vector w = M0.transpose_mult(this->angular_velocity*dt);
         Vector w = this->angular_velocity*dt;
         double angle = w.norm();
         if(angle > 1e-6) {
@@ -545,7 +585,8 @@ void SingleStageRocket::launch(double dt) {
             this->get_inertia();
         }
 
-        this->compute_acceleration(time);
+        // recompute state rate at time + dt
+        this->compute_acceleration(time + dt);
 
         this->position = p0 + (v0 + this->velocity)*dt_half;
         this->velocity = v0 + (a0 + this->acceleration)*dt_half;

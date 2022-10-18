@@ -80,12 +80,58 @@ struct SingleStageAerodynamics {
 
 };
 
+struct Fin {
+
+};
+
+template<unsigned int NFINS>
 class SingleStageControl {
 
+    double fin_angle[NFINS]; // first fin on + x axis, going counter clockwise
+
+    double commanded_angle[NFINS]; // first fin on + x axis, going counter clockwise
+
+    Vector fin_direction[NFINS]; // vector of the direction of the span of all fins on Center of pressure
+
+    Vector lift_direction[NFINS]; // vector of the direction of the span of all fins on Center of pressure
+
+    Vector lift_direction[NFINS]; // vector of the direction of the span of all fins on Center of pressure
+
+    double z_location;
+
+    double dCMdTheta;
+
+    double dCDdTheta;
+
+    double dCLdTheta;
+
+    double max_theta = 0.1; // rad
+
+    double slew_rate = 0.5; // rad/s
+
+    double K1;
+
+    double K2;
+
+    double C2;
+
+    double time_old;
+
+    Vector angular_velocity_measured;
+
+    Axis CS_measured;
+
     SingleStageRocket& rocket;
+
 public:
 
+    Vector dForce;
+
+    Vector dMoment;
+
     SingleStageControl(SingleStageRocket& r);
+
+    void update(double time);
 
 };
 
@@ -276,7 +322,7 @@ public:
 
     SingleStageThruster thruster;
 
-    SingleStageControl control;
+    SingleStageControl<3> control;
 
     SingleStageRocket();
 

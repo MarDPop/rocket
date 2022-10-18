@@ -63,7 +63,7 @@ void SingleSimulation::set_gmt(int year, int month, int day, int hour, int minut
 
     double seconds_unix = difftime(mktime(&tm),0);
 
-    this->unix_ms = static_cast<unsigned long>(seconds_unix*1000);
+    this->unix_ms = static_cast<unsigned long>((seconds_unix + sec_frac)*1000);
 }
 
 void SingleSimulation::set_location(Geodetic& lla) {
