@@ -81,21 +81,17 @@ struct SingleStageAerodynamics {
 };
 
 struct Fin {
-
+    double deflection; // first fin on + x axis, going counter clockwise
+    double commanded_deflection; // first fin on + x axis, going counter clockwise
+    Vector span; // vector of the direction of the span of all fins
+    Vector lift; // vector of the direction of the lift of all fins
+    double lift_span_location; // distance along span vector of  on Center of pressure
 };
 
 template<unsigned int NFINS>
 class SingleStageControl {
 
-    double fin_angle[NFINS]; // first fin on + x axis, going counter clockwise
-
-    double commanded_angle[NFINS]; // first fin on + x axis, going counter clockwise
-
-    Vector fin_direction[NFINS]; // vector of the direction of the span of all fins on Center of pressure
-
-    Vector lift_direction[NFINS]; // vector of the direction of the span of all fins on Center of pressure
-
-    Vector lift_direction[NFINS]; // vector of the direction of the span of all fins on Center of pressure
+    Fin fins[NFINS];
 
     double z_location;
 

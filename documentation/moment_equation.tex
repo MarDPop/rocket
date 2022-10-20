@@ -1,0 +1,66 @@
+\documentclass[12pt]{article}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage[latin1]{inputenc}
+
+\title{Fin Angle Computation}
+\author{Marius Popescu}
+\date{03/14/15}
+
+\begin{document}
+\maketitle
+
+The goal is to find out what deflection the fins must have for a given $\tau$ .
+
+\begin{equation}
+  \vec{\tau} = \sum_{i = 1}^{N} \vec{r}_i \times \vec{L}_i + \vec{M}_i
+\end{equation}
+
+\begin{equation}
+  \vec{r}_i = z\hat{k} + d \hat{s}
+\end{equation}
+
+where s is in the direction of the span and d is the distance to the COP. for now assume d = 0
+
+\begin{equation}
+  \vec{M}_i = q S C_M \alpha_i \hat{s} 
+\end{equation}
+
+\begin{equation}
+  \vec{L}_i = q S C_L \alpha_i \hat{l} 
+\end{equation}
+
+\begin{equation}
+  \hat{l} = \hat{k} \times \hat{s} = s_y \hat{i} - s_x \hat{j}
+\end{equation}
+
+\begin{equation}
+  \vec{\tau} = q S\sum_{i = 1}^{N} \{C_M(s_{x,i} \hat{i} + s_{y,i} \hat{j}) - z C_L(s_{x,i} \hat{i} + s_{y,i} \hat{j})\} \alpha_i
+\end{equation}
+
+\begin{equation}
+  \tau_x = q S\sum_{i = 1}^{N} s_{x,i}(C_M - z C_L) \alpha_i
+\end{equation}
+
+\begin{equation}
+  \tau_y = q S\sum_{i = 1}^{N} s_{y,i}(C_M - z C_L) \alpha_i
+\end{equation}
+
+We have 2 equations and N unknowns
+
+we can constrain the equations by minimizing
+
+\begin{equation}
+  J =\sum_{i = 1}^{N} a_i^2 
+\end{equation}
+
+which is true when
+
+\begin{equation}
+  \nabla_\alpha J = 0 = 2 \sum_{i = 1}^{N} a_i
+\end{equation}
+
+We can do this with lagrange multipliers
+
+\end{document}
