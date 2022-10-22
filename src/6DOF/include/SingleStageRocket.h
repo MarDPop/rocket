@@ -87,9 +87,11 @@ struct Fin {
     Vector lift; // vector of the direction of the lift of all fins
 };
 
-template<unsigned int NFINS>
+
 class SingleStageControl {
-    Fin fins[NFINS];
+
+protected:
+    std::vector<Fin> fins;
 
     double z;
 
@@ -129,11 +131,13 @@ class SingleStageControl {
 
 public:
 
+    const unsigned int NFINS;
+
     Vector dForce;
 
     Vector dMoment;
 
-    SingleStageControl(SingleStageRocket& r);
+    SingleStageControl(SingleStageRocket& r, unsigned int N);
 
     void set_system_limits(double slew_limit, double angle_limit);
 
@@ -153,7 +157,7 @@ public:
 
 };
 
-class SingleStageControl_3 : public virtual SingleStageControl<3> {
+class SingleStageControl_3 : public virtual SingleStageControl {
 
     Axis solve3;
 
@@ -161,13 +165,13 @@ public:
 
     SingleStageControl_3(SingleStageRocket& r);
 
-    void set_aero_coef(double dCL, double dCD, double dCM, double fin_z, double fin_COP_d);
+    void set_aero_coef(double dCL, double dCD, double dCM, double fin_z, double fin_COP_d) override;
 
     void command_fins(const Vector& commanded_torque, double measured_dynamic_pressure) override;
 
 };
 
-class SingleStageControl_4 : public virtual SingleStageControl<4> {
+class SingleStageControl_4 : public virtual SingleStageControl {
 
 public:
 

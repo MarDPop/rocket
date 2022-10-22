@@ -182,9 +182,7 @@ void WindHistory::load(std::string fn) {
     }
 }
 
-
-template<unsigned int NFINS>
-SingleStageControl<NFINS>::SingleStageControl(SingleStageRocket& r) : rocket(r) {
+SingleStageControl::SingleStageControl(SingleStageRocket& r, unsigned int N) : rocket(r), NFINS(N) {
 
     for(unsigned int i = 0; i < NFINS;i++){
         this->fins[i].span.zero();
@@ -199,21 +197,18 @@ SingleStageControl<NFINS>::SingleStageControl(SingleStageRocket& r) : rocket(r) 
     }
 }
 
-template<unsigned int NFINS>
-void SingleStageControl<NFINS>::set_system_limits(double slew_limit, double angle_limit){
+void SingleStageControl::set_system_limits(double slew_limit, double angle_limit){
     this->max_theta = angle_limit;
     this->slew_rate = slew_limit;
 }
 
-template<unsigned int NFINS>
-void SingleStageControl<NFINS>::set_controller_terms(double P_angle, double P_velocity, double C_velocity ){
+void SingleStageControl::set_controller_terms(double P_angle, double P_velocity, double C_velocity ){
     this->K1 = P_angle;
     this->K2 = P_velocity;
     this->C2 = C_velocity;
 }
 
-template<unsigned int NFINS>
-void SingleStageControl<NFINS>::set_aero_coef(double dCL, double dCD, double dCM, double fin_COP_z, double fin_COP_d){
+void SingleStageControl::set_aero_coef(double dCL, double dCD, double dCM, double fin_COP_z, double fin_COP_d){
     this->dCLdTheta = dCL;
     this->dCDdTheta = dCD;
     this->dCMdTheta = dCM;
@@ -223,16 +218,14 @@ void SingleStageControl<NFINS>::set_aero_coef(double dCL, double dCD, double dCM
     this->const_planer_term = dCM - z*dCL;
 }
 
-template<unsigned int NFINS>
-void SingleStageControl<NFINS>::get_measured_quantities() {
+void SingleStageControl::get_measured_quantities() {
     this->CS_measured = rocket.CS;
     this->angular_velocity_measured = rocket.angular_velocity;
     Vector airspeed = rocket.velocity - rocket.wind.wind;
     this->measured_dynamic_pressure = 0.5*rocket.air_density*airspeed.dot(airspeed);
 }
 
-template<unsigned int NFINS>
-void SingleStageControl<NFINS>::deflect_fins(double time) {
+void SingleStageControl::deflect_fins(double time) {
     double max_angle = this->slew_rate*(time - this->time_old);
     for(auto& fin : this->fins) {
         double delta = fin.commanded_deflection - fin.deflection;
@@ -246,8 +239,8 @@ void SingleStageControl<NFINS>::deflect_fins(double time) {
     }
 }
 
-template<unsigned int NFINS>
-void SingleStageControl<NFINS>::update_force() {
+
+void SingleStageControl::update_force() {
     this->dMoment.zero();
     this->dForce.zero();
     Vector airspeed = rocket.velocity - rocket.wind.wind;
@@ -273,8 +266,8 @@ void SingleStageControl<NFINS>::update_force() {
     this->dForce = rocket.CS.transpose_mult(this->dForce);
 }
 
-template<unsigned int NFINS>
-void SingleStageControl<NFINS>::update_commands() {
+
+void SingleStageControl::update_commands() {
     this->get_measured_quantities();
 
     Vector arm_inertial(-this->CS_measured.axis.z.y(),this->CS_measured.axis.z.x(),0); // rocket.z cross z to get correct sign
@@ -286,28 +279,18 @@ void SingleStageControl<NFINS>::update_commands() {
     this->command_fins(commanded_torque, measured_dynamic_pressure);
 }
 
-template<unsigned int NFINS>
-void SingleStageControl<NFINS>::update(double time) {
+
+void SingleStageControl::update(double time) {
     this->deflect_fins(time);
     this->update_force();
     this->update_commands();
     this->time_old = time;
 }
 
-SingleStageControl_3::SingleStageControl_3(SingleStageRocket& r) : SingleStageControl(r) {
+SingleStageControl_3::SingleStageControl_3(SingleStageRocket& r) : SingleStageControl(r,3) {}
 
-    Axis A;
-    for(int i = 0; i < 3;i++){
-        A.data[i] = this->const_planer_term*this->fins[i].span.x();
-        A.data[i+3] = this->const_planer_term*this->fins[i].span.y();
-        A.data[i+6] = this->const_axial_term;
-    }
-    Axis A_inv = A.get_inverse();
-    this->solve3.reset(new Axis(A_inv));
-}
-
-SingleStageControl_3::set_aero_coef(double dCL, double dCD, double dCM, double fin_z, double fin_COP_d) {
-    SingleStageControl<3>::set_aero_coef(dCL, dCD, dCM, fin_z, fin_COP_d);
+void SingleStageControl_3::set_aero_coef(double dCL, double dCD, double dCM, double fin_z, double fin_COP_d) {
+    SingleStageControl::set_aero_coef(dCL, dCD, dCM, fin_z, fin_COP_d);
     Axis A;
     for(int i = 0; i < 3;i++){
         A.data[i] = this->const_planer_term*this->fins[i].span.x();
@@ -323,14 +306,16 @@ void SingleStageControl_3::command_fins(const Vector& commanded_torque, double m
 
     Vector angles = this->solve3*command_torque_scaled;
 
-    for(int i = 0; i < 3;i++) {
+    for(unsigned int i = 0; i < NFINS; i++) {
         this->fins[i].commanded_deflection = angles.data[i];
     }
 }
 
+SingleStageControl_4::SingleStageControl_4(SingleStageRocket& r) : SingleStageControl(r,4) {}
+
 void SingleStageControl_4::command_fins(const Vector& commanded_torque, double measured_dynamic_pressure) {
 
-    double beta[4];
+    std::array<double,4> beta;
     for(unsigned int i = 0; i < NFINS;i++) {
         beta[i] = 1 + this->fins[i].span.x() + this->fins[i].span.y();
     }
@@ -386,7 +371,7 @@ void WindHistory::reset() {
     this->wind.data[2] = siter->data[2] + this->dvdt.data[2]*dt;
 }
 
-SingleStageRocket::SingleStageRocket(const std::string& fn) : aero(*this), control(*this) {
+SingleStageRocket::SingleStageRocket(const std::string& fn) : aero(*this) {
 
     if(fn.size() < 8) {
         throw std::invalid_argument("invalid filename.");
@@ -418,7 +403,7 @@ SingleStageRocket::SingleStageRocket(const std::string& fn) : aero(*this), contr
         throw std::runtime_error("file length invalid");
     }
 
-    data = util::split(lines[MASS_EMPTY_LINE]);
+    data = util::split(lines[0]);
     if(data.size() < 4) {
         throw std::runtime_error("Not enough empty mass information: " + std::to_string(data.size()) + " < 4. Reminder: {mass,Ixx,Izz,COG}");
     }
@@ -488,7 +473,7 @@ SingleStageRocket::SingleStageRocket(const std::string& fn) : aero(*this), contr
     }
 
     if(lines.size() < 8 + nPoints){
-        throw std::runtime_error("Not enough Fin Info")
+        throw std::runtime_error("Not enough Fin Info");
     }
 
     data = util::split(lines[6+nPoints]);
@@ -496,7 +481,15 @@ SingleStageRocket::SingleStageRocket(const std::string& fn) : aero(*this), contr
         throw std::runtime_error("Not enough Fin Info: " + std::to_string(data.size()) + " < 6. Reminder: {NFINS,dSCL,dSCM,dSCD,COP_z,COP_radial}");
     }
 
-    this->control = std::make_unique<SingleStageControl>(*this,std::stou(data[0]));
+    int NFINS = std::stoi(data[0]);
+    if(NFINS == 3) {
+        this->control = std::make_unique<SingleStageControl_3>(*this);
+    } else if (NFINS == 4) {
+        this->control = std::make_unique<SingleStageControl_4>(*this);
+    } else {
+        throw std::runtime_error("Currently only 3 or 4 fins are supported");
+    }
+
     this->control->set_aero_coef(std::stod(data[1]),std::stod(data[2]),std::stod(data[3]),std::stod(data[4]),std::stod(data[5]));
 
     data = util::split(lines[7+nPoints]);
