@@ -270,7 +270,11 @@ void SingleStageControl<NFINS>::get_measured_quantities() {
 }
 
 template<unsigned int NFINS>
-void SingleStageControl<NFINS>::update(double time) {
+void SingleStageControl<NFINS>::update_force(double time) {
+    this->dMoment.zero();
+    this->dForce.zero();
+    Vector airspeed = rocket.velocity - rocket.wind.wind;
+    dynamic_pressure = 0.5*rocket.air_density*airspeed.dot(airspeed);
 
     double max_angle = this->slew_rate*(time - this->time_old);
     for(unsigned int i = 0; i < NFINS;i++) {
@@ -280,8 +284,20 @@ void SingleStageControl<NFINS>::update(double time) {
         } else {
             this->fins[i].deflection = this->fins[i].commanded_deflection;
         }
+
+        double tmp = this->const_planer_term*this->fins[i].deflection;
+
+        this->dMoment.data[0] += this->fins[i].span.data[0]*tmp;
+        this->dMoment.data[1] += this->fins[i].span.data[1]*tmp;
+        this->dMoment.data[2] += this->fins[i].span.data[2]*this->const_axial_term*this->fins[i].deflection;
     }
 
+    this->dMoment *= dynamic_pressure;
+    this->dForce *= dynamic_pressure;
+}
+
+template<unsigned int NFINS>
+void SingleStageControl<NFINS>::update_commands() {
     this->get_measured_quantities();
 
     Vector arm_inertial(-this->CS_measured.axis.z.y(),this->CS_measured.axis.z.x(),0); // rocket.z cross z to get correct sign
@@ -295,6 +311,14 @@ void SingleStageControl<NFINS>::update(double time) {
     commanded_torque = this->CS_measured * commanded_torque;
 
     this->command_fins(commanded_torque, measured_dynamic_pressure);
+}
+
+template<unsigned int NFINS>
+void SingleStageControl<NFINS>::update(double time) {
+
+
+
+
 
     this->time_old = time;
 

@@ -146,6 +146,10 @@ public:
 
     void update(double time);
 
+    void update_force(double time);
+
+    void update_commands();
+
     void command_fins(const Vector& commanded_torque, double measured_dynamic_pressure);
 
 };
