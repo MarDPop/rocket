@@ -11,7 +11,7 @@
 \begin{document}
 \maketitle
 
-The goal is to find out what deflection the fins must have for a given $\tau$ .
+The goal is to find out what deflection the fins must have for a given $\tau$. At this point, we are also ignorning angle of attack, because in part those terms are captured by the undeflected body coefficients, in particular the restoring moment and the drag to induced lift. These should just be "deltas" to those coefficients. That is an idealization, but is sufficient without a full aero table.
 
 \begin{equation}
   \vec{\tau} = \sum_{i = 1}^{N} \vec{r}_i \times \vec{L}_i + \vec{M}_i
@@ -21,7 +21,7 @@ The goal is to find out what deflection the fins must have for a given $\tau$ .
   \vec{r}_i = z\hat{k} + d \hat{s}
 \end{equation}
 
-where s is in the direction of the span and d is the distance to the COP. for now assume d = 0
+where s is in the direction of the span and d is the distance to the COP. for now assume d = 0. 
 
 \begin{equation}
   \vec{M}_i = q S C_{M,\alpha} \alpha_i \hat{s}_i 

@@ -429,6 +429,7 @@
 		<Unit filename="src/6DOF/include/Control.h" />
 		<Unit filename="src/6DOF/include/GNC.h" />
 		<Unit filename="src/6DOF/include/Gravity.h" />
+		<Unit filename="src/6DOF/include/SingleStageRocket.h" />
 		<Unit filename="src/6DOF/include/Stage.h" />
 		<Unit filename="src/6DOF/include/StageDynamics.h" />
 		<Unit filename="src/6DOF/include/Thruster.h" />
@@ -436,6 +437,7 @@
 		<Unit filename="src/6DOF/src/Aerodynamics.cpp" />
 		<Unit filename="src/6DOF/src/Atmosphere.cpp" />
 		<Unit filename="src/6DOF/src/Body.cpp" />
+		<Unit filename="src/6DOF/src/SingleStageRocket.cpp" />
 		<Unit filename="src/6DOF/src/Stage.cpp" />
 		<Unit filename="src/6DOF/src/StageDynamics.cpp" />
 		<Unit filename="src/6DOF/src/Thruster.cpp" />

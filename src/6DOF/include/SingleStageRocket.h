@@ -89,9 +89,6 @@ struct Fin {
 
 template<unsigned int NFINS>
 class SingleStageControl {
-
-    std::unique_ptr<Axis> solve3;
-
     Fin fins[NFINS];
 
     double z;
@@ -142,17 +139,43 @@ public:
 
     void set_controller_terms(double P_angle, double P_velocity, double C_velocity );
 
-    void set_aero_coef(double dCL, double dCD, double dCM, double fin_z, double fin_COP_d);
+    virtual void set_aero_coef(double dCL, double dCD, double dCM, double fin_z, double fin_COP_d);
 
     void update(double time);
 
-    void update_force(double time);
+    void deflect_fins(double time);
+
+    void update_force();
 
     void update_commands();
 
-    void command_fins(const Vector& commanded_torque, double measured_dynamic_pressure);
+    virtual void command_fins(const Vector& commanded_torque, double measured_dynamic_pressure) = 0;
 
 };
+
+class SingleStageControl_3 : public virtual SingleStageControl<3> {
+
+    Axis solve3;
+
+public:
+
+    SingleStageControl_3(SingleStageRocket& r);
+
+    void set_aero_coef(double dCL, double dCD, double dCM, double fin_z, double fin_COP_d);
+
+    void command_fins(const Vector& commanded_torque, double measured_dynamic_pressure) override;
+
+};
+
+class SingleStageControl_4 : public virtual SingleStageControl<4> {
+
+public:
+
+    SingleStageControl_4(SingleStageRocket& r);
+
+    void command_fins(const Vector& commanded_torque, double measured_dynamic_pressure) override;
+};
+
 
 class WindHistory {
 
@@ -341,9 +364,7 @@ public:
 
     SingleStageThruster thruster;
 
-    SingleStageControl<3> control;
-
-    SingleStageRocket();
+    std::unique_ptr<SingleStageControl> control;
 
     SingleStageRocket(const std::string& fn);
 
