@@ -2,6 +2,7 @@
 
 #include "../../common/include/util.h"
 #include <fstream>
+#include <numeric>
 
 void SingleStageThruster::add_thrust_point(double pressure, double thrust, double mass_rate) {
 
@@ -184,23 +185,104 @@ void WindHistory::load(std::string fn) {
 template<unsigned int NFINS>
 SingleStageControl<NFINS>::SingleStageControl(SingleStageRocket& r) : rocket(r) {
     for(unsigned int i = 1; i < NFINS;i++){
-        this->fin_direction[i].zero();
-        this->fin_angle[i] = 0;
+        this->fins[i].span.zero();
+        this->fins[i].deflection = 0;
     }
 
-    this->fin_direction[0].data[0] = 1;
+    this->fins[0].span.x(1);
     double dtheta = 6.283185307179586476925286766559/NFINS;
     for(unsigned int i = 1; i < NFINS;i++){
-        this->fin_direction[i].data[0] = cos(i*dtheta);
-        this->fin_direction[i].data[1] = sin(i*dtheta);
+        this->fins[i].span.data[0] = cos(i*dtheta);
+        this->fins[i].span.data[1] = sin(i*dtheta);
+    }
+}
+
+template<>
+void SingleStageControl<3>::command_fins(const Vector& commanded_torque, double measured_dynamic_pressure) {
+
+    if(!this->solve3) {
+        Axis A;
+        for(int i = 0; i < 3;i++){
+            A.data[i] = this->const_planer_term*this->fins[i].span.x();
+            A.data[i+3] = this->const_planer_term*this->fins[i].span.y();
+            A.data[i+6] = this->const_axial_term;
+        }
+        Axis A_inv = A.get_inverse();
+        this->solve3.reset(new Axis(A_inv));
+    }
+
+    Vector command_torque_scaled = commanded_torque * (1.0/measured_dynamic_pressure);
+
+    Vector angles = (*this->solve3)*command_torque_scaled;
+
+    for(int i = 0; i < 3;i++) {
+        this->fins[i].commanded_deflection = angles.data[i];
     }
 }
 
 template<unsigned int NFINS>
-void SingleStageControl<NFINS>::update(double time){
+void SingleStageControl<NFINS>::command_fins(const Vector& commanded_torque, double measured_dynamic_pressure) {
 
+    std::array<double,NFINS> beta;
+    for(unsigned int i = 0; i < NFINS;i++) {
+        beta[i] = 1 + this->fins[i].span.x() + this->fins[i].span.y();
+    }
+    auto num = (commanded_torque.x() + commanded_torque.y())/this->const_planer_term + commanded_torque.z()/this->const_axial_term;
+    auto den = measured_dynamic_pressure*std::accumulate(beta.begin(),beta.end(),0);
+
+    auto lambda = num/den;
+
+    for(unsigned int i = 0; i < NFINS;i++) {
+        this->fins[i].commanded_deflection = lambda*beta[i];
+    }
+}
+
+template<unsigned int NFINS>
+void SingleStageControl<NFINS>::set_system_limits(double slew_limit, double angle_limit){
+    this->max_theta = angle_limit;
+    this->slew_rate = slew_limit;
+}
+
+template<unsigned int NFINS>
+void SingleStageControl<NFINS>::set_controller_terms(double P_angle, double P_velocity, double C_velocity ){
+    this->K1 = P_angle;
+    this->K2 = P_velocity;
+    this->C2 = C_velocity;
+}
+
+template<unsigned int NFINS>
+void SingleStageControl<NFINS>::set_aero_coef(double dCL, double dCD, double dCM, double fin_COP_z, double fin_COP_d){
+    this->dCLdTheta = dCL;
+    this->dCDdTheta = dCD;
+    this->dCMdTheta = dCM;
+    this->z = fin_COP_z;
+    this->d = fin_COP_d;
+    this->const_axial_term = dCL*fin_COP_d;
+    this->const_planer_term = dCM - z*dCL;
+}
+
+template<unsigned int NFINS>
+void SingleStageControl<NFINS>::get_measured_quantities() {
     this->CS_measured = rocket.CS;
     this->angular_velocity_measured = rocket.angular_velocity;
+    Vector airspeed = rocket.velocity - rocket.wind.wind;
+    this->measured_dynamic_pressure = 0.5*rocket.air_density*airspeed.dot(airspeed);
+}
+
+template<unsigned int NFINS>
+void SingleStageControl<NFINS>::update(double time) {
+
+    double max_angle = this->slew_rate*(time - this->time_old);
+    for(unsigned int i = 0; i < NFINS;i++) {
+        double delta = this->fins[i].commanded_deflection - this->fins[i].deflection;
+        if(fabs(delta) > max_angle) {
+            this->fins[i].deflection += std::copysign(max_angle,delta);
+        } else {
+            this->fins[i].deflection = this->fins[i].commanded_deflection;
+        }
+    }
+
+    this->get_measured_quantities();
 
     Vector arm_inertial(-this->CS_measured.axis.z.y(),this->CS_measured.axis.z.x(),0); // rocket.z cross z to get correct sign
 
@@ -212,11 +294,9 @@ void SingleStageControl<NFINS>::update(double time){
 
     commanded_torque = this->CS_measured * commanded_torque;
 
-    for(unsigned int i = 0; i < NFINS; i++) {
-        double torque_fin = this->fin_direction[i].dot(commanded_torque);
+    this->command_fins(commanded_torque, measured_dynamic_pressure);
 
-
-    }
+    this->time_old = time;
 
 }
 

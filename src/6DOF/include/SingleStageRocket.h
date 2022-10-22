@@ -85,21 +85,28 @@ struct Fin {
     double commanded_deflection; // first fin on + x axis, going counter clockwise
     Vector span; // vector of the direction of the span of all fins
     Vector lift; // vector of the direction of the lift of all fins
-    double lift_span_location; // distance along span vector of  on Center of pressure
 };
 
 template<unsigned int NFINS>
 class SingleStageControl {
 
+    std::unique_ptr<Axis> solve3;
+
     Fin fins[NFINS];
 
-    double z_location;
+    double z;
+
+    double d; // distance along span vector of  on Center of pressure
 
     double dCMdTheta;
 
     double dCDdTheta;
 
     double dCLdTheta;
+
+    double const_axial_term;
+
+    double const_planer_term;
 
     double max_theta = 0.1; // rad
 
@@ -113,9 +120,13 @@ class SingleStageControl {
 
     double time_old;
 
+    double measured_dynamic_pressure;
+
     Vector angular_velocity_measured;
 
     Axis CS_measured;
+
+    void get_measured_quantities();
 
     SingleStageRocket& rocket;
 
@@ -127,7 +138,15 @@ public:
 
     SingleStageControl(SingleStageRocket& r);
 
+    void set_system_limits(double slew_limit, double angle_limit);
+
+    void set_controller_terms(double P_angle, double P_velocity, double C_velocity );
+
+    void set_aero_coef(double dCL, double dCD, double dCM, double fin_z, double fin_COP_d);
+
     void update(double time);
+
+    void command_fins(const Vector& commanded_torque, double measured_dynamic_pressure);
 
 };
 
