@@ -182,7 +182,7 @@ void WindHistory::load(std::string fn) {
     }
 }
 
-SingleStageControl::SingleStageControl(SingleStageRocket& r, unsigned int N) : rocket(r), NFINS(N) {
+SingleStageControl::SingleStageControl(SingleStageRocket& r, unsigned int N) : fins(N), rocket(r), NFINS(N) {
 
     for(unsigned int i = 0; i < NFINS;i++){
         this->fins[i].span.zero();
@@ -195,6 +195,8 @@ SingleStageControl::SingleStageControl(SingleStageRocket& r, unsigned int N) : r
         this->fins[i].span.data[0] = cos(i*dtheta);
         this->fins[i].span.data[1] = sin(i*dtheta);
     }
+
+    this->chute_deployed = false;
 }
 
 void SingleStageControl::set_system_limits(double slew_limit, double angle_limit){
@@ -209,20 +211,34 @@ void SingleStageControl::set_controller_terms(double P_angle, double P_velocity,
 }
 
 void SingleStageControl::set_aero_coef(double dCL, double dCD, double dCM, double fin_COP_z, double fin_COP_d){
-    this->dCLdTheta = dCL;
+    this->dCLdTheta = dCL; // remember that these already have fin area "built in"
     this->dCDdTheta = dCD;
     this->dCMdTheta = dCM;
     this->z = fin_COP_z;
     this->d = fin_COP_d;
     this->const_axial_term = dCL*fin_COP_d;
-    this->const_planer_term = dCM - z*dCL;
+    this->const_planer_term = dCM - (z - rocket.COG)*dCL; // remember z should be negative distance from nose
+}
+
+void SingleStageControl::set_chute(double area_drogue, double area_deployed, double CD_drogue, double CD_deployed, double chord_length, double deployment_time) {
+    this->chute.area_drogue = area_drogue;
+    this->chute.area_deployed = area_deployed;
+    this->chute.CD_drogue = CD_drogue;
+    this->chute.CD_deployed = CD_deployed;
+    this->chute.chord_length = chord_length;
+    this->chute.deployment_time = deployment_time;
+}
+
+void SingleStageControl::reset() {
+    this->chute_deployed = false;
 }
 
 void SingleStageControl::get_measured_quantities() {
     this->CS_measured = rocket.CS;
     this->angular_velocity_measured = rocket.angular_velocity;
     Vector airspeed = rocket.velocity - rocket.wind.wind;
-    this->measured_dynamic_pressure = 0.5*rocket.air_density*airspeed.dot(airspeed);
+    this->dynamic_pressure_measured = 0.5*rocket.air_density*airspeed.dot(airspeed);
+    this->ascent_rate_measured = rocket.velocity.z();
 }
 
 void SingleStageControl::deflect_fins(double time) {
@@ -239,25 +255,28 @@ void SingleStageControl::deflect_fins(double time) {
     }
 }
 
-
 void SingleStageControl::update_force() {
     this->dMoment.zero();
     this->dForce.zero();
+
+    double axial_term = this->dCLdTheta*this->d;
+    double planar_term = this->dCMdTheta - (this->z - rocket.COG)*this->dCLdTheta;
+
     Vector airspeed = rocket.velocity - rocket.wind.wind;
     double dynamic_pressure = 0.5*rocket.air_density*airspeed.dot(airspeed);
 
     for(auto& fin : this->fins) {
-        double tmp = this->const_planer_term*fin.deflection;
+        double tmp = planar_term*fin.deflection;
 
         this->dMoment.data[0] += fin.span.data[0]*tmp;
         this->dMoment.data[1] += fin.span.data[1]*tmp;
-        this->dMoment.data[2] += fin.span.data[2]*this->const_axial_term*fin.deflection;
+        this->dMoment.data[2] += fin.span.data[2]*axial_term*fin.deflection;
 
         tmp = this->dCLdTheta*fin.deflection;
 
         this->dForce.data[0] += fin.lift.data[0]*tmp;
         this->dForce.data[1] += fin.lift.data[1]*tmp;
-        this->dForce.data[2] += fin.lift.data[2]*this->dCDdTheta*fin.deflection; // simply linear approximation
+        this->dForce.data[2] -= this->dCDdTheta*fin.deflection; // simply linear approximation for small angles
     }
     this->dMoment *= dynamic_pressure;
     this->dForce *= dynamic_pressure;
@@ -268,7 +287,8 @@ void SingleStageControl::update_force() {
 
 
 void SingleStageControl::update_commands() {
-    this->get_measured_quantities();
+    // essentially straight up
+    //if( fabs(this->CS_measured.axis.z.z()) > 0.99999)
 
     Vector arm_inertial(-this->CS_measured.axis.z.y(),this->CS_measured.axis.z.x(),0); // rocket.z cross z to get correct sign
     Vector commanded_angular_rate = arm_inertial*this->K1;
@@ -276,11 +296,50 @@ void SingleStageControl::update_commands() {
     Vector commanded_torque = angular_err*this->K2 - this->angular_velocity_measured*this->C2;
     commanded_torque = this->CS_measured * commanded_torque;
 
-    this->command_fins(commanded_torque, measured_dynamic_pressure);
+    this->command_fins(commanded_torque);
 }
 
+void SingleStageControl::chute_dynamics(double time) {
+    Vector airspeed = rocket.velocity - rocket.wind.wind;
+    double dynamic_pressure = 0.5*rocket.air_density*airspeed.dot(airspeed);
+
+    this->chute.frac_deployed = (time - this->chute_deployment_time)/this->chute.deployment_time;
+    double CDA;
+    if(this->chute.frac_deployed > 1) {
+        CDA = this->chute.CD_deployed*this->chute.area_deployed;
+    } else {
+        double CD = this->chute.CD_drogue + (this->chute.CD_deployed - this->chute.CD_drogue)*frac;
+        double A = this->chute.area_drogue + (this->chute.area_deployed - this->chute.area_drogue)*frac;
+        CDA = CD*A;
+    }
+
+    // chute is more complicated than this, but for now assume just a drag force
+
+    Vector unit_v = airspeed * (-1.0/airspeed.norm());
+
+    this->dForce = unit_v * (CDA*dynamic_pressure);
+    this->dMoment.zero();
+}
 
 void SingleStageControl::update(double time) {
+
+    if(this->chute_deployed) {
+        this->chute_dynamics(time);
+        return;
+    }
+
+    this->get_measured_quantities();
+
+    if(this->dynamic_pressure_measured < 1e-3) {
+        return;
+    }
+
+    if(this->ascent_rate_measured < -0.5) {
+        this->chute_deployed = true;
+        this->chute_deployment_time = time;
+        return;
+    }
+
     this->deflect_fins(time);
     this->update_force();
     this->update_commands();
@@ -300,33 +359,32 @@ void SingleStageControl_3::set_aero_coef(double dCL, double dCD, double dCM, dou
     this->solve3 = A.get_inverse();
 }
 
-void SingleStageControl_3::command_fins(const Vector& commanded_torque, double measured_dynamic_pressure) {
+void SingleStageControl_3::command_fins(const Vector& commanded_torque) {
 
-    Vector command_torque_scaled = commanded_torque * (1.0/measured_dynamic_pressure);
+    Vector command_torque_scaled = commanded_torque * (1.0/this->dynamic_pressure_measured);
 
     Vector angles = this->solve3*command_torque_scaled;
-
-    for(unsigned int i = 0; i < NFINS; i++) {
-        this->fins[i].commanded_deflection = angles.data[i];
-    }
+    this->fins[0].commanded_deflection = angles.data[0];
+    this->fins[1].commanded_deflection = angles.data[1];
+    this->fins[2].commanded_deflection = angles.data[2];
 }
 
 SingleStageControl_4::SingleStageControl_4(SingleStageRocket& r) : SingleStageControl(r,4) {}
 
-void SingleStageControl_4::command_fins(const Vector& commanded_torque, double measured_dynamic_pressure) {
+void SingleStageControl_4::command_fins(const Vector& commanded_torque) {
 
     std::array<double,4> beta;
     for(unsigned int i = 0; i < NFINS;i++) {
         beta[i] = 1 + this->fins[i].span.x() + this->fins[i].span.y();
     }
     auto num = (commanded_torque.x() + commanded_torque.y())/this->const_planer_term + commanded_torque.z()/this->const_axial_term;
-    auto den = measured_dynamic_pressure*std::accumulate(beta.begin(),beta.end(),0);
+    auto den = this->dynamic_pressure_measured*std::accumulate(beta.begin(),beta.end(),0);
 
     auto lambda = num/den;
-
-    for(unsigned int i = 0; i < NFINS;i++) {
-        this->fins[i].commanded_deflection = lambda*beta[i];
-    }
+    this->fins[0].commanded_deflection = lambda*beta[0];
+    this->fins[1].commanded_deflection = lambda*beta[1];
+    this->fins[2].commanded_deflection = lambda*beta[2];
+    this->fins[3].commanded_deflection = lambda*beta[3];
 }
 
 void WindHistory::load(std::vector<double> t, std::vector<Vector> s) {
@@ -458,9 +516,9 @@ SingleStageRocket::SingleStageRocket(const std::string& fn) : aero(*this) {
         throw std::runtime_error("Need to Set Thruster Points");
     }
 
-    int nPoints = std::stoi(data[1]);
+    unsigned int nPoints = std::stoi(data[1]);
 
-    for(int i = 0; i < nPoints; i++) {
+    for(unsigned int i = 0; i < nPoints; i++) {
         data = util::split(lines[6+i]);
         if(data.size() < 3) {
             throw std::runtime_error("Not enough thruster data in row");
@@ -493,7 +551,7 @@ SingleStageRocket::SingleStageRocket(const std::string& fn) : aero(*this) {
     this->control->set_aero_coef(std::stod(data[1]),std::stod(data[2]),std::stod(data[3]),std::stod(data[4]),std::stod(data[5]));
 
     data = util::split(lines[7+nPoints]);
-    if(data.size() < 6) {
+    if(data.size() < 5) {
         throw std::runtime_error("Not enough Fin Info: " + std::to_string(data.size()) + " < 5. Reminder: {K1,K2,C2,slew,limit}");
     }
 

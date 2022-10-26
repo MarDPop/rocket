@@ -48,9 +48,11 @@ int main(int argc, char *argv[]) {
 
     rocket.launch(dt);
 
-    std::cout << "Done. Printing." << std::endl;
+    std::cout << "Printing." << std::endl;
 
     print_out(rocket,argv[2]);
+
+    std::cout << "Done. Press enter to exit" << std::endl;
 
     char b;
     std::cin >>  b;

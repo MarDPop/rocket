@@ -81,17 +81,28 @@ struct SingleStageAerodynamics {
 };
 
 struct Fin {
-    double deflection; // first fin on + x axis, going counter clockwise
-    double commanded_deflection; // first fin on + x axis, going counter clockwise
+    double deflection = 0; // first fin on + x axis, going counter clockwise
+    double commanded_deflection = 0; // first fin on + x axis, going counter clockwise
     Vector span; // vector of the direction of the span of all fins
     Vector lift; // vector of the direction of the lift of all fins
 };
 
+struct Chute {
+    double area_drogue;
+    double CD_drogue;
+    double area_deployed;
+    double CD_deployed;
+    double deployment_time = 1;
+    double chord_length;
+    double frac_deployed;
+};
 
 class SingleStageControl {
 
 protected:
     std::vector<Fin> fins;
+
+    Chute chute;
 
     double z;
 
@@ -119,11 +130,17 @@ protected:
 
     double time_old;
 
-    double measured_dynamic_pressure;
+    double ascent_rate_measured;
+
+    double dynamic_pressure_measured;
 
     Vector angular_velocity_measured;
 
     Axis CS_measured;
+
+    double chute_deployment_time;
+
+    bool chute_deployed;
 
     void get_measured_quantities();
 
@@ -145,6 +162,10 @@ public:
 
     virtual void set_aero_coef(double dCL, double dCD, double dCM, double fin_z, double fin_COP_d);
 
+    void set_chute(double area_drogue, double area_deployed, double CD_drogue, double CD_deployed, double chord_length, double deployment_time);
+
+    void reset();
+
     void update(double time);
 
     void deflect_fins(double time);
@@ -153,7 +174,9 @@ public:
 
     void update_commands();
 
-    virtual void command_fins(const Vector& commanded_torque, double measured_dynamic_pressure) = 0;
+    void chute_dynamics(double time);
+
+    virtual void command_fins(const Vector& commanded_torque) = 0;
 
 };
 
@@ -167,7 +190,7 @@ public:
 
     void set_aero_coef(double dCL, double dCD, double dCM, double fin_z, double fin_COP_d) override;
 
-    void command_fins(const Vector& commanded_torque, double measured_dynamic_pressure) override;
+    void command_fins(const Vector& commanded_torque) override;
 
 };
 
@@ -177,14 +200,17 @@ public:
 
     SingleStageControl_4(SingleStageRocket& r);
 
-    void command_fins(const Vector& commanded_torque, double measured_dynamic_pressure) override;
+    void command_fins(const Vector& commanded_torque) override;
 };
 
 
 class WindHistory {
 
+    /* Wind Table */
     std::vector<double> times;
     std::vector<Vector> speed;
+
+    /* iterator positions */
     double* titer;
     Vector* siter;
     double* tend;
@@ -295,7 +321,7 @@ public:
     double Izz;
 
     /**
-    * current center of mass location from nose (m)
+    * current center of mass location from nose (m) [should be negative]
     */
     double COG;
 
