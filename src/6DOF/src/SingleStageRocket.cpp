@@ -3,6 +3,7 @@
 #include "../../common/include/util.h"
 #include <fstream>
 #include <numeric>
+#include <iostream>
 
 void SingleStageThruster::add_thrust_point(double pressure, double thrust, double mass_rate) {
 
@@ -308,8 +309,8 @@ void SingleStageControl::chute_dynamics(double time) {
     if(this->chute.frac_deployed > 1) {
         CDA = this->chute.CD_deployed*this->chute.area_deployed;
     } else {
-        double CD = this->chute.CD_drogue + (this->chute.CD_deployed - this->chute.CD_drogue)*frac;
-        double A = this->chute.area_drogue + (this->chute.area_deployed - this->chute.area_drogue)*frac;
+        double CD = this->chute.CD_drogue + (this->chute.CD_deployed - this->chute.CD_drogue)*this->chute.frac_deployed;
+        double A = this->chute.area_drogue + (this->chute.area_deployed - this->chute.area_drogue)*this->chute.frac_deployed;
         CDA = CD*A;
     }
 
@@ -318,7 +319,8 @@ void SingleStageControl::chute_dynamics(double time) {
     Vector unit_v = airspeed * (-1.0/airspeed.norm());
 
     this->dForce = unit_v * (CDA*dynamic_pressure);
-    this->dMoment.zero();
+    // assume arm is nose
+    Vector::cross((rocket.CS.axis.z*-rocket.COG),this->dForce,this->dMoment);
 }
 
 void SingleStageControl::update(double time) {
@@ -526,15 +528,15 @@ SingleStageRocket::SingleStageRocket(const std::string& fn) : aero(*this) {
         this->thruster.add_thrust_point(std::stod(data[0]),std::stod(data[1]),std::stod(data[2]));
     }
 
-    if(lines.size() == 6+nPoints){
+    if(lines.size() == 6 + nPoints){
         return;
     }
 
-    if(lines.size() < 8 + nPoints){
+    if(lines.size() < 9 + nPoints){
         throw std::runtime_error("Not enough Fin Info");
     }
 
-    data = util::split(lines[6+nPoints]);
+    data = util::split(lines[6 + nPoints]);
     if(data.size() < 6) {
         throw std::runtime_error("Not enough Fin Info: " + std::to_string(data.size()) + " < 6. Reminder: {NFINS,dSCL,dSCM,dSCD,COP_z,COP_radial}");
     }
@@ -550,13 +552,20 @@ SingleStageRocket::SingleStageRocket(const std::string& fn) : aero(*this) {
 
     this->control->set_aero_coef(std::stod(data[1]),std::stod(data[2]),std::stod(data[3]),std::stod(data[4]),std::stod(data[5]));
 
-    data = util::split(lines[7+nPoints]);
+    data = util::split(lines[7 + nPoints]);
     if(data.size() < 5) {
         throw std::runtime_error("Not enough Fin Info: " + std::to_string(data.size()) + " < 5. Reminder: {K1,K2,C2,slew,limit}");
     }
 
     this->control->set_controller_terms(std::stod(data[0]),std::stod(data[1]),std::stod(data[2]));
     this->control->set_system_limits(std::stod(data[3]),std::stod(data[4]));
+
+    data = util::split(lines[8 + nPoints]);
+    if(data.size() == 6) {
+        this->control->set_chute(std::stod(data[0]),std::stod(data[1]),std::stod(data[2]),std::stod(data[3]),std::stod(data[4]),std::stod(data[5]));
+    } else {
+        std::cout << "no chute modeled.\n";
+    }
 }
 
 void SingleStageRocket::init() {
@@ -610,20 +619,17 @@ void SingleStageRocket::compute_acceleration(double time) {
     this->acceleration *= (1.0/this->mass);
     this->acceleration.data[2] -= this->grav;
 
-    Axis I_bodyR;
-    int i;
-    for(i=0;i < 6;i++){
-        I_bodyR.data[i] = this->Ixx*this->CS.data[i];
+    Axis I_inertial;
+    int i = 0;
+    for(; i < 6;i++) {
+        I_inertial.data[i] = this->CS.data[i]*this->Ixx;
     }
-    for(;i<9;i++){
-        I_bodyR.data[i] = this->Izz*this->CS.data[i];
+    for(; i < 9;i++) {
+        I_inertial.data[i] = this->CS.data[i]*this->Izz;
     }
-
-    Axis I = this->CS.transpose_mult(I_bodyR);
-    Vector Iw = I*this->angular_velocity;
-    Vector wIw = this->angular_velocity.cross(Iw);
-    Vector rhs = this->angular_acceleration - wIw;
-    this->angular_acceleration = I.get_inverse() * rhs;
+    Vector Iw = I_inertial * this->angular_velocity;
+    Vector rhs = this->angular_acceleration - this->angular_velocity.cross(Iw);
+    this->angular_acceleration = I_inertial.get_inverse() * rhs;
 }
 
 void SingleStageRocket::set_launch(double launch_heading, double launch_angle) {
