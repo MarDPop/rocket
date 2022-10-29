@@ -1,0 +1,29 @@
+{
+  "name": "rocket-gui",
+  "version": "1.0.0",
+  "description": "GUI for the C++ rocket simulator",
+  "main": "index.js",
+  "scripts": {
+    "test": "run"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MarDPop/rocket.git"
+  },
+  "keywords": [
+    "simulator",
+    "gui",
+    "rocket",
+    "aerospace"
+  ],
+  "author": "Marius Popescu",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/MarDPop/rocket/issues"
+  },
+  "homepage": "https://github.com/MarDPop/rocket#readme",
+  "dependencies": {
+    "cesium": "^1.98.1",
+    "electron": "^21.2.0"
+  }
+}
