@@ -2,8 +2,9 @@
   "name": "rocket-gui",
   "version": "1.0.0",
   "description": "GUI for the C++ rocket simulator",
-  "main": "index.js",
+  "main": "main.js",
   "scripts": {
+    "start": "electron .",
     "test": "run"
   },
   "repository": {
