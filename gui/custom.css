@@ -1,0 +1,40 @@
+html, body {
+    height: 100%; margin: 0; padding: 0; overflow: hidden;
+}
+
+#cesiumContainer {
+    position:fixed; 
+    top: 0px; 
+    left: 0px; 
+    right: 0px; 
+    bottom: 0px;
+}
+
+main {
+    background: rgba(0,0,0,0.75);
+    border: 2px solid #000;
+    border-radius: 24px;
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    height: 400px;
+    width: 200px;
+    color: #fff;
+    z-index: 100;
+}
+
+button {
+    padding: 6px;
+    background-color: #fff;
+    color: #333;
+    font-weight: bold;
+    font-size: 18px;
+    border-radius: 6px;
+    margin: 6px;
+    border: 1px solid #222;
+}
+
+button:hover {
+    cursor: pointer;
+    background-color: #eee;
+}
