@@ -4,7 +4,7 @@ const Menu = electron.Menu
 const app = electron.app;
 
 const path = require('path');
-const functions = require('./functions');
+const functions = require('./lib/functions');
 const fs = require('fs');
 
 var mainWindow = null;
