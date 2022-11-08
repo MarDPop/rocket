@@ -3,9 +3,11 @@ const BrowserWindow = electron.BrowserWindow;
 const Menu = electron.Menu
 const app = electron.app;
 
+const dialog = require('electron').dialog;
+const ipcMain = require('electron').ipcMain;
+
 const path = require('path');
-const functions = require('./lib/functions');
-const fs = require('fs');
+const global = require('./lib/global');
 
 var mainWindow = null;
 
@@ -33,7 +35,16 @@ function createWindow() {
                 {
                     label: 'Open Mission File',
                     click() {
-                        functions.openMissionFile();
+                        let options = {
+                            properties: ['openFile']
+                        };
+                        dialog.showOpenDialog(mainWindow, options)
+                        .then((result) => {
+                            // Bail early if user cancelled dialog
+                            if (result.canceled) { return }
+
+                            return global.openMissionFile(result.filePaths);
+                        })
                     }
                 },
                 {
@@ -101,7 +112,7 @@ function createWindow() {
         mainWindow = null;
     });
 
-    
+    mainWindow.show();
 }
 
 // This method will be called when Electron has finished
@@ -124,3 +135,17 @@ app.on('window-all-closed', function() {
         app.quit();
     }
 });
+
+ipcMain.handle('dialog:openFile', () => {
+    let options = {
+        properties: ['openFile']
+    };
+
+    return dialog.showOpenDialog(mainWindow, options)
+        .then((result) => {
+            // Bail early if user cancelled dialog
+            if (result.canceled) { return }
+
+            return result.filePaths;
+        })
+})

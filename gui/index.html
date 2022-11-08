@@ -4,7 +4,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
     <title>Rocket GUI</title>
     <script src="./node_modules/cesium/Build/Cesium/Cesium.js"></script>
-    <script src="./global.js"></script>
+    <script type="module" src="./lib/functions.js"></script>
     <style>
         @import url(./node_modules/cesium/Build/Cesium/Widgets/widgets.css);
         @import url(./custom.css);
@@ -15,6 +15,7 @@
         <input type="hidden" id="rocketFile" name="rocketFile" />
         <button id="runSim">Run</button>
         <button id="loadFile">Load</button>
+        <div id="test"></div>
     </main>
     <div id="cesiumContainer"></div>
     <script>
@@ -25,5 +26,5 @@
         });   
     </script>
 </body>
-<script src="./renderer.js"></script>
+<script type="module" src="./renderer.js"></script>
 </html>
