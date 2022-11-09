@@ -5,9 +5,10 @@ const app = electron.app;
 
 const dialog = require('electron').dialog;
 const ipcMain = require('electron').ipcMain;
-
+const child_process = require("child_process");
 const path = require('path');
 const global = require('./lib/global');
+const fs = require('fs');
 
 var mainWindow = null;
 
@@ -43,7 +44,7 @@ function createWindow() {
                             // Bail early if user cancelled dialog
                             if (result.canceled) { return }
 
-                            return global.openMissionFile(result.filePaths);
+                            return global.DATA.load(result.filePaths);
                         })
                     }
                 },
@@ -136,7 +137,7 @@ app.on('window-all-closed', function() {
     }
 });
 
-ipcMain.handle('dialog:openFile', () => {
+ipcMain.handle('getFile', () => {
     let options = {
         properties: ['openFile']
     };
@@ -146,6 +147,41 @@ ipcMain.handle('dialog:openFile', () => {
             // Bail early if user cancelled dialog
             if (result.canceled) { return }
 
-            return result.filePaths;
+            return fs.readFile(result.filePaths[0],mimeType,(err,contents)=>{
+                if(err){
+                   console.log(err);
+                   return;
+                }
+                return contents;
+              })
         })
 })
+
+ipcMain.handle('openTrajectoryFile', () => {
+    let options = {
+        properties: ['openFile']
+    };
+
+    dialog.showOpenDialog(mainWindow, options).then((result) => {
+        if (result.canceled) { return }
+        global.DATA.trajectory.load(result.filePaths[0]);
+    });
+})
+
+ipcMain.handle('getMissionData', () => {
+    return global.DATA;
+});
+
+ipcMain.handle('runSim', (data) => {
+    global.writeRocketFile(data);
+    var child = child_process.execFile;
+    let command = "./bin/rocket.exe ./data/test.srocket";
+    console.log(command);
+    child(command, function(err, data) {
+        if(err){
+            console.error(err);
+            return;
+        }
+        console.log(data.toString());
+    });
+});

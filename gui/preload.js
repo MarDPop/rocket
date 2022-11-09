@@ -1,30 +1,20 @@
 const contextBridge = require('electron').contextBridge;
 const ipcRenderer = require('electron').ipcRenderer;
-const child_process = require("child_process");
-
-function runExecutable(executablePath, args) {
-    var child = child_process.execFile;
-    var command = executablePath + " " + args;
-    console.log(command);
-    child(command, function(err, data) {
-        if(err){
-            console.error(err);
-            return;
-        }
-        console.log(data.toString());
-    });
-};
 
 // White-listed channels.
 const ipc = {
-    'render': {
+    'api': {
         // From render to main.
         'send': [],
         // From main to render.
-        'receive': [],
+        'receive': [
+            'getMissionData'
+        ],
         // From render to main and back again.
         'sendReceive': [
-            'dialog:openFile' // Channel name
+            'getFile',
+            'openTrajectoryFile',
+            'runSim'
         ]
     }
 };
@@ -35,14 +25,14 @@ contextBridge.exposeInMainWorld(
     'ipcRender', {
         // From render to main.
         send: (channel, args) => {
-            let validChannels = ipc.render.send;
+            let validChannels = ipc.api.send;
             if (validChannels.includes(channel)) {
                 ipcRenderer.send(channel, args);
             }
         },
         // From main to render.
         receive: (channel, listener) => {
-            let validChannels = ipc.render.receive;
+            let validChannels = ipc.api.receive;
             if (validChannels.includes(channel)) {
                 // Deliberately strip event as it includes `sender`.
                 ipcRenderer.on(channel, (event, ...args) => listener(...args));
@@ -50,16 +40,10 @@ contextBridge.exposeInMainWorld(
         },
         // From render to main and back again.
         invoke: (channel, args) => {
-            let validChannels = ipc.render.sendReceive;
+            let validChannels = ipc.api.sendReceive;
             if (validChannels.includes(channel)) {
                 return ipcRenderer.invoke(channel, args);
             }
         }
     }
 );
-
-window.addEventListener('DOMContentLoaded', () => {
-    // do stuff when window loads
-    var btn = document.getElementById("runSim");
-    btn.addEventListener('click', () => {runExecutable("bin\\rocket.exe","test.srocket");});
-});
