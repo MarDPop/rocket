@@ -162,9 +162,10 @@ ipcMain.handle('openTrajectoryFile', () => {
         properties: ['openFile']
     };
 
-    dialog.showOpenDialog(mainWindow, options).then((result) => {
+    return dialog.showOpenDialog(mainWindow, options).then((result) => {
         if (result.canceled) { return }
         global.DATA.trajectory.load(result.filePaths[0]);
+        return [global.DATA.trajectory.times,global.DATA.trajectory.position_ECEF];
     });
 })
 
