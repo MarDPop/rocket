@@ -17,24 +17,21 @@ class Trajectory {
         } catch (e) {
             return;
         }
+        var t = this;
         let lines = data.split(/\r?\n/);
         let n = lines.length - 1;
         this.times = new Array(n);
         this.position_ENU = new Array(n);
         for(let i = 0; i < n; i++){
             let row = lines[i+1].split(/\s+/);
-            var t = parseFloat(row[0]);
-            this.times[i] = t;
-            console.log(t);
-            this.position_ENU[i] = [parseFloat(row[1]),parseFloat(row[2]),parseFloat(row[3])];
+            t.times[i] = Number.parseFloat(row[1]);
+            t.position_ENU[i] = [parseFloat(row[2]),parseFloat(row[3]),parseFloat(row[4])];
         }
-
-        let row = lines[0].split(/\s+/);
-        let lat = parseFloat(row[0])*0.0174532925;
-        let lon = parseFloat(row[1])*0.0174532925;
-        let alt = parseFloat(row[2])*0.001;
+        let row2 = lines[0].split(/\s+/);
+        let lat = parseFloat(row2[0])*0.0174532925;
+        let lon = parseFloat(row2[1])*0.0174532925;
+        let alt = parseFloat(row2[2])*0.001;
         this.position_ECEF = math.convertLocalENU2ECEF(this.position_ENU,lat,lon,alt);
-        console.log(this.times)
         console.log("Trajectory loaded.");
     }
 }

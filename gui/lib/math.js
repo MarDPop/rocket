@@ -26,13 +26,15 @@ function latLon2ECEF(lat,lon,alt) {
 function convertLocalENU2ECEF(ENU, lat, lon,elevation){
     let start = latLon2ECEF(lat,lon,elevation);
 
+    const start_km = [start[0]*1000,start[1]*1000,start[2]*1000];
+
     let east = [-Math.sin(lon),Math.cos(lon),0];
     let north = [-Math.sin(lat)*Math.cos(lon), -Math.sin(lat)*Math.sin(lon), Math.cos(lat)];
     let up = [Math.cos(lat)*Math.cos(lon), Math.cos(lat)*Math.sin(lon), Math.sin(lat)];
 
     ECEF = new Array(ENU.length);
     for(let i = 0; i < ENU.length;i++) {
-        ECEF[i] = add3(start,add3(mult3(east,ENU[i][0]),add3(mult3(north,ENU[i][1]),mult3(up,ENU[i][2]))));
+        ECEF[i] = add3(start_km,add3(mult3(east,ENU[i][0]),add3(mult3(north,ENU[i][1]),mult3(up,ENU[i][2]))));
     }
 
     return ECEF;
