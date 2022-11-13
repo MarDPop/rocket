@@ -29,8 +29,8 @@ document.getElementById('loadFile').addEventListener('click', () => {
     window.ipcRender.invoke('openTrajectoryFile').then((data) => {
         let seconds = data[0];
         let ecef = data[1];
+        let quat = data[2];
         
-        const timeStepInSeconds = 0.25;
         const totalSeconds = timeStepInSeconds * (seconds.length - 1);
         const start = Cesium.JulianDate.fromIso8601("2020-03-09T23:10:00Z");
         const stop = Cesium.JulianDate.addSeconds(start, totalSeconds, new Cesium.JulianDate());
@@ -43,13 +43,16 @@ document.getElementById('loadFile').addEventListener('click', () => {
         // Start playing the scene.
         viewer.clock.shouldAnimate = true;
         const positionProperty = new Cesium.SampledPositionProperty();
+        const orientationProperty = new Cesium.SampledProperty(Cesium.Quaternion); 
 
-        let pos = []
-        for(let i = 0; i < ecef.length;i++){
+        let pos = [];
+        for(let i = 0; i < ecef.length;i+=2){
             var position = new Cesium.Cartesian3(ecef[i][0],ecef[i][1],ecef[i][2]);
             pos.push(position);
-            var time = Cesium.JulianDate.addSeconds(start, i * timeStepInSeconds, new Cesium.JulianDate());
+            var orientation = new Cesium.Quaternion(quat[i][1], quat[i][2],quat[i][3],quat[i][0]);
+            var time = Cesium.JulianDate.addSeconds(start, seconds[i], new Cesium.JulianDate());
             positionProperty.addSample(time, position);
+            orientationProperty.addSample(time,orientation);
         }       
 
         var greenLine = viewer.entities.add({
@@ -65,7 +68,7 @@ document.getElementById('loadFile').addEventListener('click', () => {
             model: {
                 uri: rocketModel,
             },
-            orientation: new Cesium.VelocityOrientationProperty(positionProperty),    
+            orientation: orientationProperty,    
             path: new Cesium.PathGraphics({ width: 3 })
         });
 

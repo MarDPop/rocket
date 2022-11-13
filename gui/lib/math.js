@@ -11,6 +11,46 @@ function mult3(x,a){
     return [x[0]*a,x[1]*a,x[2]*a];
 }
 
+function multmat3(A,x){
+    return [dot3(A[0],x),dot3(A[1],x),dot3(A[2],x)];
+}
+
+function multmatT3(A,x){
+    return add3(mult3(A[0],x[0]),add3(mult3(A[1],x[1]),mult3(A[2],x[2])));
+}
+
+function mat2quat(a){
+    let trace = a[0][0] + a[1][1] + a[2][2];
+    var q = [0,0,0,0];
+    if( trace > 0 ) {
+        let s = 0.5 / Math.sqrt(trace + 1.0);
+        q[0] = 0.25 / s;
+        q[1] = ( a[2][1] - a[1][2] ) * s;
+        q[2] = ( a[0][2] - a[2][0] ) * s;
+        q[3] = ( a[1][0] - a[0][1] ) * s;
+    } else {
+        if ( a[0][0] > a[1][1] && a[0][0] > a[2][2] ) {
+            let s = 2.0 * Math.sqrt( 1.0 + a[0][0] - a[1][1] - a[2][2]);
+            q[0] = (a[2][1] - a[1][2] ) / s;
+            q[1] = 0.25 * s;
+            q[2] = (a[0][1] + a[1][0] ) / s;
+            q[3] = (a[0][2] + a[2][0] ) / s;
+        } else if (a[1][1] > a[2][2]) {
+            let s = 2.0 * Math.sqrt( 1.0 + a[1][1] - a[0][0] - a[2][2]);
+            q[0] = (a[0][2] - a[2][0] ) / s;
+            q[1] = (a[0][1] + a[1][0] ) / s;
+            q[2] = 0.25 * s;
+            q[3] = (a[1][2] + a[2][1] ) / s;
+        } else {
+            let s = 2.0 * Math.sqrt( 1.0 + a[2][2] - a[0][0] - a[1][1] );
+            q[0] = (a[1][0] - a[0][1] ) / s;
+            q[1] = (a[0][2] + a[2][0] ) / s;
+            q[2] = (a[1][2] + a[2][1] ) / s;
+            q[3] = 0.25 * s;
+        }
+    }
+    return q;
+}
 
 function latLon2ECEF(lat,lon,alt) {
     let s = Math.sin(lat);
@@ -23,21 +63,15 @@ function latLon2ECEF(lat,lon,alt) {
     return [x,y,z];
 }
 
-function convertLocalENU2ECEF(ENU, lat, lon,elevation){
-    let start = latLon2ECEF(lat,lon,elevation);
-
-    const start_km = [start[0]*1000,start[1]*1000,start[2]*1000];
-
-    let east = [-Math.sin(lon),Math.cos(lon),0];
-    let north = [-Math.sin(lat)*Math.cos(lon), -Math.sin(lat)*Math.sin(lon), Math.cos(lat)];
-    let up = [Math.cos(lat)*Math.cos(lon), Math.cos(lat)*Math.sin(lon), Math.sin(lat)];
-
-    ECEF = new Array(ENU.length);
-    for(let i = 0; i < ENU.length;i++) {
-        ECEF[i] = add3(start_km,add3(mult3(east,ENU[i][0]),add3(mult3(north,ENU[i][1]),mult3(up,ENU[i][2]))));
-    }
-
-    return ECEF;
+function getENUinECEF(lat, lon) {
+    let sLon = Math.sin(lon);
+    let cLon = Math.cos(lon);
+    let sLat = Math.sin(lat);
+    let cLat = Math.sqrt(1-sLat*sLat);
+    let east = [-sLon,cLon,0];
+    let north = [-sLat*cLon, -sLat*sLon, cLat];
+    let up = [cLat*cLon, cLat*sLon, sLat];
+    return [east,north,up];
 }
 
-module.exports = {convertLocalENU2ECEF}
+module.exports = {getENUinECEF,latLon2ECEF,dot3,add3,mult3,multmat3,multmatT3,mat2quat}
