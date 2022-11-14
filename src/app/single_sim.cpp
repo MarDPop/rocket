@@ -24,7 +24,7 @@ void print_out(SingleStageRocket& rocket, const char* fn) {
     for(int i = 0; i < nLines; i++) {
         const double* pos = rocket.record.position[i].data;
         const double* q = rocket.record.orientation[i].data;
-        fprintf(file,"%7.2f % .6e % .6e % .6e % 8.6f % 8.6f % 8.6f % 8.6f % 8.6f % 8.6f % 8.6f % 8.6f % 8.6f\n",
+        fprintf(file,"%7.2f % .6e % .6e % .6e % 10.8f % 10.8f % 10.8f % 10.8f % 10.8f % 10.8f % 10.8f % 10.8f % 10.8f\n",
                     i*rocket.record.t_interval, pos[0], pos[1], pos[2], q[0], q[1], q[2], q[3], q[4], q[5], q[6], q[7], q[8]);
     }
 

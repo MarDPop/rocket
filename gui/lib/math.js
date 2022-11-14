@@ -19,6 +19,14 @@ function multmatT3(A,x){
     return add3(mult3(A[0],x[0]),add3(mult3(A[1],x[1]),mult3(A[2],x[2])));
 }
 
+function det(a){
+    let x=a[0][0]*((a[1][1]*a[2][2])-(a[2][1]*a[1][2]));
+    let y=-a[0][1]*((a[1][0]*a[2][2])-(a[2][0]*a[1][2]));
+    let z=a[0][2]*((a[1][0]*a[2][1])-(a[1][1]*a[2][0]));
+
+    return x+y+z;
+}
+
 function mat2quat(a){
     let trace = a[0][0] + a[1][1] + a[2][2];
     var q = [0,0,0,0];
@@ -74,4 +82,4 @@ function getENUinECEF(lat, lon) {
     return [east,north,up];
 }
 
-module.exports = {getENUinECEF,latLon2ECEF,dot3,add3,mult3,multmat3,multmatT3,mat2quat}
+module.exports = {getENUinECEF,latLon2ECEF,dot3,add3,mult3,multmat3,multmatT3,mat2quat,det}

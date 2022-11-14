@@ -32,6 +32,8 @@ class Trajectory {
         const start = math.latLon2ECEF(lat,lon,alt);
         const CS = math.getENUinECEF(lat,lon);
 
+        console.log(CS);
+
         let A = [[1,0,0],[0,1,0],[0,0,1]];
         let B = new Array(3);
         this.times = new Array(n);
@@ -45,18 +47,19 @@ class Trajectory {
             let j = 4;
             for(let r = 0; r < 3; r++){
                 for(let c = 0; c < 3; c++){
-                    //A[r][c] = parseFloat(row[j]);
+                    A[r][c] = parseFloat(row[j]);
                     j++;
                 }
             }
+
             // Y up
-            B[0] = math.multmatT3(CS,A[1]);
-            B[1] = math.multmatT3(CS,A[2]);
-            B[2] = math.multmatT3(CS,A[0]);
+            B[0] = math.multmatT3(CS,A[2]);
+            B[1] = math.multmatT3(CS,A[0]);
+            B[2] = math.multmatT3(CS,A[1]);
 
             this.orientation_ECEF[i] = math.mat2quat(B);
         }
-        console.log(this.orientation_ECEF);
+        //console.log(this.orientation_ECEF);
         console.log("Trajectory loaded.");
     }
 }

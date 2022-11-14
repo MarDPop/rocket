@@ -50,7 +50,7 @@ document.getElementById('loadFile').addEventListener('click', () => {
         for(let i = 0; i < seconds.length;i+=2){
             var position = new Cesium.Cartesian3(ecef[i][0],ecef[i][1],ecef[i][2]);
             pos.push(position);
-            var orientation = new Cesium.Quaternion(quat[i][1],quat[i][2],quat[i][3],quat[i][0]);
+            var orientation = new Cesium.Quaternion(-quat[i][1],-quat[i][2],-quat[i][3],quat[i][0]);
             var time = Cesium.JulianDate.addSeconds(start, seconds[i], new Cesium.JulianDate());
             positionProperty.addSample(time, position);
             orientationProperty.addSample(time,orientation);
