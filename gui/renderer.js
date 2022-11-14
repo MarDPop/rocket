@@ -29,9 +29,9 @@ document.getElementById('loadFile').addEventListener('click', () => {
     window.ipcRender.invoke('openTrajectoryFile').then((data) => {
         let seconds = data[0];
         let ecef = data[1];
-        let ENU = data[2];
+        let quat = data[2];
 
-        console.log(ENU);
+        console.log(quat);
         
         const start = Cesium.JulianDate.fromIso8601("2023-03-09T13:10:00Z");
         const stop = Cesium.JulianDate.addSeconds(start, seconds[seconds.length-1], new Cesium.JulianDate());
@@ -50,7 +50,7 @@ document.getElementById('loadFile').addEventListener('click', () => {
         for(let i = 0; i < seconds.length;i+=2){
             var position = new Cesium.Cartesian3(ecef[i][0],ecef[i][1],ecef[i][2]);
             pos.push(position);
-            var orientation = new Cesium.Quaternion(ENU[i][1],ENU[i][2],ENU[i][3],ENU[i][0]);
+            var orientation = new Cesium.Quaternion(quat[i][1],quat[i][2],quat[i][3],quat[i][0]);
             var time = Cesium.JulianDate.addSeconds(start, seconds[i], new Cesium.JulianDate());
             positionProperty.addSample(time, position);
             orientationProperty.addSample(time,orientation);
