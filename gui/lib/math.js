@@ -55,7 +55,7 @@ function mat2quat(a){
 function latLon2ECEF(lat,lon,alt) {
     let s = Math.sin(lat);
     let c = Math.sqrt(1-s*s);
-    let N = 6378.1370/Math.sqrt(1 - 0.006694384442042289*s*s);
+    let N = 6378137.0/Math.sqrt(1 - 0.006694384442042289*s*s);
     let tmp = (N + alt)*c;
     let x = tmp*Math.cos(lon);
     let y = tmp*Math.sin(lon);

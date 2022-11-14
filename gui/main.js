@@ -165,7 +165,7 @@ ipcMain.handle('openTrajectoryFile', () => {
     return dialog.showOpenDialog(mainWindow, options).then((result) => {
         if (result.canceled) { return }
         global.DATA.trajectory.load(result.filePaths[0]);
-        return [global.DATA.trajectory.times,global.DATA.trajectory.position_ECEF,global.DATA.trajectory.orientation_ECEF];
+        return [global.DATA.trajectory.times,global.DATA.trajectory.position_ECEF,global.DATA.trajectory.orientation_ENU];
     });
 })
 

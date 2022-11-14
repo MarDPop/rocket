@@ -17,12 +17,14 @@ void print_out(SingleStageRocket& rocket, const char* fn) {
         throw std::invalid_argument("could not open file.");
     }
 
+    fprintf(file,"39.94426809919236 -104.94474985717818 1606.0\n");
+
     int nLines = rocket.record.position.size();
 
     for(int i = 0; i < nLines; i++) {
         const double* pos = rocket.record.position[i].data;
         const double* q = rocket.record.orientation[i].data;
-        fprintf(file,"%6.2f %.6e %.6e %.6e %8.5f %8.5f %8.5f %8.5f %8.5f %8.5f %8.5f %8.5f %8.5f\n",
+        fprintf(file,"%7.2f % .6e % .6e % .6e % 8.6f % 8.6f % 8.6f % 8.6f % 8.6f % 8.6f % 8.6f % 8.6f % 8.6f\n",
                     i*rocket.record.t_interval, pos[0], pos[1], pos[2], q[0], q[1], q[2], q[3], q[4], q[5], q[6], q[7], q[8]);
     }
 

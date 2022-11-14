@@ -579,15 +579,17 @@ void SingleStageRocket::init() {
         this->CS.axis.x.x(cphi);
         this->CS.axis.x.y(-sphi);
         this->CS.axis.x.z(0);
+        this->CS.axis.y.x(ctheta*sphi);
+        this->CS.axis.y.y(ctheta*cphi);
+        this->CS.axis.y.z(-stheta);
         this->CS.axis.z.x(stheta*sphi);
         this->CS.axis.z.y(stheta*cphi);
         this->CS.axis.z.z(ctheta);
-        Cartesian::cross(this->CS.axis.x.data,this->CS.axis.z.data,this->CS.axis.y.data);
+        //Cartesian::cross(this->CS.axis.z.data,this->CS.axis.x.data,this->CS.axis.y.data);
     }
     this->position.zero();
     this->velocity.zero();
     this->angular_velocity.zero();
-    this->set_ground(0,101000,297,0);
     this->mass = this->mass_full;
     this->Ixx = this->I_empty[1] + this->dIdm[1]*(this->mass - this->mass_empty);
     this->Izz = this->I_empty[1] + this->dIdm[1]*(this->mass - this->mass_empty);
@@ -619,17 +621,18 @@ void SingleStageRocket::compute_acceleration(double time) {
     this->acceleration *= (1.0/this->mass);
     this->acceleration.data[2] -= this->grav;
 
-    Axis I_inertial;
+    Axis I_inertial = this->CS.get_transpose(); // might have to transpose CS
     int i = 0;
     for(; i < 6;i++) {
-        I_inertial.data[i] = this->CS.data[i]*this->Ixx;
+        I_inertial.data[i] *= this->Ixx;
     }
     for(; i < 9;i++) {
-        I_inertial.data[i] = this->CS.data[i]*this->Izz;
+        I_inertial.data[i] *= this->Izz;
     }
-    Vector Iw = I_inertial * this->angular_velocity;
-    Vector rhs = this->angular_acceleration - this->angular_velocity.cross(Iw);
-    this->angular_acceleration = I_inertial.get_inverse() * rhs;
+    //Vector Iw = I_inertial * this->angular_velocity;
+    //Vector rhs = this->angular_acceleration - this->angular_velocity.cross(Iw);
+    // this->angular_acceleration = I_inertial.get_inverse() * rhs;
+    this->angular_acceleration = I_inertial.get_inverse() * this->angular_acceleration;
 }
 
 void SingleStageRocket::set_launch(double launch_heading, double launch_angle) {
@@ -765,6 +768,10 @@ void SingleStageRocket::launch(double dt) {
         if(time > time_record){
             this->record.position.push_back(this->position);
             this->record.orientation.push_back(this->CS);
+
+            if(std::isnan(this->position.data[0])){
+                break;
+            }
 
             time_record += this->record.t_interval;
 

@@ -29,11 +29,12 @@ document.getElementById('loadFile').addEventListener('click', () => {
     window.ipcRender.invoke('openTrajectoryFile').then((data) => {
         let seconds = data[0];
         let ecef = data[1];
-        let quat = data[2];
+        let ENU = data[2];
+
+        console.log(ENU);
         
-        const totalSeconds = timeStepInSeconds * (seconds.length - 1);
-        const start = Cesium.JulianDate.fromIso8601("2020-03-09T23:10:00Z");
-        const stop = Cesium.JulianDate.addSeconds(start, totalSeconds, new Cesium.JulianDate());
+        const start = Cesium.JulianDate.fromIso8601("2023-03-09T13:10:00Z");
+        const stop = Cesium.JulianDate.addSeconds(start, seconds[seconds.length-1], new Cesium.JulianDate());
         viewer.clock.startTime = start.clone();
         viewer.clock.stopTime = stop.clone();
         viewer.clock.currentTime = start.clone();
@@ -46,10 +47,10 @@ document.getElementById('loadFile').addEventListener('click', () => {
         const orientationProperty = new Cesium.SampledProperty(Cesium.Quaternion); 
 
         let pos = [];
-        for(let i = 0; i < ecef.length;i+=2){
+        for(let i = 0; i < seconds.length;i+=2){
             var position = new Cesium.Cartesian3(ecef[i][0],ecef[i][1],ecef[i][2]);
             pos.push(position);
-            var orientation = new Cesium.Quaternion(quat[i][1], quat[i][2],quat[i][3],quat[i][0]);
+            var orientation = new Cesium.Quaternion(ENU[i][1],ENU[i][2],ENU[i][3],ENU[i][0]);
             var time = Cesium.JulianDate.addSeconds(start, seconds[i], new Cesium.JulianDate());
             positionProperty.addSample(time, position);
             orientationProperty.addSample(time,orientation);
