@@ -1,5 +1,3 @@
-
-
 Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI1MWQ4Nzc2Mi01ZTFmLTQ5ZTQtYmI0Zi00MjZmYzk2YmJjNGYiLCJpZCI6MTExMTQsInNjb3BlcyI6WyJhc3IiLCJnYyJdLCJpYXQiOjE1NTgxMTk5Mjl9.OnV7lmXzp-fAUIEgsaIZs7pcOuTd8hPdLhyW-UyL7EA';
 // Initialize the Cesium Viewer in the HTML element with the `cesiumContainer` ID.
 const viewer = new Cesium.Viewer('cesiumContainer', {
@@ -10,20 +8,13 @@ var rocketModel;
 
 (async () => {
     try {
-        rocketModel = await Cesium.IonResource.fromAssetId(1395959);     
+        rocketModel = await Cesium.IonResource.fromAssetId(1403984);     
     } catch (error) {
         console.log(error);
     }
 })();
 
 const scene = viewer.scene;
-
-document.getElementById('runSim').addEventListener('click', () => {
-    var data = {};
-    window.ipcRender.invoke('runSim',data).then(() => {
-
-    });
-})
 
 document.getElementById('loadFile').addEventListener('click', () => {
     window.ipcRender.invoke('openTrajectoryFile').then((data) => {
@@ -46,22 +37,19 @@ document.getElementById('loadFile').addEventListener('click', () => {
         const positionProperty = new Cesium.SampledPositionProperty();
         const orientationProperty = new Cesium.SampledProperty(Cesium.Quaternion); 
 
-        let pos = [];
-        for(let i = 0; i < seconds.length;i+=2){
-            var position = new Cesium.Cartesian3(ecef[i][0],ecef[i][1],ecef[i][2]);
-            pos.push(position);
-            var orientation = new Cesium.Quaternion(-quat[i][1],-quat[i][2],-quat[i][3],quat[i][0]);
+        let COGz = 1.1 - 0.6;
+        for(let i = 0; i < seconds.length;i++) {
             var time = Cesium.JulianDate.addSeconds(start, seconds[i], new Cesium.JulianDate());
-            positionProperty.addSample(time, position);
-            orientationProperty.addSample(time,orientation);
+            var position = new Cesium.Cartesian3(ecef[i][0],ecef[i][1],ecef[i][2]);
+            var orientation = new Cesium.Quaternion(-quat[i][1],-quat[i][2],-quat[i][3],quat[i][0]);
+            var position_shifted = new Cesium.Cartesian3();
+            var COG = new Cesium.Cartesian3(COGz*(quat[i][1]*quat[i][3] + quat[i][2]*quat[i][0]),COGz*(quat[i][2]*quat[i][3] - quat[i][1]*quat[i][0]),COGz*(1 - 2*(quat[i][1]*quat[i][1] + quat[i][2]*quat[i][2])));
+            Cesium.Cartesian3.add(position,COG,position_shifted);
+            positionProperty.addSample(time, position_shifted);
+            orientationProperty.addSample(time, orientation);
         }       
 
-        var greenLine = viewer.entities.add({
-            polyline : {
-                positions : pos,
-                material : Cesium.Color.RED
-            }
-        });
+        Cesium.EntityView.defaultOffset3D.z = 0.5;
 
         var rocket = viewer.entities.add({
             availability: new Cesium.TimeIntervalCollection([ new Cesium.TimeInterval({ start: start, stop: stop }) ]),
@@ -70,12 +58,46 @@ document.getElementById('loadFile').addEventListener('click', () => {
                 uri: rocketModel,
             },
             orientation: orientationProperty,    
-            path: new Cesium.PathGraphics({ width: 3 })
+            path: new Cesium.PathGraphics({ width: 2 })
         });
 
         viewer.trackedEntity = rocket;
     })
     
-})
+});
+
+function loadPage(){ 
+
+    document.querySelectorAll('form a').forEach(element => {
+        element.addEventListener('click', () =>{
+            document.querySelectorAll('form a').forEach(el => {
+                el.className = "";
+            })
+            document.querySelectorAll('form table').forEach(el => {
+                el.className = "";
+            })
+            
+            element.className = "selected";
+            let tablename = element.href.substring(element.href.indexOf('#')+1);
+            console.log(tablename);
+            document.getElementById(tablename).className = "selected";
+        });
+    });
+
+    document.getElementById('runSim').addEventListener('click', () => {
+        var data = {};
+        window.ipcRender.invoke('runSim',data).then(() => {
+    
+        });
+    })
+}
+
+fetch('./view/rocket_form.html').then((result) => {
+    if (result.status != 200) { throw new Error("Bad Server Response"); }
+    return result.text();
+}).then((content) => {
+    document.getElementById('rocket_form').innerHTML = content;
+    loadPage();
+}).catch((error) => { console.log(error); });
 
 console.log("App loaded.");

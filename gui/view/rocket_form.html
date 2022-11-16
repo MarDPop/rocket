@@ -1,0 +1,118 @@
+<div id="form-nav">
+<a class="selected" href="#rocket_inertia">Inertia</a><a href="#ground_info">Launch</a><a href="#aero">Aero</a><a href="#thruster">Thruster</a><a href="#control">Control</a>
+</div>
+
+<table id="rocket_inertia" class="selected">
+    <tr>
+        <td>Empty Mass (kg): </td>
+        <td><input type="text" id="input_empty_mass" name="input_empty_mass" /></td>
+    </tr>
+    <tr>
+        <td>Full Mass (kg): </td>
+        <td><input type="text" id="input_full_mass" name="input_full_mass" /></td>
+    </tr>
+    <tr>
+        <td>Empty Ixx (kg m2): </td>
+        <td><input type="text" id="input_empty_Ixx" name="input_empty_Ixx" /></td>
+    </tr>
+    <tr>
+        <td>Full Ixx (kg m2): </td>
+        <td><input type="text" id="input_full_Ixx" name="input_full_Ixx" /></td>
+    </tr>
+    <tr>
+        <td>Empty Izz (kg m2): </td>
+        <td><input type="text" id="input_empty_Izz" name="input_empty_Izz" /></td>
+    </tr>
+    <tr>
+        <td>Full Izz (kg m2): </td>
+        <td><input type="text" id="input_full_Izz" name="input_full_Izz" /></td>
+    </tr>
+    <tr>
+        <td>Empty COG [From Nose] (m): </td>
+        <td><input type="text" id="input_empty_COG" name="input_empty_COG" /></td>
+    </tr>
+    <tr>
+        <td>Full COG [From Nose] (m): </td>
+        <td><input type="text" id="input_full_COG" name="input_full_COG" /></td>
+    </tr>
+    <input type="hidden" id="rocketFile" name="rocketFile" />
+</table>
+<table id="ground_info">
+    <tr>
+        <td>Altitude [MSL] (m): </td>
+        <td><input type="text" id="input_altitude" name="input_altitude" /></td>
+    </tr>
+    <tr>
+        <td>Ground Pressure (Pa): </td>
+        <td><input type="text" id="input_ground_pressure" name="input_ground_pressure" /></td>
+    </tr>
+    <tr>
+        <td>Ground Temperature (K): </td>
+        <td><input type="text" id="input_ground_temp" name="input_ground_temp" /></td>
+    </tr>
+    <tr>
+        <td>Lapse Rate (K/m): </td>
+        <td><input type="text" id="input_lapse_rate" name="input_lapse_rate" /></td>
+    </tr>
+    <tr>
+        <td>Initial Heading [From North] (deg): </td>
+        <td><input type="text" id="input_heading" name="input_heading" /></td>
+    </tr>
+    <tr>
+        <td>Initial Pitch [From Up] (deg): </td>
+        <td><input type="text" id="input_pitch" name="input_pitch" /></td>
+    </tr>
+    <tr>
+        <td>Wind File: </td>
+        <td><input type="file"  name="wind_file" /></td>
+        <input type="hidden" id="windFile" name="rocketFile" />
+    </tr>
+</table>
+<table id="aero">
+    <tr>
+        <td>CD<sub>0</sub> : </td>
+        <td><input type="text" id="input_CD0" name="input_CD0" /></td>
+    </tr>
+    <tr>
+        <td>CL<sub>&alpha;</sub> : </td>
+        <td><input type="text" id="input_CL_alpha" name="input_CL_alpha" /></td>
+    </tr>
+    <tr>
+        <td>CM<sub>&alpha;</sub> : </td>
+        <td><input type="text" id="input_CM_alpha" name="input_CM_alpha" /></td>
+    </tr>
+    <tr>
+        <td>CM<sub>&alpha;,rate</sub> : </td>
+        <td><input type="text" id="input_CM_alpha_dot" name="input_CM_alpha_dot" /></td>
+    </tr>
+    <tr>
+        <td>K : </td>
+        <td><input type="text" id="input_K" name="input_K" /></td>
+    </tr>
+    <tr>
+        <td>Reference Area (m2): </td>
+        <td><input type="text" id="input_Sref" name="input_Sref" /></td>
+    </tr>
+    <tr>
+        <td>Reference Length (m): </td>
+        <td><input type="text" id="input_Lref" name="input_Lref" /></td>
+    </tr>
+    <tr>
+        <td>Stall Angle (deg): </td>
+        <td><input type="text" id="input_stall_angle" name="input_stall_angle" /></td>
+    </tr>
+</table>
+<table id="thruster">
+    <tr>
+        <td>Pressure (Pa)</td>
+        <td>Thrust (N)</td>
+        <td>Mass Rate (kg/s)</td>
+    </tr>
+    <tr>
+        <td><input type="text" id="input_PA_1" name="input_PA_1" /></td>
+        <td><input type="text" id="input_THRUST_1" name="input_THRUST_1" /></td>
+        <td><input type="text" id="input_MDOT_1" name="input_MDOT_1" /></td>
+    </tr>
+</table>
+
+<button id="runSim">Run</button>
