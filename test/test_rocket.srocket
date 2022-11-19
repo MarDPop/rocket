@@ -5,7 +5,7 @@
 # Alt, Pres, Temp, Lapse Rate
 0 101000 297 0
 # Heading, Pitch, Wind File
-0 0.007 test/wind_test.txt
+0 0.005 test/wind_test.txt
 # CD0, CL_a, CM_a, CM_a_dot, K, area, length, stall
 0.6 6 -0.002 -0.08 0.05 0.07 1.1 0.2
 # thruster points
@@ -18,4 +18,4 @@ NPTS 3
 # K1,K2,C2,slew,limit
 # 0.1 0.1 0.2 0.5 0.1
 # A0,AF,CD0,CDF,length,deploy time 
-# 0.1 1.5 0.2 1.3 1 7.5
+# 0.1 2.5 0.2 1.3 1 5

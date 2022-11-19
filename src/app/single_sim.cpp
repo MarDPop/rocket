@@ -36,7 +36,7 @@ void print_out(SingleStageRocket& rocket, const char* fn) {
 int main(int argc, char *argv[]) {
 
     if(argc < 3) {
-        throw std::exception("need input and output file.");
+        throw std::invalid_argument("need input and output file.");
     }
     std::cout << "Loading File: " + std::string(argv[1]) << std::endl;
 

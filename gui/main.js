@@ -148,6 +148,9 @@ ipcMain.handle('runSim', async (event, data) => {
             return;
         }
         console.log(data.toString());
+
+        global.DATA.trajectory.load('./data/rocket.traj');
+        return [global.DATA.trajectory.times,global.DATA.trajectory.position_ECEF,global.DATA.trajectory.orientation_ECEF];
     });
 });
 

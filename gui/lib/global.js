@@ -32,8 +32,6 @@ class Trajectory {
         const start = math.latLon2ECEF(lat,lon,alt);
         const CS = math.getENUinECEF(lat,lon);
 
-        console.log(CS);
-
         let A = [[1,0,0],[0,1,0],[0,0,1]];
         let B = new Array(3);
         this.times = new Array(n);

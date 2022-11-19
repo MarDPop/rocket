@@ -16,52 +16,56 @@ var rocketModel;
 
 const scene = viewer.scene;
 
+function plotData(data) {
+    let seconds = data[0];
+    let ecef = data[1];
+    let quat = data[2];
+
+    console.log(quat);
+    
+    const start = Cesium.JulianDate.fromIso8601("2023-03-09T13:10:00Z");
+    const stop = Cesium.JulianDate.addSeconds(start, seconds[seconds.length-1], new Cesium.JulianDate());
+    viewer.clock.startTime = start.clone();
+    viewer.clock.stopTime = stop.clone();
+    viewer.clock.currentTime = start.clone();
+    viewer.timeline.zoomTo(start, stop);
+    // Speed up the playback speed 50x.
+    viewer.clock.multiplier = 1;
+    // Start playing the scene.
+    viewer.clock.shouldAnimate = true;
+    const positionProperty = new Cesium.SampledPositionProperty();
+    const orientationProperty = new Cesium.SampledProperty(Cesium.Quaternion); 
+
+    let COGz = 1.1 - 0.6;
+    for(let i = 0; i < seconds.length;i++) {
+        var time = Cesium.JulianDate.addSeconds(start, seconds[i], new Cesium.JulianDate());
+        var position = new Cesium.Cartesian3(ecef[i][0],ecef[i][1],ecef[i][2]);
+        var orientation = new Cesium.Quaternion(-quat[i][1],-quat[i][2],-quat[i][3],quat[i][0]);
+        var position_shifted = new Cesium.Cartesian3();
+        var COG = new Cesium.Cartesian3(COGz*(quat[i][1]*quat[i][3] + quat[i][2]*quat[i][0]),COGz*(quat[i][2]*quat[i][3] - quat[i][1]*quat[i][0]),COGz*(1 - 2*(quat[i][1]*quat[i][1] + quat[i][2]*quat[i][2])));
+        Cesium.Cartesian3.add(position,COG,position_shifted);
+        positionProperty.addSample(time, position_shifted);
+        orientationProperty.addSample(time, orientation);
+    }       
+
+    Cesium.EntityView.defaultOffset3D.z = 0.5;
+
+    var rocket = viewer.entities.add({
+        availability: new Cesium.TimeIntervalCollection([ new Cesium.TimeInterval({ start: start, stop: stop }) ]),
+        position: positionProperty,
+        model: {
+            uri: rocketModel,
+        },
+        orientation: orientationProperty,    
+        path: new Cesium.PathGraphics({ width: 2 })
+    });
+
+    viewer.trackedEntity = rocket;
+}
+
 document.getElementById('loadFile').addEventListener('click', () => {
     window.ipcRender.invoke('openTrajectoryFile').then((data) => {
-        let seconds = data[0];
-        let ecef = data[1];
-        let quat = data[2];
-
-        console.log(quat);
-        
-        const start = Cesium.JulianDate.fromIso8601("2023-03-09T13:10:00Z");
-        const stop = Cesium.JulianDate.addSeconds(start, seconds[seconds.length-1], new Cesium.JulianDate());
-        viewer.clock.startTime = start.clone();
-        viewer.clock.stopTime = stop.clone();
-        viewer.clock.currentTime = start.clone();
-        viewer.timeline.zoomTo(start, stop);
-        // Speed up the playback speed 50x.
-        viewer.clock.multiplier = 1;
-        // Start playing the scene.
-        viewer.clock.shouldAnimate = true;
-        const positionProperty = new Cesium.SampledPositionProperty();
-        const orientationProperty = new Cesium.SampledProperty(Cesium.Quaternion); 
-
-        let COGz = 1.1 - 0.6;
-        for(let i = 0; i < seconds.length;i++) {
-            var time = Cesium.JulianDate.addSeconds(start, seconds[i], new Cesium.JulianDate());
-            var position = new Cesium.Cartesian3(ecef[i][0],ecef[i][1],ecef[i][2]);
-            var orientation = new Cesium.Quaternion(-quat[i][1],-quat[i][2],-quat[i][3],quat[i][0]);
-            var position_shifted = new Cesium.Cartesian3();
-            var COG = new Cesium.Cartesian3(COGz*(quat[i][1]*quat[i][3] + quat[i][2]*quat[i][0]),COGz*(quat[i][2]*quat[i][3] - quat[i][1]*quat[i][0]),COGz*(1 - 2*(quat[i][1]*quat[i][1] + quat[i][2]*quat[i][2])));
-            Cesium.Cartesian3.add(position,COG,position_shifted);
-            positionProperty.addSample(time, position_shifted);
-            orientationProperty.addSample(time, orientation);
-        }       
-
-        Cesium.EntityView.defaultOffset3D.z = 0.5;
-
-        var rocket = viewer.entities.add({
-            availability: new Cesium.TimeIntervalCollection([ new Cesium.TimeInterval({ start: start, stop: stop }) ]),
-            position: positionProperty,
-            model: {
-                uri: rocketModel,
-            },
-            orientation: orientationProperty,    
-            path: new Cesium.PathGraphics({ width: 2 })
-        });
-
-        viewer.trackedEntity = rocket;
+        plotData(data);
     })
     
 });
@@ -69,8 +73,8 @@ document.getElementById('loadFile').addEventListener('click', () => {
 function get_rocket_data() {
     // generate defaults
     var data = {
-        "full" : {"mass" : 1000 , "Ixx" : 19, "Izz" : 1.4, "COG" : -0.5},
-        "empty" : {"mass" : 500, "Ixx" : 10, "Izz" : 0.7, "COG" : -0.5},
+        "full" : {"mass" : 100 , "Ixx" : 19, "Izz" : 1.4, "COG" : -0.5},
+        "empty" : {"mass" : 50, "Ixx" : 10, "Izz" : 0.7, "COG" : -0.5},
         "ground" : {"alt" : 0, "pressure" : 101325, "temperature" : 297, "lapse_rate" : 0, "heading" : 0, "pitch" : 0, "wind_file": null},
         "aero" : {"CD0" : 0.6, "CL_alpha" : 5, "CM_alpha" : -0.002, "CM_alpha_dot" : -0.08, "K" : 0.05, "area" : 0.07, "length" : 1.1, "stall_angle" : 0.2},
         "thruster" : [  
@@ -108,7 +112,10 @@ function loadPage(){
 
     document.getElementById('runSim').addEventListener('click', () => {
         var data = get_rocket_data();
-        window.ipcRender.invoke('runSim', data);
+        window.ipcRender.invoke('runSim', data).then( (traj) => {
+            console.log(traj);
+            plotData(traj);
+        });
     })
 
     document.querySelectorAll('#form-nav i').forEach(el => {el.addEventListener('click', () => {

@@ -342,6 +342,13 @@ void SingleStageControl::update(double time) {
         return;
     }
 
+    if(this->ascent_rate_measured < 10) {
+        this->dMoment.zero();
+        this->dForce.zero();
+        this->time_old = time;
+        return;
+    }
+
     this->deflect_fins(time);
     this->update_force();
     this->update_commands();

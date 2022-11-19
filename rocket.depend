@@ -1739,21 +1739,22 @@
 1662824479 c:\users\mariu\onedrive\documents\repos\rocket\rocket\lib\eigen\src\eigenvalues\selfadjointeigensolver_lapacke.h
 	"./InternalHeaderCheck.h"
 
-1668383827 source:c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\app\single_sim.cpp
+1668899135 source:c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\app\single_sim.cpp
 	<iostream>
 	"../common/include/util.h"
 	"../common/include/Cartesian.h"
 	"../6DOF/include/SingleStageRocket.h"
 	<string>
 	<cstdio>
+	<exception>
 
-1666751414 c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\6dof\include\singlestagerocket.h
+1668887852 c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\6dof\include\singlestagerocket.h
 	<vector>
 	<memory>
 	<string>
 	"../../common/include/Cartesian.h"
 
-1668386118 source:c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\6dof\src\singlestagerocket.cpp
+1668887873 source:c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\6dof\src\singlestagerocket.cpp
 	"../include/SingleStageRocket.h"
 	"../../common/include/util.h"
 	<fstream>

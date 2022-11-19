@@ -1,7 +1,7 @@
 # mass, Ixx, Izz, COG (Empty)
-500 10 0.7 -0.5
+50 10 0.7 -0.5
 # mass, Ixx, Izz, COG (Full) 
-1000 19 1.4 -0.5
+100 19 1.4 -0.5
 # Alt, Pres, Temp, Lapse Rate 
 0 101325 297 0
 # Heading, Pitch, Wind File  
