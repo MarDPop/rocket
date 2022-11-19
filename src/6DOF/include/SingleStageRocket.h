@@ -383,6 +383,7 @@ public:
         double t_interval = 0.25;
         std::vector<Vector> position;
         std::vector<Axis> orientation;
+        std::vector<double> mass;
         std::vector<double> test_value;
     };
 

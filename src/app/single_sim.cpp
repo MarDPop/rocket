@@ -4,6 +4,7 @@
 #include "../6DOF/include/SingleStageRocket.h"
 #include <string>
 #include <cstdio>
+#include <exception>
 
 #ifndef M_PI
     #define M_PI 3.14159265358979323846
@@ -24,8 +25,9 @@ void print_out(SingleStageRocket& rocket, const char* fn) {
     for(int i = 0; i < nLines; i++) {
         const double* pos = rocket.record.position[i].data;
         const double* q = rocket.record.orientation[i].data;
-        fprintf(file,"%7.2f % .6e % .6e % .6e % 10.8f % 10.8f % 10.8f % 10.8f % 10.8f % 10.8f % 10.8f % 10.8f % 10.8f\n",
-                    i*rocket.record.t_interval, pos[0], pos[1], pos[2], q[0], q[1], q[2], q[3], q[4], q[5], q[6], q[7], q[8]);
+        const double m = rocket.record.mass[i];
+        fprintf(file,"%7.2f % .6e % .6e % .6e % 10.8f % 10.8f % 10.8f % 10.8f % 10.8f % 10.8f % 10.8f % 10.8f % 10.8f % .6e\n",
+                    i*rocket.record.t_interval, pos[0], pos[1], pos[2], q[0], q[1], q[2], q[3], q[4], q[5], q[6], q[7], q[8], m);
     }
 
     fclose(file);
@@ -34,7 +36,7 @@ void print_out(SingleStageRocket& rocket, const char* fn) {
 int main(int argc, char *argv[]) {
 
     if(argc < 3) {
-        throw "need input and output file.";
+        throw std::exception("need input and output file.");
     }
     std::cout << "Loading File: " + std::string(argv[1]) << std::endl;
 

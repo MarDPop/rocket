@@ -1,6 +1,9 @@
 <div id="form-nav">
 <a class="selected" href="#rocket_inertia">Inertia</a><a href="#ground_info">Launch</a><a href="#aero">Aero</a><a href="#thruster">Thruster</a><a href="#control">Control</a>
+<i class="fa fa-chevron-up"></i>
 </div>
+
+<form id="rocket_parameters" class="showing">
 
 <table id="rocket_inertia" class="selected">
     <tr>
@@ -102,7 +105,12 @@
         <td><input type="text" id="input_stall_angle" name="input_stall_angle" /></td>
     </tr>
 </table>
+
+
 <table id="thruster">
+    <tr>
+        <td colspan="3"><a href="#" onclick="addThrusterPoint();">Add </a> <a href="#" onclick="removeThrusterPoint();">Remove</a></td>
+    </tr>
     <tr>
         <td>Pressure (Pa)</td>
         <td>Thrust (N)</td>
@@ -115,4 +123,5 @@
     </tr>
 </table>
 
-<button id="runSim">Run</button>
+</form>
+

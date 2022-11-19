@@ -5,18 +5,22 @@
     <title>Rocket GUI</title>
     <script src="./node_modules/cesium/Build/Cesium/Cesium.js"></script>
     <script src="./lib/functions.js"></script>
+    
     <style>
         @import url(./node_modules/cesium/Build/Cesium/Widgets/widgets.css);
+        @import url(./node_modules/font-awesome/css/font-awesome.min.css);
         @import url(./custom.css);
     </style>
 </head>
 <body>
     <main>
-
-        <form id="rocket_form">
-        </form>
-        <button id="loadFile">Load</button>
-        <div id="test"></div>
+        
+        <div id="rocket_form"></div>
+        <div>
+            <button id="runSim">Generate Trajectory</button>
+            <button id="loadFile">Load Trajectory</button>
+            <span id="response"></span>
+        </div>
     </main>
     <div id="cesiumContainer"></div>
 </body>

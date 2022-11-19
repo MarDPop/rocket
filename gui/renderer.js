@@ -66,30 +66,61 @@ document.getElementById('loadFile').addEventListener('click', () => {
     
 });
 
+function get_rocket_data() {
+    // generate defaults
+    var data = {
+        "full" : {"mass" : 1000 , "Ixx" : 19, "Izz" : 1.4, "COG" : -0.5},
+        "empty" : {"mass" : 500, "Ixx" : 10, "Izz" : 0.7, "COG" : -0.5},
+        "ground" : {"alt" : 0, "pressure" : 101325, "temperature" : 297, "lapse_rate" : 0, "heading" : 0, "pitch" : 0, "wind_file": null},
+        "aero" : {"CD0" : 0.6, "CL_alpha" : 5, "CM_alpha" : -0.002, "CM_alpha_dot" : -0.08, "K" : 0.05, "area" : 0.07, "length" : 1.1, "stall_angle" : 0.2},
+        "thruster" : [  
+            {"pressure" : 105000, "thrust" : 3000, "mass_rate" : 3 },
+            {"pressure" : 75000, "thrust" : 3000, "mass_rate" : 3 },
+            {"pressure" : 10, "thrust" : 3000, "mass_rate" : 3 }
+                    ],
+        "control" : {
+            "NFINS" : 3,
+            "fin_aero" : {"dSCL" : 0.1, "dSCM" : 0.001, "dSCD" : 0.001, "COP_z" : 1, "COP_radial" : 0.15},
+            "fin_control" : {"K1" : 0.1,"K2" : 0.1,"C2" : 0.2,"slew" : 0.5,"limit" : 0.1},
+            "chute" : {"A0" : 0.1,"AF" : 1.5,"CD0" : 0.5, "CDF" : 1, "length" : 1,"deploy_time" : 5 }
+        }
+    };
+
+    return data;
+}
+
 function loadPage(){ 
 
-    document.querySelectorAll('form a').forEach(element => {
+    document.querySelectorAll('#form-nav a').forEach(element => {
         element.addEventListener('click', () =>{
-            document.querySelectorAll('form a').forEach(el => {
+            document.querySelectorAll('#form-nav a').forEach(el => {
                 el.className = "";
             })
-            document.querySelectorAll('form table').forEach(el => {
+            document.querySelectorAll('#rocket_parameters table').forEach(el => {
                 el.className = "";
             })
             
             element.className = "selected";
             let tablename = element.href.substring(element.href.indexOf('#')+1);
-            console.log(tablename);
             document.getElementById(tablename).className = "selected";
         });
     });
 
     document.getElementById('runSim').addEventListener('click', () => {
-        var data = {};
-        window.ipcRender.invoke('runSim',data).then(() => {
-    
-        });
+        var data = get_rocket_data();
+        window.ipcRender.invoke('runSim', data);
     })
+
+    document.querySelectorAll('#form-nav i').forEach(el => {el.addEventListener('click', () => {
+        var form = document.getElementById('rocket_parameters');
+        if(form.className == "minimized") {
+            form.className = "showing";
+            el.className = "fa fa-chevron-up";
+        } else {
+            form.className = "minimized";
+            el.className = "fa fa-chevron-down";
+        }
+    })});
 }
 
 fetch('./view/rocket_form.html').then((result) => {

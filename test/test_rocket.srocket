@@ -14,7 +14,7 @@ NPTS 3
 75000 3000 2.8
 5000 3100 2.8
 # NFINS, dSCL, dSCM, dSCD, COP_z, COP_radial
-# 3 0.1 0.001 -0.00001 1 0.15
+# 3 0.1 0.001 0.00001 1 0.15
 # K1,K2,C2,slew,limit
 # 0.1 0.1 0.2 0.5 0.1
 # A0,AF,CD0,CDF,length,deploy time 

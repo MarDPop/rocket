@@ -79,7 +79,55 @@ class MissionData {
 const DATA = new MissionData();
 
 function writeRocketFile(data){
+    let tmp = data["empty"];
+    let empty_mass = tmp["mass"] + " " + tmp["Ixx"] + " " + tmp["Izz"] + " " + tmp["COG"] + "\n";
+    tmp = data["full"];
+    let full_mass = tmp["mass"] + " " + tmp["Ixx"] + " " + tmp["Izz"] + " " + tmp["COG"] + "\n";
+    tmp = data["ground"];
+    let ground = tmp["alt"] + " " + tmp["pressure"] + " " + tmp["temperature"] + " " + tmp["lapse_rate"] + "\n";
+    let windFile = tmp["wind_file"] == null ? "" : tmp["wind_file"] ;
+    let direction = tmp["heading"] + " " + tmp["pitch"] + " " + windFile  + "\n";
+    tmp = data["aero"];
+    let aero = tmp["CD0"] + " " + tmp["CL_alpha"] + " " + tmp["CM_alpha"] + " " + tmp["CM_alpha_dot"] + " " + tmp["K"] + " " + tmp["area"] + " " + tmp["length"] + " " + tmp["stall_angle"] + "\n";
+    tmp = data["thruster"];
+    let thruster = "NPTS " + tmp.length + "\n"
+    for(let i = 0; i < tmp.length;i++){
+        thruster += tmp[i]["pressure"] + " " + tmp[i]["thrust"] + " " + tmp[i]["mass_rate"] + "\n";
+    }
 
+
+    tmp = data["control"]["fin_aero"];
+    let fins = data["control"]["NFINS"] + " " + tmp["dSCL"] + " " + tmp["dSCM"] + " " + tmp["dSCD"] + " " + tmp["COP_z"] + " " + tmp["COP_radial"] + "\n";
+    tmp = data["control"]["fin_control"];
+    let control = tmp["K1"] + " " + tmp["K2"] + " " + tmp["C2"] + " " + tmp["slew"] + " " + tmp["limit"] + "\n";
+    tmp = data["control"]["chute"];
+    let chute = tmp["A0"] + " " + tmp["AF"] + " " + tmp["CD0"] + " " + tmp["CDF"] + " " + tmp["length"] + " " + tmp["deploy_time"] + "\n";
+
+    let output = "# mass, Ixx, Izz, COG (Empty)\n" +
+    empty_mass +
+    "# mass, Ixx, Izz, COG (Full) \n" + 
+    full_mass +
+    "# Alt, Pres, Temp, Lapse Rate \n" + 
+    ground +
+    "# Heading, Pitch, Wind File  \n" + 
+    direction +
+    "# CD0, CL_a, CM_a, CM_a_dot, K, area, length, stall  \n" + 
+    aero +
+    "# thruster points  \n" + 
+    thruster +
+    "# NFINS, dSCL, dSCM, dSCD, COP_z, COP_radial  \n" + 
+    fins +
+    "# K1,K2,C2,slew,limit  \n" + 
+    control +
+    "# A0,AF,CD0,CDF,length,deploy time  \n" + 
+    chute;
+
+    fs.writeFile('data/rocket.srocket', output, (err) => {
+        if (err) throw err;
+        else{
+           console.log("The file is updated with the given data")
+        }
+    })
 }
 
 module.exports = {DATA,writeRocketFile};

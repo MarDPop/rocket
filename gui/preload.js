@@ -5,7 +5,9 @@ const ipcRenderer = require('electron').ipcRenderer;
 const ipc = {
     'api': {
         // From render to main.
-        'send': [],
+        'send': [
+            
+        ],
         // From main to render.
         'receive': [
             'getMissionData'

@@ -9,6 +9,7 @@ const child_process = require("child_process");
 const path = require('path');
 const global = require('./lib/global');
 const fs = require('fs');
+const { contextIsolated } = require('process');
 
 var mainWindow = null;
 
@@ -18,7 +19,7 @@ function createWindow() {
     // Create the browser window
     mainWindow = new BrowserWindow({
         width: 1024, 
-        height: 640,
+        height: 720,
         webPreferences: {
             preload: path.join(__dirname, 'preload.js'),
             devTools: true,
@@ -137,6 +138,19 @@ app.on('window-all-closed', function() {
     }
 });
 
+ipcMain.handle('runSim', async (event, data) => {
+    console.log("running sim.")
+    global.writeRocketFile(data);
+    var child = child_process.execFile;
+    child("./bin/rocket.exe", ['./data/rocket.srocket', './data/rocket.traj'], function(err, data) {
+        if(err){
+            console.error(err);
+            return;
+        }
+        console.log(data.toString());
+    });
+});
+
 ipcMain.handle('getFile', () => {
     let options = {
         properties: ['openFile']
@@ -173,16 +187,3 @@ ipcMain.handle('getMissionData', () => {
     return global.DATA;
 });
 
-ipcMain.handle('runSim', (data) => {
-    global.writeRocketFile(data);
-    var child = child_process.execFile;
-    let command = "./bin/rocket.exe ./data/test.srocket";
-    console.log(command);
-    child(command, function(err, data) {
-        if(err){
-            console.error(err);
-            return;
-        }
-        console.log(data.toString());
-    });
-});

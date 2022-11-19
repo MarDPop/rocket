@@ -768,6 +768,7 @@ void SingleStageRocket::launch(double dt) {
         if(time > time_record){
             this->record.position.push_back(this->position);
             this->record.orientation.push_back(this->CS);
+            this->record.mass.push_back(this->mass);
 
             if(std::isnan(this->position.data[0])){
                 break;

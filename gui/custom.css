@@ -17,12 +17,15 @@ main {
     position: absolute;
     top: 5px;
     left: 5px;
-    height: 480px;
-    width: 360px;
+    width: 400px;
     color: #fff;
     z-index: 100;
     font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
     overflow: hidden;
+}
+
+a {
+    text-decoration: none;
 }
 
 button {
@@ -56,12 +59,20 @@ form tr input {
     width: 100px;
 }
 
+#rocket_parameters.minimized {
+    display: none;
+}
+
+#form-nav i {
+    color: #222;
+}
+
 #form-nav {
     margin: -1px;
     background: #aaa;
 }
 
-form a {
+#form-nav a {
     display: inline-block;
     color: #222;
     font-weight: bold;
@@ -71,13 +82,19 @@ form a {
     text-decoration: none;
 }
 
-form a.selected {
+#form-nav a.selected {
     background: #fff;
 }
 
-form a:hover {
+#form-nav a:hover {
     background: #ccc;
     color: #000;
+}
+
+#form-nav i {
+    float: right;
+    padding: 5px;
+    cursor: pointer;
 }
 
 form table {
@@ -87,4 +104,12 @@ form table {
 
 form table.selected {
     display: table;
+}
+
+form table a {
+    display: inline-block;
+    background-color: #fff;
+    color: #222;
+    padding: 5px;
+    font-weight:bold;
 }
