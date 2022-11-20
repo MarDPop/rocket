@@ -94,11 +94,11 @@ function writeRocketFile(data){
     }
 
 
-    tmp = data["control"]["fin_aero"];
-    let fins = data["control"]["NFINS"] + " " + tmp["dSCL"] + " " + tmp["dSCM"] + " " + tmp["dSCD"] + " " + tmp["COP_z"] + " " + tmp["COP_radial"] + "\n";
-    tmp = data["control"]["fin_control"];
+    tmp = data["finAero"];
+    let fins = data["NFINS"] + " " + tmp["dSCL"] + " " + tmp["dSCM"] + " " + tmp["dSCD"] + " " + tmp["COP_z"] + " " + tmp["COP_radial"] + "\n";
+    tmp = data["finControl"];
     let control = tmp["K1"] + " " + tmp["K2"] + " " + tmp["C2"] + " " + tmp["slew"] + " " + tmp["limit"] + "\n";
-    tmp = data["control"]["chute"];
+    tmp = data["chute"];
     let chute = tmp["A0"] + " " + tmp["AF"] + " " + tmp["CD0"] + " " + tmp["CDF"] + " " + tmp["length"] + " " + tmp["deploy_time"] + "\n";
 
     let output = "# mass, Ixx, Izz, COG (Empty)\n" +

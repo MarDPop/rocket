@@ -138,20 +138,20 @@ app.on('window-all-closed', function() {
     }
 });
 
-ipcMain.handle('runSim', async (event, data) => {
+ipcMain.handle('runSim', (event, data) => {
     console.log("running sim.")
     global.writeRocketFile(data);
-    var child = child_process.execFile;
-    child("./bin/rocket.exe", ['./data/rocket.srocket', './data/rocket.traj'], function(err, data) {
-        if(err){
-            console.error(err);
-            return;
-        }
-        console.log(data.toString());
+    var data = child_process.spawnSync("./bin/rocket.exe", ['./data/rocket.srocket', './data/rocket.traj']);
 
-        global.DATA.trajectory.load('./data/rocket.traj');
-        return [global.DATA.trajectory.times,global.DATA.trajectory.position_ECEF,global.DATA.trajectory.orientation_ECEF];
-    });
+    if(data.error){
+        console.log(data.stderr);
+        return null;
+    }
+
+    console.log(data.toString());
+
+    global.DATA.trajectory.load('./data/rocket.traj');
+    return [global.DATA.trajectory.times,global.DATA.trajectory.position_ECEF,global.DATA.trajectory.orientation_ECEF];
 });
 
 ipcMain.handle('getFile', () => {

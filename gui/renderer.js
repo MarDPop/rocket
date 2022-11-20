@@ -82,13 +82,13 @@ function get_rocket_data() {
             {"pressure" : 75000, "thrust" : 3000, "mass_rate" : 3 },
             {"pressure" : 10, "thrust" : 3000, "mass_rate" : 3 }
                     ],
-        "control" : {
-            "NFINS" : 3,
-            "fin_aero" : {"dSCL" : 0.1, "dSCM" : 0.001, "dSCD" : 0.001, "COP_z" : 1, "COP_radial" : 0.15},
-            "fin_control" : {"K1" : 0.1,"K2" : 0.1,"C2" : 0.2,"slew" : 0.5,"limit" : 0.1},
-            "chute" : {"A0" : 0.1,"AF" : 1.5,"CD0" : 0.5, "CDF" : 1, "length" : 1,"deploy_time" : 5 }
-        }
+        "NFINS" : 3,
+        "finAero" : {"dSCL" : 0.1, "dSCM" : 0.001, "dSCD" : 0.001, "COP_z" : 1, "COP_radial" : 0.15},
+        "finControl" : {"K1" : 0.1,"K2" : 0.1,"C2" : 0.2,"slew" : 0.5,"limit" : 0.1},
+        "chute" : {"A0" : 0.1,"AF" : 1.5,"CD0" : 0.5, "CDF" : 1, "length" : 1,"deploy_time" : 5 }
     };
+
+    document.getElementById("input_full_mass").value
 
     return data;
 }
@@ -113,6 +113,9 @@ function loadPage(){
     document.getElementById('runSim').addEventListener('click', () => {
         var data = get_rocket_data();
         window.ipcRender.invoke('runSim', data).then( (traj) => {
+            if(traj == null) {
+                return;
+            }
             console.log(traj);
             plotData(traj);
         });
