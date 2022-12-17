@@ -28,3 +28,6 @@ void AerodynamicsBasic::update(double time) {
 
 }
 
+
+AerodynamicsTable::AerodynamicsTable(std::string fn) : (NestedTable::create(fn)) {}
+

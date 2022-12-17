@@ -3,6 +3,7 @@
 #include <vector>
 #include <array>
 #include <string>
+#include <set>
 
 template < unsigned int N, int COLS >
 class LinearFixedTable {
@@ -101,70 +102,126 @@ public:
 
 }
 
-struct NestedEntry {
+template< unsigned N_KEY, unsigned N_DATA >
+class NestedTable {
 
-    int level;
+    const int level;
 
     std::vector< double > values;
 
     std::vector< double > delta;
 
-    std::vector< NestedEntry > next;
+    std::vector< NestedTable > next;
+
+    inline bool is_same(double a, double b) {
+        return fabs(a - b) < 1e-7;
+    }
+
+    inline NestedTable<N_KEY, N_DATA> process(std::vector< std::array<double, N_KEY + N_DATA > >& data, int level) {
+        // ensure sort
+        std::sort(data.begin(),data.end(),
+                  [level](auto& a, auto& b) {
+                    a[level] < b[level];
+                  });
+
+        std::vector< double > vals;
+        std::vector< NestedTable<N_KEY,N_DATA> > entries;
+
+        if(level == N_KEY - 1) {
+            std::array<double,N_DATA> data;
+            for(auto& row : data) {
+                vals.push_back(row[level]);
+                for(int i = 0; i < N_DATA;i++) {
+                    data[i] = row[N_KEY + i];
+                }
+                entries.emplace_back(data);
+            }
+            return NestedTable<N_KEY, N_DATA>(vals,entries,level);
+        }
+
+        std::vector< std::array<double, N_KEY + N_DATA> > next_data;
+
+        unsigned n_rows = data.size();
+        unsigned idx = 0;
+
+        int next_key_idx = next_keys + 1;
+        while(i < n_rows) {
+            double key_val = data[i][level];
+            vals.push_back(key_val);
+
+            next_data.clear();
+            next_data.push_back(data[i]);
+            while(++i < n_rows && is_same(data[i][level],key_val)){
+                next_data.push_back(data[i]);
+            }
+
+            entries.push_back(process(next_data, level + 1));
+        }
+
+        return NestedTable<N_KEY, N_DATA>(vals,entries,level);
+    }
+
+    NestedTable(const std::array< double, N_DATA >& vals) : level(N_KEY) {
+        this->values.reserve(N_DATA);
+        for(auto d : vals){
+            this->values.push_back(d);
+        }
+    }
+
+    NestedTable(const std::vector< double >& vals, const std::vector< NestedTable<N_KEY,N_DATA> >& n, int l) : values(vals) , next(n), level(l) {
+        for(unsigned i = 1; i < vals.size(); i++) {
+            this->delta.push_back(1.0/(vals[i] - vals[i-1]));
+        }
+    }
 
 public:
 
-    NestedEntry(const std::vector< double >& vals) : values(vals) , level(0) {
+    static NestedTable<N_KEY, N_DATA> create(std::vector< std::array<double, N_KEY + N_DATA > >& data) {
+        return process(data, 0);
     }
 
-    NestedEntry(const std::vector< double >& vals, const std::vector< NestedEntry >& n, int l) : values(vals) , next(n), level(l) {
-
+    static NestedTable<N_KEY, N_DATA> create(std::string file) {
+        std::vector< std::array<double, N_KEY + N_DATA > > data;
+        return process(data,0);
     }
 
-    const std::vector< double > get(const double* key) {
+    void get(const std::array< double, N_KEY >& key, const std::array< double, N_DATA >& output ) const {
 
-        if(this->level == 0) {
-            return this->values;
+        if(this->level == N_KEY) {
+            memcpy(output.data(),this->values.data(),output);
+            return;
         }
 
-        if(key[level] < values[0]) {
-            return next[0].get(key);
+        auto val = key[level];
+
+        if(val <= values[0]) {
+            next[0].get(key,output);
+            return;
         }
 
-        if(key[level] > values.back()) {
-            return next.back().get(key);
+        if(val >= values.back()) {
+            next.back().get(key,output);
+            return;
         }
 
-        unsigned int lo = util::lowerbound(this->values.data(), key[level], this->values.size()-1);
-        unsigned int hi = lo + 1;
-
-        double f_hi = (key[level] - this->values[lo])/(this->values[hi] - this->values[lo]);
-        double f_lo = 1 - f_hi;
-
-        const std::vector< double >& l_v = this->next[lo].get(key);
-        const std::vector< double >& h_v = this->next[hi].get(key);
-
-        std::vector< double > out(lo.size());
-        for( unsigned int i = 0; i < lo.size(); i++) {
-            out[i] = f_lo*l_v[i] + f_hi*h_v[i];
+        unsigned lo = 0;
+        while(this->values[lo] < val){ // faster for < 10 entries
+            lo++;
         }
-        return out;
 
+        double d = (val - this->values[lo])*delta[lo];
+
+        this->next[lo].get(key, output);
+        std::array< double, N_DATA > hi;
+        this->next[lo + 1].get(key, hi);
+
+        for(unsigned i = 0; i < N_DATA; i++) {
+            output[i] += d*hi[i]; // hopefully vectorized
+        }
     }
 
-}
+};
 
-class LinearNestedTable {
-
-    NestedEntry table;
-
-public:
-
-    LinearNestedTable() {}
-
-    LinearNestedTable(std::string file) {}
-
-
-}
 
 
 

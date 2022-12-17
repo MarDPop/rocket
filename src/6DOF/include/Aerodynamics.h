@@ -54,3 +54,16 @@ public:
     void update(double time) override;
 
 };
+
+template <unsigned N_CONTROL >
+class AerodynamicsTable : public Aerodynamics {
+
+    // key is Mach, Reynolds, Pitch angle, Sideslip Angle, + control deflections
+    // CFx, CFy, CFz, CMx, CMy, CMz
+    NestedTable<4 + N_CONTROL, 6> coefficients;
+
+public:
+
+    AerodynamicsTable(std::string fn);
+
+};
