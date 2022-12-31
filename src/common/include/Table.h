@@ -3,7 +3,8 @@
 #include <vector>
 #include <array>
 #include <string>
-#include <set>
+#include <fstream>
+#include <exception>
 
 template < unsigned int N, int COLS >
 class LinearFixedTable {
@@ -56,7 +57,7 @@ public:
         }
     }
 
-}
+};
 
 template < unsigned int N, int COLS >
 class CubicFixedTable {
@@ -80,7 +81,7 @@ public:
                 this->coef[i][j][0] = data[i][j]; // d
                 this->coef[i][j][1] = (data[i + 1][j] - data[i - 1][j])*dx1; // c
                 double dydx2 = (data[i + 2][j] - data[i][j])*dx2;
-                this->coef[i][j][2] = 3*tmp*(data[i + 1][j] - this->this->coef[i][j][0]) - 2*this->coef[i][j][1] - dydx2;
+                this->coef[i][j][2] = 3*tmp*(data[i + 1][j] - this->coef[i][j][0]) - 2*this->coef[i][j][1] - dydx2;
                 this->coef[i][j][3] = 0.3333333333333333*tmp*((dydx2 - this->coef[i][j][1])*tmp - 2*this->coef[i][j][2]);
             }
         }
@@ -100,7 +101,7 @@ public:
         }
     }
 
-}
+};
 
 template< unsigned N_KEY, unsigned N_DATA >
 class NestedTable {
@@ -144,15 +145,14 @@ class NestedTable {
         unsigned n_rows = data.size();
         unsigned idx = 0;
 
-        int next_key_idx = next_keys + 1;
-        while(i < n_rows) {
-            double key_val = data[i][level];
+        while(idx < n_rows) {
+            double key_val = data[idx][level];
             vals.push_back(key_val);
 
             next_data.clear();
-            next_data.push_back(data[i]);
-            while(++i < n_rows && is_same(data[i][level],key_val)){
-                next_data.push_back(data[i]);
+            next_data.push_back(data[idx]);
+            while(++idx < n_rows && is_same(data[idx][level],key_val)){
+                next_data.push_back(data[idx]);
             }
 
             entries.push_back(process(next_data, level + 1));
@@ -180,8 +180,30 @@ public:
         return process(data, 0);
     }
 
-    static NestedTable<N_KEY, N_DATA> create(std::string file) {
+    static NestedTable<N_KEY, N_DATA> create(std::string fn) {
+        std::ifstream file(fn);
+        if(!file.is_open()){
+            throw std::runtime_error("file does not exist.");
+        }
+
         std::vector< std::array<double, N_KEY + N_DATA > > data;
+        std::string line;
+        while(getline(file,line)){
+            auto row = util::split(line);
+            if(row.size() < N_KEY + N_DATA) {
+                continue;
+            }
+
+            std::array<double, N_KEY + N_DATA > line_data;
+            try {
+                for(unsigned i = 0; i < N_KEY + N_DATA; i++) {
+                    line_data[i] = std::stod(row[i]);
+                }
+            } catch (...) {
+                continue;
+            }
+            data.push_back(line_data);
+        }
         return process(data,0);
     }
 

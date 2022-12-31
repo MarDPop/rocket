@@ -1,9 +1,13 @@
 html, body {
-    height: 100%; margin: 0; padding: 0; overflow: hidden;
+    height: 100%; 
+    margin: 0; 
+    padding: 0; 
+    overflow: hidden;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
 }
 
 #cesiumContainer {
-    position:fixed; 
+    position: absolute; 
     top: 0px; 
     left: 0px; 
     right: 0px; 
@@ -11,17 +15,11 @@ html, body {
 }
 
 main {
-    background: rgba(0,0,0,0.75);
-    border: 1px solid #aaa;
-    padding: 0px;
-    position: absolute;
-    top: 5px;
-    left: 5px;
-    width: 420px;
-    color: #fff;
-    z-index: 100;
-    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
-    overflow: hidden;
+    position: fixed;
+    top: 0px; 
+    left: 0px; 
+    right: 0px; 
+    bottom: 0px;
 }
 
 a {
@@ -59,6 +57,112 @@ form tr input {
     width: 100px;
 }
 
+ul {
+    list-style-type: none;
+}
+
+#input-container {
+    border-right: 1px solid #999;
+    position: absolute;
+    top: 0px;
+    bottom: 0px;
+    left:0px;
+    width: 400px;
+    padding: 0px;
+    z-index: 100;
+}
+
+#input-nav {
+    background-color: #eee;
+    height: 32px;
+}
+
+#input-title {
+    padding: 5px;
+    text-transform: uppercase;
+    font-weight: thin;
+}
+
+#input-nav a {
+    padding: 10px 5px;
+    color: #333;
+}
+
+#input-nav a:visited {
+    color: #333;
+}
+
+#show-input {
+    position: absolute;
+    margin: 5px;
+    left: 0px;
+    top: 0px;
+    width: 32px;
+    height: 32px;
+    display:none;
+    background-color: #303030;
+    border: 1px solid #444;
+    border-radius: 2px;
+    z-index: 200;
+    text-align:center;
+}
+
+#show-input:hover {
+    background-color: #48b;
+    border-color: #aef;
+    box-shadow: 0 0 8px #fff;
+    color: #fff;
+}
+
+#show-input a {
+    font-size: 28px;
+    padding: 4px;
+    font-weight: bold;
+    color: #edffff;
+}
+
+#show-input a:visited {
+    color: #edffff;
+}
+
+#content-container {
+    position: absolute;
+    top: 0px;
+    bottom: 0px;
+    right:0px;
+    left: 400px;
+    padding: 0px;
+}
+
+#content-window {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    bottom: 32px;
+}
+
+#content-tabs {
+    position:absolute;
+    bottom: 0px;
+    left:0px;
+    right:0px;
+    height: 32px;
+}
+
+#content-tabs ul {
+    margin: 0px;
+    padding: 0px;
+    display:block;
+}
+
+#content-tabs li {
+    display: inline-block;
+    padding: 5px;
+    height: 100%;
+    border-right: 1px solid #ccc;
+}
+
 #rocket_parameters.minimized {
     display: none;
 }
@@ -69,7 +173,7 @@ form tr input {
 
 #form-nav {
     margin: -1px;
-    background: #aaa;
+    background: #eee;
 }
 
 #form-nav a {
@@ -87,7 +191,7 @@ form tr input {
 }
 
 #form-nav a:hover {
-    background: #ccc;
+    background: #fff;
     color: #000;
 }
 

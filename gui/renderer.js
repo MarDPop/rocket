@@ -70,6 +70,24 @@ document.getElementById('loadFile').addEventListener('click', () => {
     
 });
 
+document.getElementById('nav-close-link').addEventListener('click', () => {
+    let el = document.getElementById('input-container');
+    el.style.width = 0;
+    el.style.display = "none";
+    el = document.getElementById('show-input');
+    el.style.display = "block";
+    document.getElementById('content-container').style.left = 0;
+});
+
+document.getElementById('show-input').addEventListener('click', () => {
+    let el = document.getElementById('input-container');
+    el.style.width = "400px";
+    el.style.display = "block";
+    el = document.getElementById('show-input');
+    el.style.display = "none";
+    document.getElementById('content-container').style.left = "400px";
+});
+
 function get_rocket_data() {
     // generate defaults
     var data = {
@@ -93,7 +111,7 @@ function get_rocket_data() {
     return data;
 }
 
-function loadPage(){ 
+function loadPage() { 
 
     document.querySelectorAll('#form-nav a').forEach(element => {
         element.addEventListener('click', () =>{

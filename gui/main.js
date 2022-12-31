@@ -12,6 +12,7 @@ const fs = require('fs');
 const { contextIsolated } = require('process');
 
 var mainWindow = null;
+var dialogWindow = null;
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
@@ -92,6 +93,12 @@ function createWindow() {
                 {
                     label: 'Earth Perspective',
                     role: 'Rocket Simulation'
+                },
+                {
+                    label: 'Analysis Tools',
+                    click() {
+                        mainWindow.webContents.openDevTools();
+                    }
                 },
                 {
                     label: 'Dev Tools',

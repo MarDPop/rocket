@@ -2,6 +2,7 @@
 
 #include "Action.h"
 #include "Atmosphere.h"
+#include "../../common/include/Table.h"
 
 class Vehicle;
 
@@ -60,7 +61,7 @@ class AerodynamicsTable : public Aerodynamics {
 
     // key is Mach, Reynolds, Pitch angle, Sideslip Angle, + control deflections
     // CFx, CFy, CFz, CMx, CMy, CMz
-    NestedTable<4 + N_CONTROL, 6> coefficients;
+    NestedTable<4 + N_CONTROL, 6> table;
 
 public:
 

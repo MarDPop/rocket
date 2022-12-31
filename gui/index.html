@@ -14,15 +14,38 @@
 </head>
 <body>
     <main>
-        
-        <div id="rocket_form"></div>
-        <div>
-            <button id="runSim">Generate Trajectory</button>
-            <button id="loadFile">Load Trajectory</button>
-            <span id="response"></span>
+        <div id="input-container">
+            <div id="input-nav">
+                <span id="input-title">Rocket</span>
+                <span style="float:right">
+                    <a href="#show-input-menu" id="nav-show-menu"><i class="fa fa-ellipsis-h"></i></a>
+                    <a href="#close-nav" id="nav-close-link"><i class="fa fa-times"></i></a>
+                </span>
+            </div>
+            <div id="input-rocket">
+                <div id="rocket_form"></div>
+                <div>
+                    <button id="runSim">Generate Trajectory</button>
+                    <button id="loadFile">Load Trajectory</button>
+                    <span id="response"></span>
+                </div>
+            </div>
+        </div>
+        <div id="show-input">
+            <a href="#show-nav" id="nav-open-link"><i class="fa fa-bars"></i></a>
+        </div>
+        <div id="content-container">
+            <div id="content-window">
+                <div id="cesiumContainer"></div>
+            </div>
+            <div id="content-tabs">
+                <ul>
+                    <li>Earth View <i class="fa fa-times"></i></li>
+                </ul>
+            </div>
+            
         </div>
     </main>
-    <div id="cesiumContainer"></div>
 </body>
 <script src="./renderer.js"></script>
 </html>

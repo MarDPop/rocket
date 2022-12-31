@@ -24,6 +24,11 @@ public:
         return pow(1 + 0.5*k1*M*M,-k/k1);
     }
 
+    inline static double p_dynamic(double p_static, double M, double k) {
+        double k1 = k-1;
+        return p_static*pow(0.5*k1*M*M,-k/k1);
+    }
+
     inline static double rho_static2rho_total(double M, double k) {
         double k1 = k-1;
         return pow(1 + 0.5*k1*M*M,1.0/k1);
