@@ -1,4 +1,4 @@
-#include "Simulation.h"
+#include "../include/Simulation.h"
 
 #include <fstream>
 #include <stdexcept>

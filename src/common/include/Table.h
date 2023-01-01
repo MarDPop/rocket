@@ -6,6 +6,8 @@
 #include <fstream>
 #include <exception>
 
+#include "util.h"
+
 template < unsigned int N, int COLS >
 class LinearFixedTable {
     std::array< double, N> values;

@@ -1,9 +1,9 @@
 #pragma once
 
-#include "../common/include/Geodesy.h"
+#include "../../common/include/Geodesy.h"
 #include <string>
 #include <memory>
-#include "../6DOF/include/Vehicle.h"
+#include "../../6DOF/include/Vehicle.h"
 
 class SingleSimulation {
 
