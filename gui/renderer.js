@@ -88,6 +88,18 @@ document.getElementById('show-input').addEventListener('click', () => {
     document.getElementById('content-container').style.left = "400px";
 });
 
+document.querySelectorAll('#content-tabs li').forEach(function(tab) {
+    tab.addEventListener('click', () => {
+        document.querySelector('#content-window div.selected').className = "";
+        document.querySelector('#content-tabs li.selected').className = "";
+
+        let windowName = tab.getAttribute('data-window');
+
+        document.getElementById(windowName).className = "selected";
+        tab.className = "selected";
+    });
+});
+
 function get_rocket_data() {
     // generate defaults
     var data = {
@@ -111,7 +123,7 @@ function get_rocket_data() {
     return data;
 }
 
-function loadPage() { 
+function load_nav() { 
 
     document.querySelectorAll('#form-nav a').forEach(element => {
         element.addEventListener('click', () =>{
@@ -138,17 +150,6 @@ function loadPage() {
             plotData(traj);
         });
     })
-
-    document.querySelectorAll('#form-nav i').forEach(el => {el.addEventListener('click', () => {
-        var form = document.getElementById('rocket_parameters');
-        if(form.className == "minimized") {
-            form.className = "showing";
-            el.className = "fa fa-chevron-up";
-        } else {
-            form.className = "minimized";
-            el.className = "fa fa-chevron-down";
-        }
-    })});
 }
 
 fetch('./view/rocket_form.html').then((result) => {
@@ -156,7 +157,19 @@ fetch('./view/rocket_form.html').then((result) => {
     return result.text();
 }).then((content) => {
     document.getElementById('rocket_form').innerHTML = content;
-    loadPage();
+    load_nav();
+}).catch((error) => { console.log(error); });
+
+function load_analysis() {
+    
+}
+
+fetch('./view/analysis_tab.html').then((result) => {
+    if (result.status != 200) { throw new Error("Bad Server Response"); }
+    return result.text();
+}).then((content) => {
+    document.getElementById('anaylsis-window').innerHTML = content;
+    load_analysis();
 }).catch((error) => { console.log(error); });
 
 console.log("App loaded.");

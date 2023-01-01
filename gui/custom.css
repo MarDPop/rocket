@@ -75,10 +75,11 @@ ul {
 #input-nav {
     background-color: #eee;
     height: 32px;
+    line-height: 32px;
 }
 
 #input-title {
-    padding: 5px;
+    margin-left: 10px;
     text-transform: uppercase;
     font-weight: thin;
 }
@@ -134,6 +135,14 @@ ul {
     padding: 0px;
 }
 
+#content-window > div {
+    display: none;
+}
+
+#content-window > div.selected {
+    display: block !important;
+}
+
 #content-window {
     position: absolute;
     top: 0px;
@@ -158,8 +167,26 @@ ul {
 
 #content-tabs li {
     display: inline-block;
+    cursor: pointer;
     padding: 5px;
     height: 100%;
+    border-right: 1px solid #ccc;
+}
+
+#content-tabs li i {
+    display:none;
+}
+
+#content-tabs li:hover {
+    background-color: #eee;
+}
+
+#content-tabs li:hover i {
+    display:inline;
+}
+
+#content-tabs li.selected {
+    background-color: #eee;
     border-right: 1px solid #ccc;
 }
 

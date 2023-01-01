@@ -36,11 +36,13 @@
         </div>
         <div id="content-container">
             <div id="content-window">
-                <div id="cesiumContainer"></div>
+                <div id="cesiumContainer" class="selected"></div>
+                <div id="anaylsis-window"></div>
             </div>
             <div id="content-tabs">
                 <ul>
-                    <li>Earth View <i class="fa fa-times"></i></li>
+                    <li class="selected" data-window="cesiumContainer">Earth View <i class="fa fa-times"></i></li><!--
+                    --><li data-window="anaylsis-window">Analysis View <i class="fa fa-times"></i></li>
                 </ul>
             </div>
             

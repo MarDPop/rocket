@@ -31,7 +31,7 @@ friend class Vehicle;
 
     double mdot;
 
-    Vehicle* vehicle;
+    Vehicle* vehicle = nullptr;
 
     std::vector< std::unique_ptr< Action > > actions;
 

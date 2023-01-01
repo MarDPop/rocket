@@ -21,6 +21,7 @@ function createWindow() {
     mainWindow = new BrowserWindow({
         width: 1024, 
         height: 720,
+        fullscreen: true,
         webPreferences: {
             preload: path.join(__dirname, 'preload.js'),
             devTools: true,
@@ -194,6 +195,6 @@ ipcMain.handle('openTrajectoryFile', () => {
 })
 
 ipcMain.handle('getMissionData', () => {
-    return global.DATA;
+    return [global.DATA.trajectory.times,global.DATA.trajectory.position_ECEF,global.DATA.trajectory.orientation_ECEF];
 });
 
