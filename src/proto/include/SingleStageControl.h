@@ -58,25 +58,17 @@ protected:
 
     double time_old;
 
-    double ascent_rate_measured;
-
-    double dynamic_pressure_measured;
-
-    Vector angular_velocity_measured;
-
-    Axis CS_measured;
+    Sensors sensors;
 
     double chute_deployment_time;
 
     bool chute_deployed;
 
-    void get_measured_quantities();
-
     SingleStageRocket& rocket;
 
 public:
 
-    const unsigned int NFINS;
+    const unsigned NFINS;
 
     Vector dForce;
 

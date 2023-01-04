@@ -186,7 +186,7 @@ public:
 
     void get_inertia();
 
-    void compute_atmosphere();
+    void compute_atmosphere(double maxAlt, double dH);
 
     void get_air_properties();
 

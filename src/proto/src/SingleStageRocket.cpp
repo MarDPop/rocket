@@ -242,20 +242,22 @@ void SingleStageRocket::set_ground(double ground_altitude, double ground_pressur
     this->ground_temperature = ground_temperature;
     this->lapse_rate = lapse_rate;
 
-    this->compute_atmosphere();
+    this->compute_atmosphere(40000,1);
 }
 
-void SingleStageRocket::compute_atmosphere() {
+void SingleStageRocket::compute_atmosphere(double maxAlt, double dH) {
     double pressure = this->ground_pressure;
-    this->air_pressure_table.reserve(40000);
-    this->air_density_table.reserve(40000);
-    this->air_sound_speed_table.reserve(40000);
-    this->grav_table.reserve(40000);
+    unsigned nAlt = static_cast<unsigned>(maxAlt / dH) + 1;
+    this->air_pressure_table.reserve(nAlt);
+    this->air_density_table.reserve(nAlt);
+    this->air_sound_speed_table.reserve(nAlt);
+    this->grav_table.reserve(nAlt);
     double R0 = 6371000 + this->ground_altitude + 0.5;
-    for(int i = 0; i < 40000; i++){
-        double temperature = this->ground_temperature + i*lapse_rate;
+
+    for(double h = 0; h < maxAlt; h+=dh){
+        double temperature = this->ground_temperature + h*lapse_rate;
         double density = pressure/(R_GAS*temperature);
-        double r = 6371000.0/(R0 + i);
+        double r = 6371000.0/(R0 + h);
         double g = 9.806*r*r;
         this->air_pressure_table.push_back(pressure);
         this->air_density_table.push_back(density);

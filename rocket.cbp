@@ -429,7 +429,6 @@
 		<Unit filename="src/6DOF/include/Control.h" />
 		<Unit filename="src/6DOF/include/GNC.h" />
 		<Unit filename="src/6DOF/include/Gravity.h" />
-		<Unit filename="src/6DOF/include/SingleStageRocket.h" />
 		<Unit filename="src/6DOF/include/Stage.h" />
 		<Unit filename="src/6DOF/include/StageDynamics.h" />
 		<Unit filename="src/6DOF/include/Thruster.h" />
@@ -437,13 +436,11 @@
 		<Unit filename="src/6DOF/src/Aerodynamics.cpp" />
 		<Unit filename="src/6DOF/src/Atmosphere.cpp" />
 		<Unit filename="src/6DOF/src/Body.cpp" />
-		<Unit filename="src/6DOF/src/SingleStageRocket.cpp" />
 		<Unit filename="src/6DOF/src/Stage.cpp" />
 		<Unit filename="src/6DOF/src/StageDynamics.cpp" />
 		<Unit filename="src/6DOF/src/Thruster.cpp" />
 		<Unit filename="src/6DOF/src/Vehicle.cpp" />
-		<Unit filename="src/app/Simulation.cpp" />
-		<Unit filename="src/app/Simulation.h" />
+		<Unit filename="src/app/main.cpp" />
 		<Unit filename="src/app/single_sim.cpp" />
 		<Unit filename="src/app/test.cpp" />
 		<Unit filename="src/common/include/Cartesian.h" />
@@ -464,6 +461,18 @@
 		<Unit filename="src/common/include/util.h" />
 		<Unit filename="src/common/src/Geodesy.cpp" />
 		<Unit filename="src/common/src/Planet.cpp" />
+		<Unit filename="src/proto/include/SingleStageAerodynamics.h" />
+		<Unit filename="src/proto/include/SingleStageControl.h" />
+		<Unit filename="src/proto/include/SingleStageRocket.h" />
+		<Unit filename="src/proto/include/SingleStageThruster.h" />
+		<Unit filename="src/proto/include/WindHistory.h" />
+		<Unit filename="src/proto/src/SingleStageAerodynamics.cpp" />
+		<Unit filename="src/proto/src/SingleStageControl.cpp" />
+		<Unit filename="src/proto/src/SingleStageRocket.cpp" />
+		<Unit filename="src/proto/src/SingleStageThruster.cpp" />
+		<Unit filename="src/proto/src/WindHistory.cpp" />
+		<Unit filename="src/util/include/Simulation.h" />
+		<Unit filename="src/util/src/Simulation.cpp" />
 		<Extensions />
 	</Project>
 </CodeBlocks_project_file>
