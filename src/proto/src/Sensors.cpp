@@ -4,15 +4,11 @@
 
 #include "../../../lib/Eigen/Dense"
 
+#include <cmath>
+
 Sensors::Sensors() {}
 
 void Sensors::get_measured_quantities(const SingleStageRocket& rocket) {
-
-    this->airspeed_real = rocket.velocity - rocket.wind.wind;
-
-    this->air_speed_sq_real = this->airspeed_real.dot(this->airspeed_real);
-
-    this->dynamic_pressure_real = 0.5*rocket.air_density*this->air_speed_sq_real;
 
     this->angular_velocity_measured = rocket.angular_velocity;
     this->acceleration_measured = rocket.acceleration;
@@ -25,14 +21,27 @@ void Sensors::get_measured_quantities(const SingleStageRocket& rocket) {
     this->dynamic_pressure_measured = this->dynamic_pressure_real + this->pressure_variance(this->generator);
 
     this->static_pressure_measured = rocket.air_pressure + this->pressure_variance(this->generator);
+
+    this->temperature_measured = rocket.air.temperature;
 }
 
 void Sensors::kalman_filter(const SingleStageRocket& rocket, double dt) {
-    Eigen::MatrixXd F(4,4);
+    auto F = Eigen::MatrixXd::Zero(6,6);
 }
 
 void Sensors::my_filter(const SingleStageRocket& rocket, double dt) {
-    Eigen::MatrixXd F(4,4);
+    double tmp = this->dynamic_pressure_measured / this->static_pressure_measured + 1.0;
+    if(tmp < 1.0) {
+        tmp = 1.0;
+    }
+    tmp = pow(tmp, 2/7);
+
+    double measured_mach = sqrt(5*(tmp - 1.0));
+
+    dobule
+}
+
+void Sensors::EKF(const SingleStageRocket& rocket, double dt) {
 }
 
 void Sensors::get_computed_quantities(const SingleStageRocket& rocket, double time) {
@@ -40,7 +49,7 @@ void Sensors::get_computed_quantities(const SingleStageRocket& rocket, double ti
 
     double dt = time - this->time_old;
 
-    this->kalman_filter(rocket,dt);
+    this->my_filter(rocket,dt);
 
     this->time_old = time;
 }

@@ -500,6 +500,64 @@ namespace Cartesian {
             memcpy(data,v.data,sizeof(data));
         }
 
+        Quaternion(const Axis& a) {
+            double m00 = a.data[0];
+            double m11 = a.data[4];
+            double m22 = a.data[8];
+            double trace = m00 + m11 + m22;
+            if( trace > 0 ) {
+                double s = 0.5 / sqrt(trace + 1.0);
+                data[0] = 0.25 / s;
+                data[1] = ( a[2][1] - a[1][2] ) * s;
+                data[2] = ( a[0][2] - a[2][0] ) * s;
+                data[3] = ( a[1][0] - a[0][1] ) * s;
+            } else {
+                if ( m00 > m11 && m00 > m22 ) {
+                  double s = 0.5 / sqrt( 1.0 + m00 - m11 - m22 );
+                  data[0] = (a[2][1] - a[1][2] ) * s;
+                  data[1] = 0.25 / s;
+                  data[2] = (a[0][1] + a[1][0] ) * s;
+                  data[3] = (a[0][2] + a[2][0] ) * s;
+                } else if (m11 > m22) {
+                  double s = 0.5 / sqrt( 1.0 + m11 - m00 - m22 );
+                  data[0] = (a[0][2] - a[2][0] ) * s;
+                  data[1] = (a[0][1] + a[1][0] ) * s;
+                  data[2] = 0.25 / s;
+                  data[3] = (a[1][2] + a[2][1] ) * s;
+                } else {
+                  double s = 0.5 / sqrt( 1.0 + m22 - m00 - m11 );
+                  data[0] = (a[1][0] - a[0][1] ) * s;
+                  data[1] = (a[0][2] + a[2][0] ) * s;
+                  data[2] = (a[1][2] + a[2][1] ) * s;
+                  data[3] = 0.25 / s;
+                }
+            }
+        }
+
+        /*
+        Quaternion(const Axis& a) {
+
+            __m256d one = _mm256_set1_pd(1.0);
+            __m256d half = _mm256_set1_pd(0.5);
+            __m256d zero = _mm256_setzero_pd();
+            __m256d m00 = _mm256_set1_pd(a.data[0]);
+            __m256d m11 = _mm256_set1_pd(a.data[4]);
+            __m256d m22 = _mm256_set1_pd(a.data[8]);
+
+            __m256d tmp = _mm256_addsub_pd(one,m11);
+
+            __m256d q = _m256_mul_pd(_mm256_sqrt_pd(_mm256_max_pd (vals,zero)),half);
+
+            data[0] = sqrt( max( 0, 1 + m00 + m11 + m22 ) ) / 2;
+            data[1] = sqrt( max( 0, 1 + m00 - m11 - m22 ) ) / 2;
+            data[2] = sqrt( max( 0, 1 - m00 + m11 - m22 ) ) / 2;
+            data[3] = sqrt( max( 0, 1 - m00 - m11 + m22 ) ) / 2;
+            data[1] = _copysign( data[1], m21 - m12 )
+            data[2] = _copysign( data[2], m02 - m20 )
+            data[3] = _copysign( data[3], m10 - m01 )
+        }
+        */
+
         Quaternion(double a, double i, double j, double k) : data{a,i,j,k} {
         }
 

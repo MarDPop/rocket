@@ -45,44 +45,11 @@ class SingleStageRocket {
     */
     double launch_angle = 0;
 
-    /**
-    * ground altitude from MSL (m)
-    */
-    double ground_altitude;
-
-    /**
-    * Ground measured pressure (Pa)
-    */
-    double ground_pressure;
-
-    /**
-    * Ground measured temperature (K)
-    */
-    double ground_temperature;
-
-    /**
-    * Lapse rate (K/m), assumed constant for flight (invalid after 10km)
-    */
-    double lapse_rate;
-
-    /* ATMOSPHERE TABLE */
-    // values are precomputed to speed processing
-    // values for every meter
-    // nearest neighbor is used for interpolation
-    std::vector<double> air_density_table;
-    std::vector<double> air_pressure_table;
-    std::vector<double> air_sound_speed_table;
-    std::vector<double> grav_table;
-
     void init();
 
     void compute_acceleration(double time);
 
 public:
-
-    static constexpr double R_GAS = 287.052874;
-
-    static constexpr double AIR_CONST = 287.052874*1.4;
 
     /**
     * current mass  (kg)
@@ -141,21 +108,6 @@ public:
     double grav;
 
     /**
-    * current air pressure (Pa)
-    */
-    double air_pressure;
-
-    /**
-    * current air density (kg/m3)
-    */
-    double air_density;
-
-    /**
-    * current inverse of sound speend  ((m/s) ^ -1)
-    */
-    double sound_speed_inv;
-
-    /**
     * Internal struct definition to record states
     */
     struct Recording {
@@ -168,7 +120,7 @@ public:
 
     Recording record;
 
-    WindHistory wind;
+    Air air;
 
     SingleStageAerodynamics aero;
 
@@ -182,13 +134,7 @@ public:
 
     void set_mass(double empty_mass, double full_mass, double I_empty[3], double I_full[3]);
 
-    void set_ground(double ground_altitude, double ground_pressure, double ground_temperature, double lapse_rate);
-
     void get_inertia();
-
-    void compute_atmosphere(double maxAlt, double dH);
-
-    void get_air_properties();
 
     void launch(double dt);
 

@@ -23,48 +23,37 @@ void SingleStageAerodynamics::set_coef(double* coef) {
 }
 
 void SingleStageAerodynamics::update() {
-    Vector airspeed_vec = rocket.velocity - rocket.wind.wind;
 
-    double v2 = airspeed_vec.dot(airspeed_vec);
-
-    if(v2 < 1e-2){
+    if(rocket.airspeed < 1e-2){
         this->force.zero();
         this->moment.zero();
         return;
     }
 
-    double airspeed = sqrt(v2);
-
-    double mach = airspeed * rocket.sound_speed_inv;
-
     double CD0_compressible;
 
-    if (mach < 0.5) {
+    if (rocket.mach < 0.5) {
         CD0_compressible = this->CD0;
     } else {
-        if(mach > 1) {
-            CD0_compressible = this->CD0 + this->CD0/mach;
+        if(rocket.mach > 1) {
+            CD0_compressible = this->CD0 + this->CD0/rocket.mach;
         } else {
-            CD0_compressible = this->CD0*(mach - 0.5)*2.0;
+            CD0_compressible = this->CD0*(rocket.mach - 0.5)*2.0;
         }
     }
 
-    Vector unit_v = airspeed_vec * (1.0/airspeed);
+    double proj = rocket.CS.axis.z.dot(rocket.air.unit_v_air);
 
-    double proj = rocket.CS.axis.z.dot(unit_v);
-
-    v2 *= rocket.air_density*0.5;
-
-    this->moment = rocket.angular_velocity*(this->CM_alpha_dot*rocket.air_density);
+    this->moment = rocket.angular_velocity*(this->CM_alpha_dot*rocket.air.dynamic_pressure);
 
     if (proj > 0.99998) {
-        this->force = unit_v*(CD0_compressible*-v2);
+        this->force = rocket.air.unit_v_air*(CD0_compressible*rocket.air.dynamic_pressure);
         return;
     }
 
     double AoA = (proj > 0.9) ? sqrt(2 - 2*proj) : acos(proj);
 
-    Vector arm = unit_v.cross(rocket.CS.axis.z);
+    Vector arm = rocket.air.unit_v_air.cross(rocket.CS.axis.z);
 
     this->moment += arm*(this->CM_alpha*v2);
 
@@ -72,7 +61,7 @@ void SingleStageAerodynamics::update() {
     if(AoA > this->stall_angle) {
         CD = CD0_compressible + this->K*this->CL_max*this->CL_max*arm.norm()*this->constant_term;
         if(AoA > 2*this->stall_angle) {
-            this->force = unit_v*(-CD*v2);
+            this->force = rocket.air.unit_v_air*(-CD*rocket.air.dynamic_pressure);
             return;
         } else {
             double frac = 1.0/(5*(AoA - this->stall_angle) + 1.0);
@@ -83,11 +72,11 @@ void SingleStageAerodynamics::update() {
         CD = CD0_compressible + this->K*CL*CL;
     }
 
-    Vector lift = arm.cross(unit_v);
+    Vector lift = arm.cross(rocket.air.unit_v_air);
     double v = lift.norm();
     if(v > 1e-8) {
         CL /= v;
     }
 
-    this->force = (lift*CL - unit_v*CD)*v2;
+    this->force = (lift*CL - rocket.air.unit_v_air*CD)*rocket.air.dynamic_pressure;
 }

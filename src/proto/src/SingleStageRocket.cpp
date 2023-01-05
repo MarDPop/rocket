@@ -60,7 +60,7 @@ SingleStageRocket::SingleStageRocket(const std::string& fn) : aero(*this) {
         throw std::runtime_error("Not enough ground information: " + std::to_string(data.size()) + " < 4. Reminder: {altitude,pressure,temperature,lapse rate}");
     }
 
-    this->set_ground(std::stod(data[0]),std::stod(data[1]),std::stod(data[2]),std::stod(data[3]));
+    this->air.set_ground(std::stod(data[0]),std::stod(data[1]),std::stod(data[2]),std::stod(data[3]));
 
     data = util::split(lines[3]);
     if(data.size() < 2) {
@@ -71,7 +71,7 @@ SingleStageRocket::SingleStageRocket(const std::string& fn) : aero(*this) {
 
     if(data.size() == 3 && data[2].compare("skip") != 0) {
         try {
-            this->wind.load(data[2]);
+            this->air.wind.load(data[2]);
         } catch(...) {}
     }
 
@@ -171,9 +171,7 @@ void SingleStageRocket::init() {
 
 void SingleStageRocket::compute_acceleration(double time) {
 
-    this->get_air_properties();
-
-    this->wind.set(time);
+    this->air.get_air_properties(this->position[2],this->velocity, time);
 
     this->aero.update();
 
@@ -236,51 +234,6 @@ void SingleStageRocket::get_inertia() {
     this->COG = this->I_empty[2] + this->dIdm[2]*dm;
 }
 
-void SingleStageRocket::set_ground(double ground_altitude, double ground_pressure ,double ground_temperature, double lapse_rate) {
-    this->ground_altitude = ground_altitude;
-    this->ground_pressure = ground_pressure;
-    this->ground_temperature = ground_temperature;
-    this->lapse_rate = lapse_rate;
-
-    this->compute_atmosphere(40000,1);
-}
-
-void SingleStageRocket::compute_atmosphere(double maxAlt, double dH) {
-    double pressure = this->ground_pressure;
-    unsigned nAlt = static_cast<unsigned>(maxAlt / dH) + 1;
-    this->air_pressure_table.reserve(nAlt);
-    this->air_density_table.reserve(nAlt);
-    this->air_sound_speed_table.reserve(nAlt);
-    this->grav_table.reserve(nAlt);
-    double R0 = 6371000 + this->ground_altitude + 0.5;
-
-    for(double h = 0; h < maxAlt; h+=dh){
-        double temperature = this->ground_temperature + h*lapse_rate;
-        double density = pressure/(R_GAS*temperature);
-        double r = 6371000.0/(R0 + h);
-        double g = 9.806*r*r;
-        this->air_pressure_table.push_back(pressure);
-        this->air_density_table.push_back(density);
-        this->air_sound_speed_table.push_back(1.0/sqrt(AIR_CONST*temperature));
-        this->grav_table.push_back(g);
-
-        pressure -= g*density; // dz = 1 meter
-    }
-}
-
-void SingleStageRocket::get_air_properties() {
-    int idx = static_cast<int>(this->position.z());
-    if(idx > 39999) {
-        idx = 39999;
-    }
-    if(idx < 0) {
-        idx = 0;
-    }
-    this->air_density = this->air_density_table[idx];
-    this->air_pressure = this->air_pressure_table[idx];
-    this->sound_speed_inv = this->air_sound_speed_table[idx];
-    this->grav = this->grav_table[idx];
-}
 
 void SingleStageRocket::launch(double dt) {
     double time = 0;

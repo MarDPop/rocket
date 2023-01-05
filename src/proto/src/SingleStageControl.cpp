@@ -119,9 +119,7 @@ void SingleStageControl::chute_dynamics(double time) {
 
     // chute is more complicated than this, but for now assume just a drag force
 
-    Vector unit_v = this->sensors.get_real_air_velocity() * (-1.0/this->sensors.get_real_airspeed());
-
-    this->dForce = unit_v * (CDA*this->sensors.get_real_dynamic_pressure());
+    this->dForce = this->rocket.air.unit_v_air * (CDA*this->sensors.get_real_dynamic_pressure());
     // assume arm is nose
     Vector::cross((rocket.CS.axis.z*-rocket.COG),this->dForce,this->dMoment);
 }
@@ -135,7 +133,7 @@ void SingleStageControl::update(double time) {
         return;
     }
 
-    if(this->sensors.get_computed_dynamic_pressure() < 1e-3) {
+    if(this->sensors.get_measured_dynamic_pressure() < 1e-3) {
         return;
     }
 
@@ -173,7 +171,7 @@ void SingleStageControl_3::set_aero_coef(double dCL, double dCD, double dCM, dou
 
 void SingleStageControl_3::command_fins(const Vector& commanded_torque) {
 
-    Vector command_torque_scaled = commanded_torque * (1.0/this->sensors.get_computed_dynamic_pressure());
+    Vector command_torque_scaled = commanded_torque * (1.0/this->sensors.get_measured_dynamic_pressure());
 
     Vector angles = this->solve3*command_torque_scaled;
     this->fins[0].commanded_deflection = angles.data[0];
@@ -190,7 +188,7 @@ void SingleStageControl_4::command_fins(const Vector& commanded_torque) {
         beta[i] = 1 + this->fins[i].span.x() + this->fins[i].span.y();
     }
     auto num = (commanded_torque.x() + commanded_torque.y())/this->const_planer_term + commanded_torque.z()/this->const_axial_term;
-    auto den = this->sensors.get_computed_dynamic_pressure()*std::accumulate(beta.begin(),beta.end(),0);
+    auto den = this->sensors.get_measured_dynamic_pressure()*std::accumulate(beta.begin(),beta.end(),0);
 
     auto lambda = num/den;
     this->fins[0].commanded_deflection = lambda*beta[0];
