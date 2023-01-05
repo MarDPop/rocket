@@ -44,13 +44,11 @@ void Air::compute_atmosphere(double maxAlt, double dH) {
     this->nAlt = this->air_pressure_table.size()-1;
 }
 
-void Air::get_air_properties(double h, const Vector& velocity, double time) {
+double Air::set_altitude(double h, const Vector& velocity, double time) {
     int idx = static_cast<int>(h * this->inv_dH);
     idx = std::clamp(idx,0,this->nAlt);
-    this->air_density = this->air_density_table[idx];
-    this->air_pressure = this->air_pressure_table[idx];
-    this->sound_speed_inv = this->air_sound_speed_table[idx];
-    this->grav = this->grav_table[idx];
+
+    this->properties = &this->air_table[idx];
 
     this->wind.set(time);
 
@@ -65,4 +63,6 @@ void Air::get_air_properties(double h, const Vector& velocity, double time) {
     double tmp = 1.0 + 0.2*this->mach*this->mach;
 
     this->dynamic_pressure = this->air_pressure*(tmp*tmp*tmp*sqrt(tmp) - 1.0);
+
+    return this->grav_table[idx];
 }

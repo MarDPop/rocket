@@ -171,7 +171,7 @@ void SingleStageRocket::init() {
 
 void SingleStageRocket::compute_acceleration(double time) {
 
-    this->air.get_air_properties(this->position[2],this->velocity, time);
+    this->grav = this->air.set_altitude(this->position[2],this->velocity, time);
 
     this->aero.update();
 

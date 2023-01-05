@@ -4,6 +4,14 @@
 
 #include "WindHistory.h"
 
+struct AirVals {
+    double pressure;
+    double temperature;
+    double inv_sound_speed;
+    double density;
+    double absolute_viscosity;
+};
+
 class Air {
 
     /**
@@ -35,40 +43,18 @@ class Air {
     int nAlt;
 
     // values are precomputed to speed processing
-    // values for every meter
-    // nearest neighbor is used for interpolation
-    std::vector<double> air_density_table;
-    std::vector<double> air_pressure_table;
-    std::vector<double> air_sound_speed_table;
-    std::vector<double> grav_table;
+    std::vector<AirVals> air_table;
 
-public:
-
-    static constexpr double R_GAS = 287.052874;
-
-    static constexpr double AIR_CONST = 287.052874*1.4;
+    AirVals* properties;
 
     Vector air_velocity;
-
-    /**
-    * current air pressure (Pa)
-    */
-    double air_pressure;
-
-    /**
-    * current air density (kg/m3)
-    */
-    double air_density;
-
-    /**
-    * current inverse of sound speend  ((m/s) ^ -1)
-    */
-    double sound_speed_inv;
 
     /**
     * current air speed (m/s)
     */
     double airspeed;
+
+    Vector unit_v_air;
 
     /**
     * current mach
@@ -80,7 +66,15 @@ public:
     */
     double dynamic_pressure;
 
-    Vector unit_v_air;
+public:
+
+    static constexpr double R_GAS = 287.052874;
+
+    static constexpr double AIR_CONST = 287.052874*1.4;
+
+    inline double get_airspeed() {
+        return this->airspeed;
+    }
 
     WindHistory wind;
 
@@ -91,6 +85,6 @@ public:
 
     void compute_atmosphere();
 
-    void get_air_properties(double h, const Vector& velocity, double time);
+    double set_altitude(double h, const Vector& velocity, double time);
 
 };
