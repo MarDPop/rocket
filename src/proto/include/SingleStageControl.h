@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include "../include/Sensors.h"
 
 #include "../../common/include/Cartesian.h"
 

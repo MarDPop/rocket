@@ -9,7 +9,8 @@ struct AirVals {
     double temperature;
     double inv_sound_speed;
     double density;
-    double absolute_viscosity;
+    double dynamic_viscosity;
+    double gravity;
 };
 
 class Air {
@@ -45,15 +46,18 @@ class Air {
     // values are precomputed to speed processing
     std::vector<AirVals> air_table;
 
-    AirVals* properties;
+    std::vector<double> grav_table; // TODO: move
 
-    Vector air_velocity;
+    AirVals* properties;
 
     /**
     * current air speed (m/s)
     */
     double airspeed;
 
+    /**
+    * current velocity with respect unit vector
+    */
     Vector unit_v_air;
 
     /**
@@ -66,25 +70,57 @@ class Air {
     */
     double dynamic_pressure;
 
+    void compute_atmosphere(double maxAlt, double dH, double g0 = 9.806);
+
 public:
 
     static constexpr double R_GAS = 287.052874;
 
     static constexpr double AIR_CONST = 287.052874*1.4;
 
-    inline double get_airspeed() {
-        return this->airspeed;
-    }
-
     WindHistory wind;
 
     Air();
     ~Air();
 
-    void set_ground(double ground_altitude, double ground_pressure ,double ground_temperature, double lapse_rate);
+    inline double get_airspeed() {
+        return this->airspeed;
+    }
 
-    void compute_atmosphere();
+    inline double get_dynamic_pressure() const {
+        return this->dynamic_pressure;
+    }
 
-    double set_altitude(double h, const Vector& velocity, double time);
+    inline double get_temperature() const {
+        return this->properties->temperature;
+    }
+
+    inline double get_static_pressure() const {
+        return this->properties->pressure;
+    }
+
+    inline double get_inv_sound_speed() const {
+        return this->properties->inv_sound_speed;
+    }
+
+    inline double get_density() const {
+        return this->properties->density;
+    }
+
+    inline double get_dynamic_viscosity() const {
+        return this->properties->dynamic_viscosity;
+    }
+
+    inline double get_mach() const {
+        return this->mach;
+    }
+
+    inline const Vector& get_air_velocity_unit_vector() const {
+        return this->unit_v_air;
+    }
+
+    void set_ground(double ground_altitude, double ground_pressure, double ground_temperature, double lapse_rate);
+
+    double compute_vals(double h, const Vector& velocity, double time);
 
 };

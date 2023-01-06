@@ -171,7 +171,7 @@ void SingleStageRocket::init() {
 
 void SingleStageRocket::compute_acceleration(double time) {
 
-    this->grav = this->air.set_altitude(this->position[2],this->velocity, time);
+    this->grav = this->air.compute_vals(this->position[2],this->velocity, time);
 
     this->aero.update();
 
@@ -179,7 +179,7 @@ void SingleStageRocket::compute_acceleration(double time) {
     this->angular_acceleration = this->aero.moment;
 
     if(this->mass > this->mass_empty) {
-        this->thruster.set(this->air_pressure);
+        this->thruster.set(this->air.get_static_pressure());
         this->acceleration += this->CS.axis.z * this->thruster.thrust;
     }
 

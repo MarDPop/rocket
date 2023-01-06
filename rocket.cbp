@@ -461,11 +461,15 @@
 		<Unit filename="src/common/include/util.h" />
 		<Unit filename="src/common/src/Geodesy.cpp" />
 		<Unit filename="src/common/src/Planet.cpp" />
+		<Unit filename="src/proto/include/Air.h" />
+		<Unit filename="src/proto/include/Sensors.h" />
 		<Unit filename="src/proto/include/SingleStageAerodynamics.h" />
 		<Unit filename="src/proto/include/SingleStageControl.h" />
 		<Unit filename="src/proto/include/SingleStageRocket.h" />
 		<Unit filename="src/proto/include/SingleStageThruster.h" />
 		<Unit filename="src/proto/include/WindHistory.h" />
+		<Unit filename="src/proto/src/Air.cpp" />
+		<Unit filename="src/proto/src/Sensors.cpp" />
 		<Unit filename="src/proto/src/SingleStageAerodynamics.cpp" />
 		<Unit filename="src/proto/src/SingleStageControl.cpp" />
 		<Unit filename="src/proto/src/SingleStageRocket.cpp" />

@@ -10,21 +10,15 @@ class SingleStageRocket;
 
 class Sensors {
 
-    double sigma_pressure = 0.5; // Pa
+    std::default_random_engine generator;
 
-    double sigma_gyro = 5e-4; // rad/s
+    std::normal_distribution<double> barometer_variance;
 
-    double sigma_accelerometer = 1e-2; // m/s2
+    std::normal_distribution<double> accelerometer_variance;
 
-    double sigma_temperature = 1e-2; // Kelvin
+    std::normal_distribution<double> thermometer_variance;
 
-    std::default_random_engine generator(clock());
-
-    normal_distribution<double> pressure_variance(0.0, sigma_pressure);
-
-    normal_distribution<double> gyro_variance(0.0, sigma_gyro);
-
-    normal_distribution<double> accel_variance(0.0, sigma_accelerometer);
+    std::normal_distribution<double> gyro_variance;
 
     double static_pressure_measured;
 
@@ -36,67 +30,59 @@ class Sensors {
 
     double mach_measured;
 
-    Vector acceleration_measured;
-
-    Vector angular_velocity_measured;
-
     double time_old;
 
-    Vector estimated_position;
+    Vector position_computed;
 
-    Vector estimated_velocity;
+    Vector velocity_computed;
 
-    Vector estimated_acceleration;
+    Vector acceleration_computed;
 
-    Quaternion estimated_orientation;
+    Vector angular_velocity_computed;
 
-    kalman_filter(const SingleStageRocket& rocket, double dt);
+    Quaternion orientation_computed;
 
-    my_filter(const SingleStageRocket& rocket, double dt);
+    void kalman_filter(const SingleStageRocket& rocket, double dt);
 
-    EKF(const SingleStageRocket& rocket, double dt);
+    void my_filter(const SingleStageRocket& rocket, double dt);
 
-    get_measured_quantities(const SingleStageRocket& rocket);
+    void EKF(const SingleStageRocket& rocket, double dt);
+
+    void get_measured_quantities(const SingleStageRocket& rocket);
 
 public:
-
-    inline double get_real_airspeed() {
-        return sqrt(this->air_speed_sq_real);
-    }
-
-    inline Vector get_real_air_velocity() {
-        return this->air_velocity_real;
-    }
-
-    inline double get_real_dynamic_pressure() {
-        return this->dynamic_pressure_real;
-    }
-
-    inline double get_real_dynamic_pressure() {
-        return this->dynamic_pressure_real;
-    }
 
     inline double get_measured_dynamic_pressure() {
         return this->dynamic_pressure_measured;
     }
 
-    inline double get_computed_ascent_rate() {
-        return this->ascent_rate_computed;
-    }
-
-    inline Axis get_computed_angular_rate() {
+    inline const Vector& get_computed_angular_rate() {
         return this->angular_velocity_computed;
     }
 
-    inline Axis get_computed_CS() {
-        return this->CS_computed;
+    inline const Vector& get_computed_position() {
+        return this->position_computed;
+    }
+
+    inline const Vector& get_computed_velocity() {
+        return this->velocity_computed;
+    }
+
+    inline const Vector& get_computed_acceleration() {
+        return this->acceleration_computed;
+    }
+
+    inline const Axis& get_computed_CS() {
+        return this->orientation_computed.to_rotation_matrix();
     }
 
     Sensors();
     ~Sensors();
 
-    init();
+    void set_sensor_variances(double sigma_pressure, double sigma_temperature, double sigma_accelerometer, double sigma_gyro);
 
-    compute_quantities(const SingleStageRocket& rocket, double time);
+    void init();
+
+    void compute_quantities(const SingleStageRocket& rocket, double time);
 
 };

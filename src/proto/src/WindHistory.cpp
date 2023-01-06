@@ -1,6 +1,9 @@
 #include "../include/WindHistory.h"
 
 #include <iostream>
+#include <fstream>
+#include <string>
+#include "../../common/include/util.h"
 
 WindHistory::WindHistory() {
     this->wind.zero();

@@ -9,7 +9,7 @@
 #include "SingleStageAerodynamics.h"
 #include "SingleStageControl.h"
 #include "SingleStageThruster.h"
-#include "WindHistory.h"
+#include "Air.h"
 
 using namespace Cartesian;
 

@@ -1,5 +1,7 @@
 #include "../include/SingleStageControl.h"
 
+#include "../include/SingleStageRocket.h"
+
 SingleStageControl::SingleStageControl(SingleStageRocket& r, unsigned int N) : fins(N), rocket(r), NFINS(N) {
 
     for(unsigned int i = 0; i < NFINS;i++){
@@ -85,8 +87,8 @@ void SingleStageControl::update_force() {
         this->dForce.data[1] += fin.lift.data[1]*tmp;
         this->dForce.data[2] -= this->dCDdTheta*fin.deflection; // simply linear approximation for small angles
     }
-    this->dMoment *= this->sensors.get_computed_dynamic_pressure();
-    this->dForce *= this->sensors.get_computed_dynamic_pressure();
+    this->dMoment *= this->sensors.get_measured_dynamic_pressure();
+    this->dForce *= this->sensors.get_measured_dynamic_pressure();
     // remember currently in body frame
     this->dMoment = rocket.CS.transpose_mult(this->dMoment);
     this->dForce = rocket.CS.transpose_mult(this->dForce);
@@ -96,12 +98,12 @@ void SingleStageControl::update_force() {
 void SingleStageControl::update_commands() {
     // essentially straight up
     //if( fabs(this->CS_measured.axis.z.z()) > 0.99999)
-
-    Vector arm_inertial(-this->sensors.CS.axis.z.y(),this->sensors.CS.axis.z.x(),0); // rocket.z cross z to get correct sign
+    const auto& CS = this->sensors.get_computed_CS();
+    Vector arm_inertial(-CS.axis.z.y(),CS.axis.z.x(),0); // rocket.z cross z to get correct sign
     Vector commanded_angular_rate = arm_inertial*this->K1;
     Vector angular_err = commanded_angular_rate - this->sensors.get_computed_angular_rate();
     Vector commanded_torque = angular_err*this->K2 - this->sensors.get_computed_angular_rate()*this->C2;
-    commanded_torque = this->sensors.get_computed_CS() * commanded_torque;
+    commanded_torque = CS * commanded_torque;
 
     this->command_fins(commanded_torque);
 }
@@ -119,14 +121,14 @@ void SingleStageControl::chute_dynamics(double time) {
 
     // chute is more complicated than this, but for now assume just a drag force
 
-    this->dForce = this->rocket.air.unit_v_air * (CDA*this->sensors.get_real_dynamic_pressure());
+    this->dForce = this->rocket.air.get_air_velocity_unit_vector() * (CDA*this->rocket.air.get_dynamic_pressure());
     // assume arm is nose
     Vector::cross((rocket.CS.axis.z*-rocket.COG),this->dForce,this->dMoment);
 }
 
 void SingleStageControl::update(double time) {
 
-    this->sensors.compute_quantities(this.rocket, time);
+    this->sensors.compute_quantities(this->rocket, time);
 
     if(this->chute_deployed) {
         this->chute_dynamics(time);
@@ -137,13 +139,15 @@ void SingleStageControl::update(double time) {
         return;
     }
 
-    if(this->sensors.get_computed_ascent_rate() < -0.5) {
+    double ascent_rate = this->sensors.get_computed_velocity()[2];
+
+    if(ascent_rate < -0.5) {
         this->chute_deployed = true;
         this->chute_deployment_time = time;
         return;
     }
 
-    if(this->sensors.get_computed_ascent_rate() < 10) {
+    if(ascent_rate < 10) {
         this->dMoment.zero();
         this->dForce.zero();
         this->time_old = time;

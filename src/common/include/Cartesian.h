@@ -508,27 +508,27 @@ namespace Cartesian {
             if( trace > 0 ) {
                 double s = 0.5 / sqrt(trace + 1.0);
                 data[0] = 0.25 / s;
-                data[1] = ( a[2][1] - a[1][2] ) * s;
-                data[2] = ( a[0][2] - a[2][0] ) * s;
-                data[3] = ( a[1][0] - a[0][1] ) * s;
+                data[1] = ( a.data[7] - a.data[5] ) * s;
+                data[2] = ( a.data[2] - a.data[6] ) * s;
+                data[3] = ( a.data[3] - a.data[1] ) * s;
             } else {
                 if ( m00 > m11 && m00 > m22 ) {
                   double s = 0.5 / sqrt( 1.0 + m00 - m11 - m22 );
-                  data[0] = (a[2][1] - a[1][2] ) * s;
+                  data[0] = (a.data[7] - a.data[5] ) * s;
                   data[1] = 0.25 / s;
-                  data[2] = (a[0][1] + a[1][0] ) * s;
-                  data[3] = (a[0][2] + a[2][0] ) * s;
+                  data[2] = (a.data[1] + a.data[3] ) * s;
+                  data[3] = (a.data[2] + a.data[6] ) * s;
                 } else if (m11 > m22) {
                   double s = 0.5 / sqrt( 1.0 + m11 - m00 - m22 );
-                  data[0] = (a[0][2] - a[2][0] ) * s;
-                  data[1] = (a[0][1] + a[1][0] ) * s;
+                  data[0] = (a.data[2] - a.data[6] ) * s;
+                  data[1] = (a.data[1] + a.data[3] ) * s;
                   data[2] = 0.25 / s;
-                  data[3] = (a[1][2] + a[2][1] ) * s;
+                  data[3] = (a.data[5] + a.data[7] ) * s;
                 } else {
                   double s = 0.5 / sqrt( 1.0 + m22 - m00 - m11 );
-                  data[0] = (a[1][0] - a[0][1] ) * s;
-                  data[1] = (a[0][2] + a[2][0] ) * s;
-                  data[2] = (a[1][2] + a[2][1] ) * s;
+                  data[0] = (a.data[3] - a.data[1] ) * s;
+                  data[1] = (a.data[2] + a.data[6] ) * s;
+                  data[2] = (a.data[5] + a.data[7] ) * s;
                   data[3] = 0.25 / s;
                 }
             }
