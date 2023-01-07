@@ -5,150 +5,16 @@
 #include <numeric>
 #include <iostream>
 
-SingleStageRocket::SingleStageRocket(const std::string& fn) : aero(*this) {
+SingleStageRocket::SingleStageRocket() : aerodynamics(*this) {}
+SingleStageRocket::~SingleStageRocket(){}
 
-    if(fn.size() < 8) {
-        throw std::invalid_argument("invalid filename.");
-    }
-
-    std::string ext = fn.substr(fn.size() - 8);
-    if(ext.compare(".srocket")) {
-        throw std::invalid_argument("not a rocket file.");
-    }
-
-    std::ifstream file(fn);
-
-    if(!file.is_open()) {
-        throw std::invalid_argument("could not open file.");
-    }
-
-    std::string line;
-    std::vector<std::string> lines;
-    std::vector<std::string> data;
-
-    while(std::getline(file, line)){
-        if(line.size() == 0 || line[0] == '#'){
-            continue;
-        }
-        lines.push_back(line);
-    }
-
-    if(lines.size() < 8) {
-        throw std::runtime_error("file length invalid");
-    }
-
-    data = util::split(lines[0]);
-    if(data.size() < 4) {
-        throw std::runtime_error("Not enough empty mass information: " + std::to_string(data.size()) + " < 4. Reminder: {mass,Ixx,Izz,COG}");
-    }
-
-    double m_empty = std::stod(data[0]);
-    double I_empty[3] = {std::stod(data[1]),std::stod(data[2]),std::stod(data[3])};
-
-    data = util::split(lines[1]);
-    if(data.size() < 4) {
-        throw std::runtime_error("Not enough full mass information: " + std::to_string(data.size()) + " < 4. Reminder: {mass,Ixx,Izz,COG}");
-    }
-
-    double m_full = std::stod(data[0]);
-    double I_full[3] = {std::stod(data[1]),std::stod(data[2]),std::stod(data[3])};
-
-    this->set_mass(m_empty,m_full,I_empty,I_full);
-
-    data = util::split(lines[2]);
-    if(data.size() < 4) {
-        throw std::runtime_error("Not enough ground information: " + std::to_string(data.size()) + " < 4. Reminder: {altitude,pressure,temperature,lapse rate}");
-    }
-
-    this->air.set_ground(std::stod(data[0]),std::stod(data[1]),std::stod(data[2]),std::stod(data[3]));
-
-    data = util::split(lines[3]);
-    if(data.size() < 2) {
-        throw std::runtime_error("Not enough launch information: " + std::to_string(data.size()) + " < 2. Reminder: {heading,angle, (optional) wind_file}");
-    }
-
-    this->set_launch(std::stod(data[0]),std::stod(data[1]));
-
-    if(data.size() == 3 && data[2].compare("skip") != 0) {
-        try {
-            this->air.wind.load(data[2]);
-        } catch(...) {}
-    }
-
-    data = util::split(lines[4]);
-    if(data.size() < 8) {
-        throw std::runtime_error("Not enough aerodynamic coefficients: " + std::to_string(data.size()) + " < 7. Reminder: {CD0,CL_a,CM_a,CM_a_dot,K,area,length,stall}");
-    }
-
-    double coef[8];
-    for(int i = 0; i < 8; i++) {
-        coef[i] = std::stod(data[i]);
-    }
-
-    this->aero.set_coef(coef);
-
-    data = util::split(lines[5]);
-    if(data.size() < 2) {
-        throw std::runtime_error("Need to Set Thruster Points");
-    }
-
-    unsigned int nPoints = std::stoi(data[1]);
-
-    for(unsigned int i = 0; i < nPoints; i++) {
-        data = util::split(lines[6+i]);
-        if(data.size() < 3) {
-            throw std::runtime_error("Not enough thruster data in row");
-        }
-        this->thruster.add_thrust_point(std::stod(data[0]),std::stod(data[1]),std::stod(data[2]));
-    }
-
-    if(lines.size() == 6 + nPoints){
-        return;
-    }
-
-    if(lines.size() < 9 + nPoints){
-        throw std::runtime_error("Not enough Fin Info");
-    }
-
-    data = util::split(lines[6 + nPoints]);
-    if(data.size() < 6) {
-        throw std::runtime_error("Not enough Fin Info: " + std::to_string(data.size()) + " < 6. Reminder: {NFINS,dSCL,dSCM,dSCD,COP_z,COP_radial}");
-    }
-
-    int NFINS = std::stoi(data[0]);
-    if(NFINS == 3) {
-        this->control = std::make_unique<SingleStageControl_3>(*this);
-    } else if (NFINS == 4) {
-        this->control = std::make_unique<SingleStageControl_4>(*this);
-    } else {
-        throw std::runtime_error("Currently only 3 or 4 fins are supported");
-    }
-
-    this->control->set_aero_coef(std::stod(data[1]),std::stod(data[2]),std::stod(data[3]),std::stod(data[4]),std::stod(data[5]));
-
-    data = util::split(lines[7 + nPoints]);
-    if(data.size() < 5) {
-        throw std::runtime_error("Not enough Fin Info: " + std::to_string(data.size()) + " < 5. Reminder: {K1,K2,C2,slew,limit}");
-    }
-
-    this->control->set_controller_terms(std::stod(data[0]),std::stod(data[1]),std::stod(data[2]));
-    this->control->set_system_limits(std::stod(data[3]),std::stod(data[4]));
-
-    data = util::split(lines[8 + nPoints]);
-    if(data.size() == 6) {
-        this->control->set_chute(std::stod(data[0]),std::stod(data[1]),std::stod(data[2]),std::stod(data[3]),std::stod(data[4]),std::stod(data[5]));
-    } else {
-        std::cout << "no chute modeled.\n";
-    }
-}
-
-void SingleStageRocket::init() {
-    if(this->launch_angle == 0) {
+void SingleStageRocket::init(double launch_angle, double launch_heading) {
+    if(launch_angle == 0) {
         this->CS.identity();
     } else {
-        double cphi = cos(this->launch_heading);
-        double sphi = sin(this->launch_heading);
-        double ctheta = cos(this->launch_angle);
+        double cphi = cos(launch_heading);
+        double sphi = sin(launch_heading);
+        double ctheta = cos(launch_angle);
         double stheta = sqrt(1 - ctheta*ctheta);
         this->CS.axis.x.x(cphi);
         this->CS.axis.x.y(-sphi);
@@ -171,15 +37,15 @@ void SingleStageRocket::init() {
 
 void SingleStageRocket::compute_acceleration(double time) {
 
-    this->grav = this->air.compute_vals(this->position[2],this->velocity, time);
+    this->altitude_table.set(this->position[2], time);
 
-    this->aero.update();
+    this->aerodynamics.update();
 
-    this->acceleration = this->aero.force;
-    this->angular_acceleration = this->aero.moment;
+    this->acceleration = this->aerodynamics.force;
+    this->angular_acceleration = this->aerodynamics.moment;
 
     if(this->mass > this->mass_empty) {
-        this->thruster.set(this->air.get_static_pressure());
+        this->thruster.set(this->altitude_table.values->pressure);
         this->acceleration += this->CS.axis.z * this->thruster.thrust;
     }
 
@@ -191,7 +57,7 @@ void SingleStageRocket::compute_acceleration(double time) {
     }
 
     this->acceleration *= (1.0/this->mass);
-    this->acceleration.data[2] -= this->grav;
+    this->acceleration.data[2] -= this->altitude_table.values->gravity;
 
     Axis I_inertial = this->CS.get_transpose(); // might have to transpose CS
     int i = 0;
@@ -205,11 +71,6 @@ void SingleStageRocket::compute_acceleration(double time) {
     //Vector rhs = this->angular_acceleration - this->angular_velocity.cross(Iw);
     // this->angular_acceleration = I_inertial.get_inverse() * rhs;
     this->angular_acceleration = I_inertial.get_inverse() * this->angular_acceleration;
-}
-
-void SingleStageRocket::set_launch(double launch_heading, double launch_angle) {
-    this->launch_heading = launch_heading;
-    this->launch_angle = launch_angle;
 }
 
 void SingleStageRocket::set_mass(double empty_mass, double full_mass, double I_empty[3], double I_full[3]) {
@@ -239,8 +100,6 @@ void SingleStageRocket::launch(double dt) {
     double time = 0;
     double time_record = 0;
     double dt_half = dt*0.5;
-
-    this->init();
 
     bool burnout = false;
 

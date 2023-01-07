@@ -1,12 +1,37 @@
 #pragma once
 
+#include "Atmosphere.h"
+
 #include "../../common/include/Cartesian.h"
 
 using namespace Cartesian;
 
 class SingleStageRocket;
 
-struct SingleStageAerodynamics {
+struct AeroValues {
+    /**
+    * current air speed (m/s)
+    */
+    double airspeed;
+
+    /**
+    * current velocity with respect unit vector
+    */
+    Vector unit_v_air;
+
+    /**
+    * current mach
+    */
+    double mach;
+
+    /**
+    * current compressible dynamic pressure (Pa)
+    */
+    double dynamic_pressure;
+};
+
+
+class SingleStageAerodynamics {
 
     double CD0;
 
@@ -30,11 +55,17 @@ struct SingleStageAerodynamics {
 
     double CM_max;
 
+    SingleStageRocket& rocket;
+
+    void compute_aero_values();
+
+public:
+
+    AeroValues aero_values;
+
     Vector force;
 
     Vector moment;
-
-    SingleStageRocket& rocket;
 
     SingleStageAerodynamics(SingleStageRocket& r);
 

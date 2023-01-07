@@ -87,8 +87,8 @@ void SingleStageControl::update_force() {
         this->dForce.data[1] += fin.lift.data[1]*tmp;
         this->dForce.data[2] -= this->dCDdTheta*fin.deflection; // simply linear approximation for small angles
     }
-    this->dMoment *= this->sensors.get_measured_dynamic_pressure();
-    this->dForce *= this->sensors.get_measured_dynamic_pressure();
+    this->dMoment *= this->rocket.aerodynamics.aero_values.dynamic_pressure;
+    this->dForce *= this->rocket.aerodynamics.aero_values.dynamic_pressure;
     // remember currently in body frame
     this->dMoment = rocket.CS.transpose_mult(this->dMoment);
     this->dForce = rocket.CS.transpose_mult(this->dForce);
@@ -121,7 +121,7 @@ void SingleStageControl::chute_dynamics(double time) {
 
     // chute is more complicated than this, but for now assume just a drag force
 
-    this->dForce = this->rocket.air.get_air_velocity_unit_vector() * (CDA*this->rocket.air.get_dynamic_pressure());
+    this->dForce = this->rocket.aerodynamics.aero_values.unit_v_air * (CDA*this->rocket.aerodynamics.aero_values.dynamic_pressure);
     // assume arm is nose
     Vector::cross((rocket.CS.axis.z*-rocket.COG),this->dForce,this->dMoment);
 }

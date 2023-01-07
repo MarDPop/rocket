@@ -9,7 +9,7 @@
 #include "SingleStageAerodynamics.h"
 #include "SingleStageControl.h"
 #include "SingleStageThruster.h"
-#include "Air.h"
+#include "Atmosphere.h"
 
 using namespace Cartesian;
 
@@ -36,17 +36,8 @@ class SingleStageRocket {
     double dIdm[3];
 
     /**
-    * Heading to which the rocket z axis is pointed (rad)
+    *
     */
-    double launch_heading;
-
-    /**
-    * The angle away from UP that the z axis of the rocket is tilted (rad)
-    */
-    double launch_angle = 0;
-
-    void init();
-
     void compute_acceleration(double time);
 
 public:
@@ -120,21 +111,22 @@ public:
 
     Recording record;
 
-    Air air;
+    AltitudeTable altitude_table;
 
-    SingleStageAerodynamics aero;
+    SingleStageAerodynamics aerodynamics;
 
     SingleStageThruster thruster;
 
     std::unique_ptr<SingleStageControl> control;
 
-    SingleStageRocket(const std::string& fn);
-
-    void set_launch(double launch_heading, double launch_angle);
+    SingleStageRocket();
+    ~SingleStageRocket();
 
     void set_mass(double empty_mass, double full_mass, double I_empty[3], double I_full[3]);
 
     void get_inertia();
+
+    void init(double launch_angle, double launch_heading);
 
     void launch(double dt);
 

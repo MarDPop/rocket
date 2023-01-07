@@ -29,11 +29,11 @@ void Sensors::get_measured_quantities(const SingleStageRocket& rocket) {
         this->acceleration_computed.data[i] += this->accelerometer_variance(this->generator);
     }
 
-    this->dynamic_pressure_measured = rocket.air.get_dynamic_pressure() + this->barometer_variance(this->generator);
+    this->dynamic_pressure_measured = rocket.aerodynamics.aero_values.dynamic_pressure + this->barometer_variance(this->generator);
 
-    this->static_pressure_measured = rocket.air.get_static_pressure() + this->barometer_variance(this->generator);
+    this->static_pressure_measured = rocket.altitude_table.values->pressure + this->barometer_variance(this->generator);
 
-    this->temperature_measured = rocket.air.get_temperature() + this->thermometer_variance(this->generator);
+    this->temperature_measured = rocket.altitude_table.values->temperature + this->thermometer_variance(this->generator);
 }
 
 void Sensors::kalman_filter(const SingleStageRocket& rocket, double dt) {
@@ -48,6 +48,7 @@ void Sensors::my_filter(const SingleStageRocket& rocket, double dt) {
     tmp = pow(tmp, 2/7);
 
     double measured_mach = sqrt(5*(tmp - 1.0));
+
 
 }
 
