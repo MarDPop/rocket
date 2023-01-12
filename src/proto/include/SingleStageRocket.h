@@ -7,7 +7,7 @@
 #include "../../common/include/Cartesian.h"
 
 #include "SingleStageAerodynamics.h"
-#include "SingleStageControl.h"
+#include "Control.h"
 #include "SingleStageThruster.h"
 #include "Atmosphere.h"
 

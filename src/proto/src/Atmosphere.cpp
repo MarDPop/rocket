@@ -35,7 +35,7 @@ void AltitudeTable::compute_atmosphere(double maxAlt, double dH, double g0, doub
         AltitudeValues vals;
         vals.pressure = pressure;
         vals.temperature = this->ground_temperature + h*lapse_rate;
-        vals.density = pressure/(R_GAS*vals.temperature);
+        vals.density = pressure/(R_AIR*vals.temperature);
         vals.inv_sound_speed = 1.0/sqrt(AIR_CONST*vals.temperature);
         vals.dynamic_viscosity = 1.458e-6*vals.temperature*sqrt(vals.temperature)/(vals.temperature + 110.4); // sutherland's https://www.cfd-online.com/Wiki/Sutherland%27s_law
 

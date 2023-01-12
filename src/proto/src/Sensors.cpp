@@ -6,6 +6,31 @@
 
 #include <cmath>
 
+void computed_quatities::set(const measured_quantities& measured, const altitude_cal& cal) {
+    double tmp = measured.total_pressure / measured.static_pressure;
+    if(tmp < 1.0) {
+        tmp = 1.0;
+    }
+    tmp = pow(tmp, 2/7);
+
+    this->mach = sqrt(5*(tmp - 1.0));
+
+    double pressure_ratio = measured.static_pressure / cal.pressure;
+
+    double lapse_rate_measured = measured.temperature - cal.temperature;
+
+    double height;
+    if(fabs(lapse_rate_measured) < 1e-6) {
+        height = log(pressure_ratio) * cal.temperature * cal.exp_const;
+    } else {
+        double inv_exp = lapse_rate_measured * cal.exp_const;
+        double rhs = pow(pressure_ratio, inv_exp);
+        height = (rhs - 1.0) * cal.temperature / lapse_rate_measured;
+    }
+
+    this->altitude = cal.altitude + height;
+}
+
 Sensors::Sensors() : generator(std::random_device{}()) {
     this->set_sensor_variances(0.5,0.1,0.01,0.0001);
 }
@@ -20,47 +45,24 @@ void Sensors::set_sensor_variances(double sigma_pressure, double sigma_temperatu
 }
 
 void Sensors::get_measured_quantities(const SingleStageRocket& rocket) {
-
-    this->angular_velocity_computed = rocket.angular_velocity;
-    this->acceleration_computed = rocket.acceleration;
+    // add delay
+    this->measured.angular_velocity = rocket.angular_velocity;
+    this->measured.acceleration = rocket.acceleration;
 
     for(int i = 0; i < 3; i++) {
-        this->angular_velocity_computed.data[i] += this->gyro_variance(this->generator);
-        this->acceleration_computed.data[i] += this->accelerometer_variance(this->generator);
+        this->measured.angular_velocity.data[i] += this->gyro_variance(this->generator);
+        this->measured.acceleration.data[i] += this->accelerometer_variance(this->generator);
     }
 
-    this->dynamic_pressure_measured = rocket.aerodynamics.aero_values.dynamic_pressure + this->barometer_variance(this->generator);
-
-    this->static_pressure_measured = rocket.altitude_table.values->pressure + this->barometer_variance(this->generator);
-
-    this->temperature_measured = rocket.altitude_table.values->temperature + this->thermometer_variance(this->generator);
+    this->measured.total_pressure = rocket.altitude_table.values->pressure + rocket.aerodynamics.aero_values.dynamic_pressure + this->barometer_variance(this->generator);
+    this->measured.static_pressure = rocket.altitude_table.values->pressure + this->barometer_variance(this->generator);
+    this->measured.temperature = rocket.altitude_table.values->temperature + this->thermometer_variance(this->generator);
 }
 
-void Sensors::kalman_filter(const SingleStageRocket& rocket, double dt) {
-    auto F = Eigen::MatrixXd::Zero(6,6);
-}
-
-void Sensors::my_filter(const SingleStageRocket& rocket, double dt) {
-    double tmp = this->dynamic_pressure_measured / this->static_pressure_measured + 1.0;
-    if(tmp < 1.0) {
-        tmp = 1.0;
-    }
-    tmp = pow(tmp, 2/7);
-
-    double measured_mach = sqrt(5*(tmp - 1.0));
-
-
-}
-
-void Sensors::EKF(const SingleStageRocket& rocket, double dt) {
-}
-
-void Sensors::compute_quantities(const SingleStageRocket& rocket, double time) {
+void Sensors::update(const SingleStageRocket& rocket, double time) {
     this->get_measured_quantities(rocket);
 
-    double dt = time - this->time_old;
+    this->computed.set(this->measured,this->cal);
 
-    this->my_filter(rocket,dt);
-
-    this->time_old = time;
+    this->filter.update(this,time);
 }

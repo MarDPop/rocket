@@ -59,7 +59,9 @@ class AltitudeTable {
 
 public:
 
-    static constexpr double R_GAS = 287.052874;
+    static constexpr double R_GAS = 8.31446261815324;
+
+    static constexpr double R_AIR = 287.052874;
 
     static constexpr double AIR_CONST = 287.052874*1.4;
 
