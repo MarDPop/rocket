@@ -7,17 +7,13 @@
 #include <cmath>
 
 void computed_quatities::set(const measured_quantities& measured, const altitude_cal& cal) {
-    double tmp = measured.total_pressure / measured.static_pressure;
-    if(tmp < 1.0) {
-        tmp = 1.0;
-    }
-    tmp = pow(tmp, 2/7);
+    double pressure_ratio = measured.total_pressure > measured.static_pressure ? measured.total_pressure/measured.static_pressure : 1.0;
 
-    this->mach_squared = 5*(tmp - 1.0);
+    this->mach_squared = 5*(pow(pressure_ratio, 2/7) - 1.0);
 
-    this->airspeed = sqrt(this->mach/(AltitudeTable::AIR_CONST*measured.temperature))
+    this->airspeed = sqrt(this->mach_squared/(AltitudeTable::AIR_CONST*measured.temperature))
 
-    double pressure_ratio = measured.static_pressure / cal.pressure;
+    pressure_ratio = measured.static_pressure * cal.inverse_ref_pressure;
 
     double lapse_rate_measured = measured.temperature - cal.temperature;
 
@@ -58,6 +54,7 @@ void Sensors::get_measured_quantities(const SingleStageRocket& rocket) {
 
     this->measured.total_pressure = rocket.altitude_table.values->pressure + rocket.aerodynamics.aero_values.dynamic_pressure + this->barometer_variance(this->generator);
     this->measured.static_pressure = rocket.altitude_table.values->pressure + this->barometer_variance(this->generator);
+    this->measured.inverse_static_pressure = 1.0/this->measured.static_pressure;
     this->measured.temperature = rocket.altitude_table.values->temperature + this->thermometer_variance(this->generator);
 }
 

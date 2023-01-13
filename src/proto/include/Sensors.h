@@ -14,6 +14,7 @@ struct altitude_cal {
     double g;
     double temperature;
     double pressure;
+    double inverse_ref_pressure;
     double exp_const;
     double accelerometer_cog_distance;
 };
@@ -73,6 +74,7 @@ public:
     inline void calibrate(const altitude_cal& cal) {
         this->cal = cal;
         this->cal.exp_const = -AltitudeTable::R_AIR / cal.g;
+        this->cal.inverse_ref_pressure = 1.0/cal.pressure;
     }
 
     void set_sensor_variances(double sigma_pressure, double sigma_temperature, double sigma_accelerometer, double sigma_gyro);
