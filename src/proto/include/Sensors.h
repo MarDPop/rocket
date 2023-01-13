@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Atmosphere.h"
+
 #include <random>
 #include <memory>
 
@@ -25,58 +27,10 @@ struct measured_quantities {
 };
 
 struct computed_quatities {
-    double mach;
+    double mach_squared;
     double altitude;
+    double airspeed;
     void set(const measured_quantities& measured, const altitude_cal& cal);
-};
-
-struct rocket_state {
-    Vector position;
-    Vector velocity;
-    Vector acceleration;
-    Vector angular_velocity;
-    Quaternion orientation;
-};
-
-class Sensors;
-
-class Filter {
-
-    double t_old;
-
-    rocket_state state;
-
-public:
-
-    virtual void update(const Sensors& sensors, double t);
-
-    inline const Vector& get_computed_angular_rate() {
-        return this->state.angular_velocity;
-    }
-
-    inline const Vector& get_computed_position() {
-        return this->state.position;
-    }
-
-    inline const Vector& get_computed_velocity() {
-        return this->state.velocity;
-    }
-
-    inline const Vector& get_computed_acceleration() {
-        return this->state.acceleration;
-    }
-
-    inline const Axis& get_computed_CS() {
-        return this->state.orientation.to_rotation_matrix();
-    }
-};
-
-class FilterMarius : public virtual Filter {
-
-public:
-
-    void update(const Sensors& sensors, double t) override;
-
 };
 
 class SingleStageRocket;
@@ -101,9 +55,9 @@ class Sensors {
 
     double delay = 0.0;
 
-public:
+    void get_measured_quantities(const SingleStageRocket& rocket);
 
-    std::unique_ptr<Filter> filter;
+public:
 
     Sensors();
     ~Sensors();

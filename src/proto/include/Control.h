@@ -1,7 +1,10 @@
 #pragma once
 
-#include <vector>
 #include "../include/Sensors.h"
+#include "../include/Filter.h"
+
+#include <memory>
+#include <array>
 
 #include "../../common/include/Cartesian.h"
 
@@ -29,7 +32,7 @@ struct Chute {
 class SingleStageControl {
 
 protected:
-    std::vector<Fin> fins;
+    std::array<Fin, 4> fins;
 
     Chute chute;
 
@@ -71,11 +74,13 @@ public:
 
     const unsigned NFINS;
 
+    std::unique_ptr<Filter> filter;
+
     Vector dForce;
 
     Vector dMoment;
 
-    SingleStageControl(SingleStageRocket& r, unsigned int N);
+    SingleStageControl(SingleStageRocket& r, unsigned N);
 
     void set_system_limits(double slew_limit, double angle_limit);
 

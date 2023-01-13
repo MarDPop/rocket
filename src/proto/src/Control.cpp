@@ -2,16 +2,17 @@
 
 #include "../include/SingleStageRocket.h"
 
-SingleStageControl::SingleStageControl(SingleStageRocket& r, unsigned int N) : fins(N), rocket(r), NFINS(N) {
 
-    for(unsigned int i = 0; i < NFINS;i++){
+SingleStageControl::SingleStageControl(SingleStageRocket& r, unsigned N) : rocket(r), NFINS(N) {
+
+    for(unsigned i = 0; i < NFINS;i++){
         this->fins[i].span.zero();
         this->fins[i].deflection = 0;
     }
 
     this->fins[0].span.x(1);
     double dtheta = 6.283185307179586476925286766559/NFINS;
-    for(unsigned int i = 1; i < NFINS; i++){
+    for(unsigned i = 1; i < NFINS; i++){
         this->fins[i].span.data[0] = cos(i*dtheta);
         this->fins[i].span.data[1] = sin(i*dtheta);
     }
@@ -19,16 +20,19 @@ SingleStageControl::SingleStageControl(SingleStageRocket& r, unsigned int N) : f
     this->chute_deployed = false;
 }
 
+
 void SingleStageControl::set_system_limits(double slew_limit, double angle_limit){
     this->max_theta = angle_limit;
     this->slew_rate = slew_limit;
 }
+
 
 void SingleStageControl::set_controller_terms(double P_angle, double P_velocity, double C_velocity ){
     this->K1 = P_angle;
     this->K2 = P_velocity;
     this->C2 = C_velocity;
 }
+
 
 void SingleStageControl::set_aero_coef(double dCL, double dCD, double dCM, double fin_COP_z, double fin_COP_d){
     this->dCLdTheta = dCL; // remember that these already have fin area "built in"
@@ -40,6 +44,7 @@ void SingleStageControl::set_aero_coef(double dCL, double dCD, double dCM, doubl
     this->const_planer_term = dCM - (z - rocket.COG)*dCL; // remember z should be negative distance from nose
 }
 
+
 void SingleStageControl::set_chute(double area_drogue, double area_deployed, double CD_drogue, double CD_deployed, double chord_length, double deployment_time) {
     this->chute.area_drogue = area_drogue;
     this->chute.area_deployed = area_deployed;
@@ -49,13 +54,16 @@ void SingleStageControl::set_chute(double area_drogue, double area_deployed, dou
     this->chute.deployment_time = deployment_time;
 }
 
+
 void SingleStageControl::reset() {
     this->chute_deployed = false;
 }
 
+
 void SingleStageControl::deflect_fins(double time) {
     double max_angle = this->slew_rate*(time - this->time_old);
-    for(auto& fin : this->fins) {
+    for(unsigned i = 0; i < NFINS;i++) {
+        auto& fin = this->fins[i];
         double delta = fin.commanded_deflection - fin.deflection;
         if(fabs(delta) > max_angle) {
             fin.deflection += std::copysign(max_angle,delta);
@@ -67,6 +75,7 @@ void SingleStageControl::deflect_fins(double time) {
     }
 }
 
+
 void SingleStageControl::update_force() {
     this->dMoment.zero();
     this->dForce.zero();
@@ -74,7 +83,8 @@ void SingleStageControl::update_force() {
     double axial_term = this->dCLdTheta*this->d;
     double planar_term = this->dCMdTheta - (this->z - rocket.COG)*this->dCLdTheta;
 
-    for(auto& fin : this->fins) {
+    for(unsigned i = 0; i < NFINS;i++) {
+        auto& fin = this->fins[i];
         double tmp = planar_term*fin.deflection;
 
         this->dMoment.data[0] += fin.span.data[0]*tmp;
@@ -98,15 +108,16 @@ void SingleStageControl::update_force() {
 void SingleStageControl::update_commands() {
     // essentially straight up
     //if( fabs(this->CS_measured.axis.z.z()) > 0.99999)
-    const auto& CS = this->sensors.filter->get_computed_CS();
+    const auto& CS = this->filter->get_computed_CS();
     Vector arm_inertial(-CS.axis.z.y(),CS.axis.z.x(),0); // rocket.z cross z to get correct sign
     Vector commanded_angular_rate = arm_inertial*this->K1;
-    Vector angular_err = commanded_angular_rate - this->sensors.filter->get_computed_angular_rate();
-    Vector commanded_torque = angular_err*this->K2 - this->sensors.filter->get_computed_angular_rate()*this->C2;
+    Vector angular_err = commanded_angular_rate - this->filter->get_computed_angular_rate();
+    Vector commanded_torque = angular_err*this->K2 - this->filter->get_computed_angular_rate()*this->C2;
     commanded_torque = CS * commanded_torque;
 
     this->command_fins(commanded_torque);
 }
+
 
 void SingleStageControl::chute_dynamics(double time) {
     this->chute.frac_deployed = (time - this->chute_deployment_time)/this->chute.deployment_time;
@@ -126,9 +137,12 @@ void SingleStageControl::chute_dynamics(double time) {
     Vector::cross((rocket.CS.axis.z*-rocket.COG),this->dForce,this->dMoment);
 }
 
+
 void SingleStageControl::update(double time) {
 
-    this->sensors.compute_quantities(this->rocket, time);
+    this->sensors.update(this->rocket, time);
+
+    this->filter->update(this->sensors, time);
 
     if(this->chute_deployed) {
         this->chute_dynamics(time);
@@ -139,7 +153,7 @@ void SingleStageControl::update(double time) {
         return;
     }
 
-    double ascent_rate = this->sensors.filter->get_computed_velocity()[2];
+    double ascent_rate = this->filter->get_computed_velocity()[2];
 
     if(ascent_rate < -0.5) {
         this->chute_deployed = true;
@@ -165,7 +179,7 @@ SingleStageControl_3::SingleStageControl_3(SingleStageRocket& r) : SingleStageCo
 void SingleStageControl_3::set_aero_coef(double dCL, double dCD, double dCM, double fin_z, double fin_COP_d) {
     SingleStageControl::set_aero_coef(dCL, dCD, dCM, fin_z, fin_COP_d);
     Axis A;
-    for(int i = 0; i < 3;i++){
+    for(unsigned i = 0; i < 3; i++){
         A.data[i] = this->const_planer_term*this->fins[i].span.x();
         A.data[i+3] = this->const_planer_term*this->fins[i].span.y();
         A.data[i+6] = this->const_axial_term;
@@ -188,7 +202,7 @@ SingleStageControl_4::SingleStageControl_4(SingleStageRocket& r) : SingleStageCo
 void SingleStageControl_4::command_fins(const Vector& commanded_torque) {
 
     std::array<double,4> beta;
-    for(unsigned int i = 0; i < NFINS;i++) {
+    for(unsigned i = 0; i < 4; i++) {
         beta[i] = 1 + this->fins[i].span.x() + this->fins[i].span.y();
     }
     auto num = (commanded_torque.x() + commanded_torque.y())/this->const_planer_term + commanded_torque.z()/this->const_axial_term;
