@@ -47,7 +47,7 @@ public:
 
 class FilterMarius : public virtual Filter {
 
-    std::array<double,5>
+    std::array<Vector,5> last_accel_measurements;
 
 public:
 

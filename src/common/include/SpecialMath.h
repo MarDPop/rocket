@@ -75,7 +75,7 @@ void quadratic_fit_precalced(const std::vector<double>& x, const Quadratic_fit_p
 }
 
 void quadratic_fit_precalced(const std::vector<double>& x, const Quadratic_fit_precalc& precalc,
-                   const double* y, unsigned skip, double* coef) {
+                   const double* y, double* coef, const unsigned skip = 3) {
 
     const unsigned nX = x.size();
     double y_avg = y[0];
@@ -100,7 +100,7 @@ void quadratic_fit_precalced(const std::vector<double>& x, const Quadratic_fit_p
 
 }
 
-Axis quadratic_fit(const std::vector<Vector>& time, const std::vector<Vector>& data)
+Axis quadratic_fit(const Vector* time, const Vector* data)
 {
     Axis coef;
 
@@ -110,7 +110,7 @@ Axis quadratic_fit(const std::vector<Vector>& time, const std::vector<Vector>& d
     double* coef_ptr = Axis.data;
     for(unsigned i = 0; i < 3; i++)
     {
-        quadratic_fit_precalced(time,precalc,data_ptr,3,coef_ptr);
+        quadratic_fit_precalced(time,precalc,data_ptr,coef_ptr);
         data_ptr++;
         coef_ptr += 3;
     }
