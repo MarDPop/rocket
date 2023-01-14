@@ -104,8 +104,16 @@ Axis quadratic_fit(const std::vector<Vector>& time, const std::vector<Vector>& d
 {
     Axis coef;
 
-    Quadratic_fit_precalc(time);
+    Quadratic_fit_precalc precalc(time);
 
+    double* data_ptr = data[0].data;
+    double* coef_ptr = Axis.data;
+    for(unsigned i = 0; i < 3; i++)
+    {
+        quadratic_fit_precalced(time,precalc,data_ptr,3,coef_ptr);
+        data_ptr++;
+        coef_ptr += 3;
+    }
 
     return coef;
 }

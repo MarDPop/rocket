@@ -124,11 +124,11 @@ namespace Cartesian {
             memset(data,0,sizeof(data));
         }
 
-        inline double& operator[](unsigned int idx){
+        inline double& operator[](uint_fast8_t idx){
             return data[idx];
         }
 
-        inline const double operator[](unsigned int idx) const {
+        inline double operator[](uint_fast8_t idx) const {
             return data[idx];
         }
 
@@ -286,7 +286,10 @@ namespace Cartesian {
             return Axis(IDENTITY);
         }
 
-        inline Vector& operator[unsigned ]
+        inline Vector& operator[](uint_fast8_t idx)
+        {
+            return row[idx];
+        }
 
         inline void operator=(const Axis& b) {
             memcpy(this->data,b.data,sizeof(this->data));
