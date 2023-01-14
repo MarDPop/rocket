@@ -47,6 +47,8 @@ public:
 
 class FilterMarius : public virtual Filter {
 
+    std::array<double,5>
+
 public:
 
     void update(const Sensors& sensors, double t) override;

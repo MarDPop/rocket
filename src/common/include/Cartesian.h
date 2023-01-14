@@ -251,6 +251,7 @@ namespace Cartesian {
 
         union {
             double data[9];
+            Vector row[3];
             struct {
                 Vector x;
                 Vector y;
@@ -284,6 +285,8 @@ namespace Cartesian {
         static inline Axis eye() {
             return Axis(IDENTITY);
         }
+
+        inline Vector& operator[unsigned ]
 
         inline void operator=(const Axis& b) {
             memcpy(this->data,b.data,sizeof(this->data));
