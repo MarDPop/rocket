@@ -3,32 +3,38 @@
 #include <cmath>
 #include <algorithm>
 #include "string.h"
+#include <stdint.h>
 
 namespace Cartesian {
 
-    inline void add(const double* u, const double* v, double* w) {
+    inline void add(const double* u, const double* v, double* w)
+    {
         w[0] = u[0] + v[0];
         w[1] = u[1] + v[1];
         w[2] = u[2] + v[2];
     }
 
-    inline void sub(const double* u, const double* v, double* w) {
+    inline void sub(const double* u, const double* v, double* w)
+    {
         w[0] = u[0] - v[0];
         w[1] = u[1] - v[1];
         w[2] = u[2] - v[2];
     }
 
-    inline void cross(const double* u, const double* v, double* w) {
+    inline void cross(const double* u, const double* v, double* w)
+    {
         w[0] = u[1]*v[2] - u[2]*v[1];
         w[1] = u[2]*v[0] - u[0]*v[2];
         w[2] = u[0]*v[1] - u[1]*v[0];
     }
 
-    inline double dot(const double* u, const double* v) {
+    inline double dot(const double* u, const double* v)
+    {
         return u[0]*v[0]+u[1]*v[1]+u[2]*v[2];
     }
 
-    inline void rotation_between(const double* u, const double* v, double* q) {
+    inline void rotation_between(const double* u, const double* v, double* q)
+    {
         //https://stackoverflow.com/questions/1171849/finding-quaternion-representing-the-rotation-from-one-vector-to-another
         q[1] = u[1]*v[2] - u[2]*v[1];
         q[2] = u[2]*v[0] - u[0]*v[2];
@@ -42,7 +48,8 @@ namespace Cartesian {
         q[3] *= recipNorm;
     }
 
-    inline void q2rotm(const double* q, double* rotm) {
+    inline void q2rotm(const double* q, double* rotm)
+    {
         double qi2 = q[1]*2;
         double qj2 = q[2]*2;
         double qk2 = q[3]*2;
@@ -58,7 +65,8 @@ namespace Cartesian {
     }
 
 
-    inline void rotm2q( const double* rotm, double* q ) {
+    inline void rotm2q( const double* rotm, double* q )
+    {
         double s = rotm[0] + rotm[4] + rotm[8];
         if( s > 0 ) {
             s = 0.5 / sqrt(s + 1.0);
@@ -89,112 +97,144 @@ namespace Cartesian {
         }
     }
 
-    struct Vector {
+    struct Vector
+    {
 
-        double data[3];
+        union
+        {
+            double data[3];
+            struct
+            {
+                double x;
+                double y;
+                double z;
+            };
+        };
 
         inline Vector() {}
 
         inline ~Vector(){}
 
-        inline Vector(const char x) {
+        inline Vector(const char x)
+        {
             memset(data,x,sizeof(data));
         }
 
-        inline Vector(const Vector& b) {
+        inline Vector(const Vector& b)
+        {
             memcpy(data,b.data,sizeof(data));
         }
 
-        inline Vector(const double* b) {
+        inline Vector(const double* b)
+        {
             memcpy(data,b,sizeof(data));
         }
 
         inline Vector(double x, double y ,double z) : data{x,y,z} {
         }
 
-        inline void operator=(const double* b) {
+        inline void operator=(const double* b)
+        {
             memcpy(this->data,b,sizeof(data));
         }
 
-        inline void operator=(const Vector& b) {
+        inline void operator=(const Vector& b)
+        {
             memcpy(this->data,b.data,sizeof(this->data));
         }
 
-        inline void zero() {
+        inline void zero()
+        {
             memset(data,0,sizeof(data));
         }
 
-        inline double& operator[](uint_fast8_t idx){
+        inline double& operator[](uint_fast8_t idx)
+        {
             return data[idx];
         }
 
-        inline double operator[](uint_fast8_t idx) const {
+        inline double operator[](uint_fast8_t idx) const
+        {
             return data[idx];
         }
 
-        inline Vector operator+(const Vector& b) const{
+        inline Vector operator+(const Vector& b) const
+        {
             return Vector(data[0] + b.data[0], data[1] + b.data[1],data[2] + b.data[2]);
         }
 
-        inline Vector operator-(const Vector& b) const{
+        inline Vector operator-(const Vector& b) const
+        {
             return Vector(data[0] - b.data[0], data[1] - b.data[1],data[2] - b.data[2]);
         }
 
-        inline Vector operator+(double b) const {
+        inline Vector operator+(double b) const
+        {
             return Vector(data[0] + b, data[1] + b,data[2] + b);
         }
 
-        inline Vector operator-(double b) const {
+        inline Vector operator-(double b) const
+        {
             return Vector(data[0] - b, data[1] - b,data[2] - b);
         }
 
-        inline Vector operator*(double b) const {
+        inline Vector operator*(double b) const
+        {
             return Vector(data[0]*b, data[1]*b,data[2]*b);
         }
 
-        inline Vector operator/(double b) const {
+        inline Vector operator/(double b) const
+        {
             return Vector(data[0]/b, data[1]/b,data[2]/b);
         }
 
-        inline void operator+=(const Vector& a) {
+        inline void operator+=(const Vector& a)
+        {
             this->data[0] += a.data[0];
             this->data[1] += a.data[1];
             this->data[2] += a.data[2];
         }
 
-        inline void operator-=(const Vector& a) {
+        inline void operator-=(const Vector& a)
+        {
             this->data[0] -= a.data[0];
             this->data[1] -= a.data[1];
             this->data[2] -= a.data[2];
         }
 
-        inline void operator+=(double a) {
+        inline void operator+=(double a)
+        {
             this->data[0] += a;
             this->data[1] += a;
             this->data[2] += a;
         }
 
-        inline void operator-=(double a) {
+        inline void operator-=(double a)
+        {
             this->data[0] -= a;
             this->data[1] -= a;
             this->data[2] -= a;
         }
 
-        inline void operator*=(double a) {
+        inline void operator*=(double a)
+        {
             this->data[0] *= a;
             this->data[1] *= a;
             this->data[2] *= a;
         }
 
-        inline double operator*(const Vector& b) const {
+        inline double operator*(const Vector& b) const
+        {
             return this->data[0]*b.data[0] + this->data[1]*b.data[1] + this->data[2]*b.data[2];
         }
 
-        inline double dot(const Vector& b) const {
+        inline double dot(const Vector& b) const
+        {
             return this->data[0]*b.data[0] + this->data[1]*b.data[1] + this->data[2]*b.data[2];
         }
 
-        inline Vector cross(const Vector& b) const {
+        inline Vector cross(const Vector& b) const
+        {
             Vector out;
             out.data[0] = this->data[1]*b.data[2] - this->data[2]*b.data[1];
             out.data[1] = this->data[2]*b.data[0] - this->data[0]*b.data[2];
@@ -202,42 +242,21 @@ namespace Cartesian {
             return out;
         }
 
-        inline double norm() const {
+        inline double norm() const
+        {
             return sqrt(this->data[0]*this->data[0] + this->data[1]*this->data[1] + this->data[2]*this->data[2]);
         }
 
-        inline void normalize() {
+        inline void normalize()
+        {
             double n = 1/sqrt(this->data[0]*this->data[0] + this->data[1]*this->data[1] + this->data[2]*this->data[2]);
             this->data[0] *= n;
             this->data[1] *= n;
             this->data[2] *= n;
         }
 
-        inline double x() const {
-            return data[0];
-        }
-
-        inline void x(double v) {
-            data[0] = v;
-        }
-
-        inline double y() const {
-            return data[1];
-        }
-
-        inline void y(double v) {
-            data[1] = v;
-        }
-
-        inline double z() const {
-            return data[2];
-        }
-
-        inline void z(double v) {
-            data[2] = v;
-        }
-
-        static inline void cross(const Vector& a, const Vector& b, Vector& c) {
+        static inline void cross(const Vector& a, const Vector& b, Vector& c)
+        {
             c.data[0] = a.data[1]*b.data[2] - a.data[2]*b.data[1];
             c.data[1] = a.data[2]*b.data[0] - a.data[0]*b.data[2];
             c.data[2] = a.data[0]*b.data[1] - a.data[1]*b.data[0];
@@ -245,14 +264,17 @@ namespace Cartesian {
 
     };
 
-    struct Axis {
+    struct Axis
+    {
 
         static constexpr double IDENTITY[9] = {1,0,0,0,1,0,0,0,1};
 
-        union {
+        union
+        {
             double data[9];
             Vector row[3];
-            struct {
+            struct
+            {
                 Vector x;
                 Vector y;
                 Vector z;
@@ -262,27 +284,33 @@ namespace Cartesian {
         inline Axis() {}
         inline ~Axis(){}
 
-        inline Axis(const char x) {
+        inline Axis(const char x)
+        {
             memset(data,x,sizeof(data));
         }
 
-        inline Axis(const double b[9]) {
+        inline Axis(const double b[9])
+        {
             memcpy(this->data,b,sizeof(this->data));
         }
 
-        inline Axis(const Axis& b) {
+        inline Axis(const Axis& b)
+        {
             memcpy(this->data,b.data,sizeof(this->data));
         }
 
-        inline void zero() {
+        inline void zero()
+        {
             memset(this->data,0,sizeof(this->data));
         }
 
-        inline void identity() {
+        inline void identity()
+        {
             memcpy(this->data,IDENTITY,sizeof(this->data));
         }
 
-        static inline Axis eye() {
+        static inline Axis eye()
+        {
             return Axis(IDENTITY);
         }
 
@@ -291,11 +319,13 @@ namespace Cartesian {
             return row[idx];
         }
 
-        inline void operator=(const Axis& b) {
+        inline void operator=(const Axis& b)
+        {
             memcpy(this->data,b.data,sizeof(this->data));
         }
 
-        inline Axis operator+(const Axis& b) const noexcept {
+        inline Axis operator+(const Axis& b) const noexcept
+        {
             Axis a;
             for(int i = 0; i < 9; i++) {
                 a.data[i] = this->data[i] + b.data[i];
@@ -303,33 +333,41 @@ namespace Cartesian {
             return a;
         }
 
-        inline Axis operator-(const Axis& b) const noexcept {
+        inline Axis operator-(const Axis& b) const noexcept
+        {
             Axis a;
-            for(int i = 0; i < 9; i++) {
+            for(int i = 0; i < 9; i++)
+            {
                 a.data[i] = this->data[i] - b.data[i];
             }
             return a;
         }
 
-        inline void operator+=(const Axis& b) noexcept {
-            for(int i = 0; i < 9; i++) {
+        inline void operator+=(const Axis& b) noexcept
+        {
+            for(int i = 0; i < 9; i++)
+            {
                 this->data[i] += b.data[i];
             }
         }
 
-        inline void operator-=(const Axis& b) noexcept {
-            for(int i = 0; i < 9; i++) {
+        inline void operator-=(const Axis& b) noexcept
+        {
+            for(int i = 0; i < 9; i++)
+            {
                 this->data[i] -= b.data[i];
             }
         }
 
-        inline void operator*=(double b) noexcept {
+        inline void operator*=(double b) noexcept
+        {
             for(int i = 0; i < 9; i++) {
                 this->data[i] *= b;
             }
         }
 
-        inline Vector operator*(const Vector& a) const noexcept {
+        inline Vector operator*(const Vector& a) const noexcept
+        {
             Vector b;
             int irow = 0;
             for(int i = 0; i < 3; i++){
@@ -339,7 +377,8 @@ namespace Cartesian {
             return b;
         }
 
-        inline Axis operator*(const Axis& B) const noexcept {
+        inline Axis operator*(const Axis& B) const noexcept
+        {
             Axis C;
             C.data[0] = data[0]*B.data[0] + data[1]*B.data[3] + data[2]*B.data[6];
             C.data[1] = data[0]*B.data[1] + data[1]*B.data[4] + data[2]*B.data[7];
@@ -353,7 +392,8 @@ namespace Cartesian {
             return C;
         }
 
-        inline static void mult(const Axis& A, const Axis& B, Axis& C) noexcept {
+        inline static void mult(const Axis& A, const Axis& B, Axis& C) noexcept
+        {
             C.data[0] = A.data[0]*B.data[0] + A.data[1]*B.data[3] + A.data[2]*B.data[6];
             C.data[1] = A.data[0]*B.data[1] + A.data[1]*B.data[4] + A.data[2]*B.data[7];
             C.data[2] = A.data[0]*B.data[2] + A.data[1]*B.data[5] + A.data[2]*B.data[8];
@@ -365,7 +405,8 @@ namespace Cartesian {
             C.data[8] = A.data[6]*B.data[2] + A.data[7]*B.data[5] + A.data[8]*B.data[8];
         }
 
-        inline static void mult(const Axis& A, const Vector& b, Vector& x) noexcept {
+        inline static void mult(const Axis& A, const Vector& b, Vector& x) noexcept
+        {
             int irow = 0;
             for(int i = 0; i < 3; i++){
                 x.data[i] = A.data[irow]*b.data[0] + A.data[irow + 1]*b.data[1] + A.data[irow + 2]*b.data[2];
@@ -373,7 +414,8 @@ namespace Cartesian {
             }
         }
 
-        inline Axis get_transpose() const noexcept {
+        inline Axis get_transpose() const noexcept
+        {
             Axis t;
             t.data[0] = this->data[0];
             t.data[1] = this->data[3];
@@ -387,7 +429,8 @@ namespace Cartesian {
             return t;
         }
 
-        inline Vector transpose_mult(const Vector& v) const noexcept {
+        inline Vector transpose_mult(const Vector& v) const noexcept
+        {
             Vector b;
             b.data[0] = this->data[0]*v.data[0] + this->data[3]*v.data[1] + this->data[6]*v.data[2];
             b.data[1] = this->data[1]*v.data[0] + this->data[4]*v.data[1] + this->data[7]*v.data[2];
@@ -395,7 +438,8 @@ namespace Cartesian {
             return b;
         }
 
-        inline Axis transpose_mult(const Axis& B) const noexcept {
+        inline Axis transpose_mult(const Axis& B) const noexcept
+        {
             Axis C;
             C.data[0] = data[0]*B.data[0] + data[3]*B.data[3] + data[6]*B.data[6];
             C.data[1] = data[0]*B.data[1] + data[3]*B.data[4] + data[6]*B.data[7];
@@ -409,7 +453,8 @@ namespace Cartesian {
             return C;
         }
 
-        inline Axis get_inverse() const noexcept {
+        inline Axis get_inverse() const noexcept
+        {
             Axis Inv;
             Inv.data[0] = this->data[4]*this->data[8] - this->data[5]*this->data[7];
             Inv.data[1] = this->data[2]*this->data[7] - this->data[1]*this->data[8];
@@ -439,24 +484,29 @@ namespace Cartesian {
 
         Spherical() {}
 
-        Spherical(double r, double el, double az) : data{r,el,az} {
+        Spherical(double r, double el, double az) : data{r,el,az}
+        {
         }
 
-        Spherical(double b[3]) {
+        Spherical(double b[3])
+        {
             std::copy_n(b,3,this->data);
         }
 
-        Spherical(const Spherical& b) {
+        Spherical(const Spherical& b)
+        {
             std::copy_n(b.data,3,this->data);
         }
 
-        Spherical(const Vector& x) {
+        Spherical(const Vector& x)
+        {
             this->data[0] = x.norm();
             this->data[1] = asin(x[2]/this->data[0]);
             this->data[2] = atan2(x[1],x[0]);
         }
 
-        Vector to_cartesian() {
+        Vector to_cartesian()
+        {
             Vector out;
             out.data[2] = sin(this->data[1]);
             double r_t = sqrt(1.0 - out.data[2]*out.data[2])*this->data[0];
@@ -466,27 +516,33 @@ namespace Cartesian {
             return out;
         }
 
-        inline double r() const {
+        inline double r() const
+        {
             return data[0];
         }
 
-        inline void r(double v) {
+        inline void r(double v)
+        {
             data[0] = v;
         }
 
-        inline double el() const {
+        inline double el() const
+        {
             return data[1];
         }
 
-        inline void el(double v) {
+        inline void el(double v)
+        {
             data[1] = v;
         }
 
-        inline double az() const {
+        inline double az() const
+        {
             return data[2];
         }
 
-        inline void az(double v) {
+        inline void az(double v)
+        {
             data[2] = v;
         }
 
@@ -494,19 +550,31 @@ namespace Cartesian {
 
     struct Quaternion {
 
-        alignas(32) double data[4];
+
+        alignas(32) union
+        {
+            double data[4];
+            struct {
+                double scalar;
+                Vector vec;
+            } components;
+        };
 
         Quaternion() {}
+        ~Quaternion() {}
 
-        Quaternion(const double* v) {
+        Quaternion(const double* v)
+        {
             memcpy(data,v,sizeof(data));
         }
 
-        Quaternion(const Quaternion& v) {
+        Quaternion(const Quaternion& v)
+        {
             memcpy(data,v.data,sizeof(data));
         }
 
-        Quaternion(const Axis& a) {
+        Quaternion(const Axis& a)
+        {
             double m00 = a.data[0];
             double m11 = a.data[4];
             double m22 = a.data[8];
@@ -564,10 +632,12 @@ namespace Cartesian {
         }
         */
 
-        Quaternion(double a, double i, double j, double k) : data{a,i,j,k} {
+        inline Quaternion(double a, double i, double j, double k) : data{a,i,j,k}
+        {
         }
 
-        Quaternion conjugate() {
+        inline Quaternion conjugate()
+        {
             Quaternion q;
             q.data[0] = this->data[0];
             q.data[1] = -this->data[1];
@@ -576,19 +646,23 @@ namespace Cartesian {
             return q;
         }
 
-        inline Vector get_vector() {
-            return Vector(data + 1);
+        inline Vector& get_vector()
+        {
+            return components.vec;
         }
 
-        inline double get_scalar() {
-            return data[0];
+        inline double get_scalar()
+        {
+            return components.scalar;
         }
 
-        inline double mag() {
+        inline double mag()
+        {
             return data[0]*data[0] + data[1]*data[1] + data[2]*data[2] + data[3]*data[3];
         }
 
-        inline void normalize() {
+        inline void normalize()
+        {
             double n = 1.0/sqrt(this->mag());
             data[0] *= n;
             data[1] *= n;
@@ -596,7 +670,8 @@ namespace Cartesian {
             data[3] *= n;
         }
 
-        inline Axis to_rotation_matrix(){
+        inline Axis to_rotation_matrix() const
+        {
             Axis out;
             double i2 = 2*data[1];
             double j2 = 2*data[2];
@@ -622,19 +697,34 @@ namespace Cartesian {
             return out;
         }
 
-        inline double w() {
+        inline Quaternion get_time_derivative(const Vector& angular_rate)
+        {
+            // could be vectorized well
+            Quaternion dq;
+            dq.data[0] = -0.5*angular_rate.dot(this->components.vec);
+            dq.data[1] = 0.5*(this->components.scalar*angular_rate.x + this->components.vec.y*angular_rate.z - this->components.vec.z*angular_rate.y);
+            dq.data[2] = 0.5*(this->components.scalar*angular_rate.y - this->components.vec.x*angular_rate.z + this->components.vec.z*angular_rate.x);
+            dq.data[3] = 0.5*(this->components.scalar*angular_rate.z + this->components.vec.x*angular_rate.y - this->components.vec.y*angular_rate.x);
+            return dq;
+        }
+
+        inline double w()
+        {
             return data[0];
         }
 
-        inline double x() {
+        inline double x()
+        {
             return data[1];
         }
 
-        inline double y() {
+        inline double y()
+        {
             return data[2];
         }
 
-        inline double z() {
+        inline double z()
+        {
             return data[3];
         }
 
@@ -644,21 +734,21 @@ namespace Cartesian {
         double c = cos(angle);
         double s = sin(angle);
         double c1 = 1 - c;
-        double xc = axis.x()*c1;
-        double yc = axis.y()*c1;
-        mat.data[0] = c + axis.x()*xc;
-        mat.data[4] = c + axis.y()*yc;
-        mat.data[8] = c + axis.z()*axis.z()*c1;
-        double uc = axis.x()*yc;
-        double us = axis.z()*s;
+        double xc = axis.x*c1;
+        double yc = axis.y*c1;
+        mat.data[0] = c + axis.x*xc;
+        mat.data[4] = c + axis.y*yc;
+        mat.data[8] = c + axis.z*axis.z*c1;
+        double uc = axis.x*yc;
+        double us = axis.z*s;
         mat.data[1] = uc - us;
         mat.data[3] = uc + us;
-        uc = axis.z()*xc;
-        us = axis.y()*s;
+        uc = axis.z*xc;
+        us = axis.y*s;
         mat.data[2] = uc + us;
         mat.data[6] = uc - us;
-        uc = axis.z()*yc;
-        us = axis.x()*s;
+        uc = axis.z*yc;
+        us = axis.x*s;
         mat.data[5] = uc - us;
         mat.data[7] = uc + us;
     }

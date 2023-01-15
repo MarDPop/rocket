@@ -39,10 +39,10 @@ void Vehicle::get_state_rate(std::array<double,14>& x, double t, std::array<doub
     }
 
     // Integration of quaternion
-    dx[6] = -0.5*Cartesian::dot(&x[10],&x[7]);
-    dx[7] = 0.5*(x[10]*x[6] + x[12]*x[8] - x[11]*x[9]);
-    dx[8] = 0.5*(x[10]*x[7] - x[12]*x[7] + x[10]*x[9]);
-    dx[9] = 0.5*(x[10]*x[8] + x[11]*x[7] - x[10]*x[9]);
+    dx[6] = -0.5*Cartesian::dot(&x[7],&x[10]);
+    dx[7] = 0.5*(x[6]*x[10] + x[8]*x[12] - x[9]*x[11]);
+    dx[8] = 0.5*(x[6]*x[11] - x[7]*x[12] + x[9]*x[10]);
+    dx[9] = 0.5*(x[6]*x[12] + x[7]*x[11] - x[8]*x[10]);
 
     // Integration of angular velocity
     this->compute_moment(&x[10],&dx[10]);

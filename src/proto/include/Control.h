@@ -12,6 +12,31 @@ using namespace Cartesian;
 
 class SingleStageRocket;
 
+class Control
+{
+protected:
+
+    SingleStageRocket* rocket = nullptr;
+
+public:
+
+    std::unique_ptr<Filter> filter;
+
+    std::unique_ptr<Sensors> sensors;
+
+    Vector dForce;
+
+    Vector dMoment;
+
+    inline void set_rocket(SingleStageRocket* rocket)
+    {
+        this->rocket = rocket;
+    }
+
+    virtual void update(double time) = 0;
+};
+
+
 struct Fin {
     double deflection = 0; // first fin on + x axis, going counter clockwise
     double commanded_deflection = 0; // first fin on + x axis, going counter clockwise
@@ -29,7 +54,7 @@ struct Chute {
     double frac_deployed;
 };
 
-class SingleStageControl {
+class SingleStageControl : public virtual Control {
 
 protected:
     std::array<Fin, 4> fins;
@@ -62,25 +87,15 @@ protected:
 
     double time_old;
 
-    Sensors sensors;
-
     double chute_deployment_time;
 
     bool chute_deployed;
-
-    SingleStageRocket& rocket;
 
 public:
 
     const unsigned NFINS;
 
-    std::unique_ptr<Filter> filter;
-
-    Vector dForce;
-
-    Vector dMoment;
-
-    SingleStageControl(SingleStageRocket& r, unsigned N);
+    SingleStageControl(unsigned N);
 
     void set_system_limits(double slew_limit, double angle_limit);
 
@@ -92,7 +107,7 @@ public:
 
     void reset();
 
-    void update(double time);
+    void update(double time) override;
 
     void deflect_fins(double time);
 
@@ -112,7 +127,7 @@ class SingleStageControl_3 : public virtual SingleStageControl {
 
 public:
 
-    SingleStageControl_3(SingleStageRocket& r);
+    SingleStageControl_3();
 
     void set_aero_coef(double dCL, double dCD, double dCM, double fin_z, double fin_COP_d) override;
 
@@ -124,7 +139,7 @@ class SingleStageControl_4 : public virtual SingleStageControl {
 
 public:
 
-    SingleStageControl_4(SingleStageRocket& r);
+    SingleStageControl_4();
 
     void command_fins(const Vector& commanded_torque) override;
 };

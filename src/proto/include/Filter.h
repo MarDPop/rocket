@@ -6,44 +6,83 @@ using namespace Cartesian;
 
 class Sensors;
 
-struct State_Filter {
+struct State_Filter
+{
     Vector position;
     Vector velocity;
-    Vector acceleration;
-    Vector angular_velocity;
+
     Quaternion orientation;
+    Vector angular_velocity;
 };
 
-class Filter {
+class Filter
+{
+protected:
 
-    double t_old;
-
-    State_Filter state;
+    State_Filter computed_state;
 
 public:
 
     virtual void update(const Sensors& sensors, double t) = 0;
 
-    inline const Vector& get_computed_angular_rate() {
-        return this->state.angular_velocity;
+    inline const State_Filter& get_computed_state() const {
+        return this->computed_state;
     }
 
-    inline const Vector& get_computed_position() {
-        return this->state.position;
+    inline const Vector& get_computed_position() const {
+        return this->computed_state.position;
     }
 
-    inline const Vector& get_computed_velocity() {
-        return this->state.velocity;
+    inline const Vector& get_computed_velocity() const {
+        return this->computed_state.velocity;
     }
 
-    inline const Vector& get_computed_acceleration() {
-        return this->state.acceleration;
+    inline const Axis& get_computed_CS() const {
+        return (this->computed_state.orientation.to_rotation_matrix());
     }
 
-    inline const Axis& get_computed_CS() {
-        return this->state.orientation.to_rotation_matrix();
+    inline const Vector& get_computed_angular_rate() const {
+        return this->computed_state.angular_velocity;
     }
 };
+
+class FilterNone: public virtual Filter
+{
+
+    double t_old;
+
+public:
+
+    void update(const Sensors& sensors, double t) override;
+
+};
+
+class FilterBasic: public virtual Filter
+{
+
+    double t_old;
+
+    State_Filter state_old;
+
+public:
+
+    void update(const Sensors& sensors, double t) override;
+
+};
+
+class FilterQuadraticSmooth: public virtual Filter
+{
+
+    double t_old;
+
+    State_Filter state_old;
+
+public:
+
+    void update(const Sensors& sensors, double t) override;
+
+};
+
 
 class FilterMarius : public virtual Filter {
 

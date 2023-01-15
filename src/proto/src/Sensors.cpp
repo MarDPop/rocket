@@ -11,7 +11,7 @@ void computed_quatities::set(const measured_quantities& measured, const altitude
 
     this->mach_squared = 5*(pow(pressure_ratio, 2/7) - 1.0);
 
-    this->airspeed = sqrt(this->mach_squared/(AltitudeTable::AIR_CONST*measured.temperature))
+    this->airspeed = sqrt(this->mach_squared/(AltitudeTable::AIR_CONST*measured.temperature));
 
     pressure_ratio = measured.static_pressure * cal.inverse_ref_pressure;
 
@@ -42,7 +42,7 @@ void Sensors::set_sensor_variances(double sigma_pressure, double sigma_temperatu
     this->gyro_variance = std::normal_distribution<double>(0,sigma_gyro);
 }
 
-void Sensors::get_measured_quantities(const SingleStageRocket& rocket) {
+void Sensors::measure_quantities(const SingleStageRocket& rocket) {
     // add delay
     this->measured.angular_velocity = rocket.angular_velocity;
     this->measured.acceleration = rocket.acceleration;
@@ -54,12 +54,11 @@ void Sensors::get_measured_quantities(const SingleStageRocket& rocket) {
 
     this->measured.total_pressure = rocket.altitude_table.values->pressure + rocket.aerodynamics.aero_values.dynamic_pressure + this->barometer_variance(this->generator);
     this->measured.static_pressure = rocket.altitude_table.values->pressure + this->barometer_variance(this->generator);
-    this->measured.inverse_static_pressure = 1.0/this->measured.static_pressure;
     this->measured.temperature = rocket.altitude_table.values->temperature + this->thermometer_variance(this->generator);
 }
 
 void Sensors::update(const SingleStageRocket& rocket, double time) {
-    this->get_measured_quantities(rocket);
+    this->measure_quantities(rocket);
 
     this->computed.set(this->measured,this->cal);
 }

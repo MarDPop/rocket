@@ -114,12 +114,14 @@ void SingleStageSimulation::load(std::string fn){
 
     int NFINS = std::stoi(data[0]);
     if(NFINS == 3) {
-        this->rocket.control = std::make_unique<SingleStageControl_3>(this->rocket);
+        this->rocket.control = std::make_unique<SingleStageControl_3>();
     } else if (NFINS == 4) {
-        this->rocket.control = std::make_unique<SingleStageControl_4>(this->rocket);
+        this->rocket.control = std::make_unique<SingleStageControl_4>();
     } else {
         throw std::runtime_error("Currently only 3 or 4 fins are supported");
     }
+
+    this->rocket.control->set_rocket(&this->rocket);
 
     this->rocket.control->set_aero_coef(std::stod(data[1]),std::stod(data[2]),std::stod(data[3]),std::stod(data[4]),std::stod(data[5]));
 
@@ -137,6 +139,7 @@ void SingleStageSimulation::load(std::string fn){
     } else {
         std::cout << "no chute modeled.\n";
     }
+
 }
 
 void print_out(SingleStageRocket& rocket, const char* fn) {

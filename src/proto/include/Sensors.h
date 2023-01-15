@@ -56,22 +56,30 @@ class Sensors {
 
     double delay = 0.0;
 
-    void get_measured_quantities(const SingleStageRocket& rocket);
+    void measure_quantities(const SingleStageRocket& rocket);
 
 public:
 
     Sensors();
     ~Sensors();
 
-    inline double get_measured_dynamic_pressure() {
+    inline double get_measured_dynamic_pressure() const
+    {
         return this->measured.total_pressure - this->measured.static_pressure;
     }
 
-    inline void set_delay(double delay) {
+    inline const measured_quantities& get_measured_quantities() const
+    {
+        return this->measured;
+    }
+
+    inline void set_delay(double delay)
+    {
         this->delay = delay;
     }
 
-    inline void calibrate(const altitude_cal& cal) {
+    inline void calibrate(const altitude_cal& cal)
+    {
         this->cal = cal;
         this->cal.exp_const = -AltitudeTable::R_AIR / cal.g;
         this->cal.inverse_ref_pressure = 1.0/cal.pressure;

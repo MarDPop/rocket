@@ -26,7 +26,7 @@ public:
 
     inline void set_thrust(double thrust) {
         this->thrust = thrust;
-        this->force.x(thrust);
+        this->force.x = thrust;
     }
 
     inline void set_mass_rate(double mass_rate) {

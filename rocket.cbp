@@ -444,6 +444,7 @@
 		<Unit filename="src/app/single_sim.cpp" />
 		<Unit filename="src/app/test.cpp" />
 		<Unit filename="src/common/include/Cartesian.h" />
+		<Unit filename="src/common/include/CircularArray.h" />
 		<Unit filename="src/common/include/Constants.h" />
 		<Unit filename="src/common/include/Dynamics.h" />
 		<Unit filename="src/common/include/Geodesy.h" />
@@ -454,6 +455,7 @@
 		<Unit filename="src/common/include/ODE.h" />
 		<Unit filename="src/common/include/Planet.h" />
 		<Unit filename="src/common/include/RocketShape.h" />
+		<Unit filename="src/common/include/SpecialMath.h" />
 		<Unit filename="src/common/include/Table.h" />
 		<Unit filename="src/common/include/Time.h" />
 		<Unit filename="src/common/include/fluid.h" />

@@ -50,13 +50,13 @@ Vector Ellipsoid::geodetic2ecef(const Geodetic& lla) {
 
 Geodetic Ellipsoid::ecef2geodetic(const Vector& ecef){
     Geodetic geo;   //Results go here (Lat, Lon, Altitude)
-    double zp = fabs( ecef.z() );
+    double zp = fabs( ecef.z );
     double z2 = zp*zp;
-    double w2 = ecef.x()*ecef.x() + ecef.y()*ecef.y();
+    double w2 = ecef.x*ecef.x + ecef.y*ecef.y;
     double w = sqrt( w2 );
     double r2 = 1.0/(w2 + z2);
     double r_inv = sqrt( r2 );
-    geo.longitude = atan2( ecef.y(), ecef.x() );       //Lon (final)
+    geo.longitude = atan2( ecef.y, ecef.x );       //Lon (final)
     double s2 = z2*r2;
     double c2 = w2*r2;
     double u = Earth::a2*r_inv;
@@ -83,7 +83,7 @@ Geodetic Ellipsoid::ecef2geodetic(const Vector& ecef){
     double p = m/( rf/g + f );
     geo.latitude += p;      //Lat
     geo.altitude = f + m*p*0.5;     //Altitude
-    if( ecef.z() < 0 ){
+    if( ecef.z < 0 ){
         geo.latitude = -geo.latitude;     //Lat
     }
     return geo;    //Return Lat, Lon, Altitude in that order

@@ -5,7 +5,9 @@
 #include <numeric>
 #include <iostream>
 
-SingleStageRocket::SingleStageRocket() : aerodynamics(*this) {}
+SingleStageRocket::SingleStageRocket() : aerodynamics(*this) {
+
+}
 SingleStageRocket::~SingleStageRocket(){}
 
 void SingleStageRocket::init(double launch_angle, double launch_heading) {
@@ -16,15 +18,15 @@ void SingleStageRocket::init(double launch_angle, double launch_heading) {
         double sphi = sin(launch_heading);
         double ctheta = cos(launch_angle);
         double stheta = sqrt(1 - ctheta*ctheta);
-        this->CS.axis.x.x(cphi);
-        this->CS.axis.x.y(-sphi);
-        this->CS.axis.x.z(0);
-        this->CS.axis.y.x(ctheta*sphi);
-        this->CS.axis.y.y(ctheta*cphi);
-        this->CS.axis.y.z(-stheta);
-        this->CS.axis.z.x(stheta*sphi);
-        this->CS.axis.z.y(stheta*cphi);
-        this->CS.axis.z.z(ctheta);
+        this->CS.axis.x.x = cphi;
+        this->CS.axis.x.y = -sphi;
+        this->CS.axis.x.z = 0;
+        this->CS.axis.y.x = ctheta*sphi;
+        this->CS.axis.y.y = ctheta*cphi;
+        this->CS.axis.y.z = -stheta;
+        this->CS.axis.z.x = stheta*sphi;
+        this->CS.axis.z.y = stheta*cphi;
+        this->CS.axis.z.z = ctheta;
         //Cartesian::cross(this->CS.axis.z.data,this->CS.axis.x.data,this->CS.axis.y.data);
     }
     this->position.zero();
@@ -164,7 +166,7 @@ void SingleStageRocket::launch(double dt) {
 
             time_record += this->record.t_interval;
 
-            if(this->position.z() < -0.5) {
+            if(this->position.z < -0.5) {
                 break;
             }
 

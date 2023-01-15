@@ -3,14 +3,14 @@
 #include "../include/SingleStageRocket.h"
 
 
-SingleStageControl::SingleStageControl(SingleStageRocket& r, unsigned N) : rocket(r), NFINS(N) {
+SingleStageControl::SingleStageControl(unsigned N) : NFINS(N) {
 
     for(unsigned i = 0; i < NFINS;i++){
         this->fins[i].span.zero();
         this->fins[i].deflection = 0;
     }
 
-    this->fins[0].span.x(1);
+    this->fins[0].span.x = 1.0;
     double dtheta = 6.283185307179586476925286766559/NFINS;
     for(unsigned i = 1; i < NFINS; i++){
         this->fins[i].span.data[0] = cos(i*dtheta);
@@ -18,6 +18,10 @@ SingleStageControl::SingleStageControl(SingleStageRocket& r, unsigned N) : rocke
     }
 
     this->chute_deployed = false;
+
+    this->sensors = std::make_unique<Sensors>();
+
+    this->filter = std::make_unique<FilterBasic>();
 }
 
 
@@ -41,7 +45,7 @@ void SingleStageControl::set_aero_coef(double dCL, double dCD, double dCM, doubl
     this->z = fin_COP_z;
     this->d = fin_COP_d;
     this->const_axial_term = dCL*fin_COP_d;
-    this->const_planer_term = dCM - (z - rocket.COG)*dCL; // remember z should be negative distance from nose
+    this->const_planer_term = dCM - (z - this->rocket->COG)*dCL; // remember z should be negative distance from nose
 }
 
 
@@ -81,7 +85,7 @@ void SingleStageControl::update_force() {
     this->dForce.zero();
 
     double axial_term = this->dCLdTheta*this->d;
-    double planar_term = this->dCMdTheta - (this->z - rocket.COG)*this->dCLdTheta;
+    double planar_term = this->dCMdTheta - (this->z - this->rocket->COG)*this->dCLdTheta;
 
     for(unsigned i = 0; i < NFINS;i++) {
         auto& fin = this->fins[i];
@@ -97,11 +101,11 @@ void SingleStageControl::update_force() {
         this->dForce.data[1] += fin.lift.data[1]*tmp;
         this->dForce.data[2] -= this->dCDdTheta*fin.deflection; // simply linear approximation for small angles
     }
-    this->dMoment *= this->rocket.aerodynamics.aero_values.dynamic_pressure;
-    this->dForce *= this->rocket.aerodynamics.aero_values.dynamic_pressure;
+    this->dMoment *= this->rocket->aerodynamics.aero_values.dynamic_pressure;
+    this->dForce *= this->rocket->aerodynamics.aero_values.dynamic_pressure;
     // remember currently in body frame
-    this->dMoment = rocket.CS.transpose_mult(this->dMoment);
-    this->dForce = rocket.CS.transpose_mult(this->dForce);
+    this->dMoment = this->rocket->CS.transpose_mult(this->dMoment);
+    this->dForce = this->rocket->CS.transpose_mult(this->dForce);
 }
 
 
@@ -109,7 +113,7 @@ void SingleStageControl::update_commands() {
     // essentially straight up
     //if( fabs(this->CS_measured.axis.z.z()) > 0.99999)
     const auto& CS = this->filter->get_computed_CS();
-    Vector arm_inertial(-CS.axis.z.y(),CS.axis.z.x(),0); // rocket.z cross z to get correct sign
+    Vector arm_inertial(-CS.axis.z.y,CS.axis.z.x,0); // rocket.z cross z to get correct sign
     Vector commanded_angular_rate = arm_inertial*this->K1;
     Vector angular_err = commanded_angular_rate - this->filter->get_computed_angular_rate();
     Vector commanded_torque = angular_err*this->K2 - this->filter->get_computed_angular_rate()*this->C2;
@@ -132,24 +136,24 @@ void SingleStageControl::chute_dynamics(double time) {
 
     // chute is more complicated than this, but for now assume just a drag force
 
-    this->dForce = this->rocket.aerodynamics.aero_values.unit_v_air * (CDA*this->rocket.aerodynamics.aero_values.dynamic_pressure);
+    this->dForce = this->rocket->aerodynamics.aero_values.unit_v_air * (CDA*this->rocket->aerodynamics.aero_values.dynamic_pressure);
     // assume arm is nose
-    Vector::cross((rocket.CS.axis.z*-rocket.COG),this->dForce,this->dMoment);
+    Vector::cross((this->rocket->CS.axis.z * -this->rocket->COG),this->dForce,this->dMoment);
 }
 
 
 void SingleStageControl::update(double time) {
 
-    this->sensors.update(this->rocket, time);
+    this->sensors->update(*this->rocket, time);
 
-    this->filter->update(this->sensors, time);
+    this->filter->update(*this->sensors, time);
 
     if(this->chute_deployed) {
         this->chute_dynamics(time);
         return;
     }
 
-    if(this->sensors.get_measured_dynamic_pressure() < 1e-3) {
+    if(this->sensors->get_measured_dynamic_pressure() < 1e-3) {
         return;
     }
 
@@ -174,14 +178,16 @@ void SingleStageControl::update(double time) {
     this->time_old = time;
 }
 
-SingleStageControl_3::SingleStageControl_3(SingleStageRocket& r) : SingleStageControl(r,3) {}
+SingleStageControl_3::SingleStageControl_3() : SingleStageControl(3) {}
 
-void SingleStageControl_3::set_aero_coef(double dCL, double dCD, double dCM, double fin_z, double fin_COP_d) {
+void SingleStageControl_3::set_aero_coef(double dCL, double dCD, double dCM, double fin_z, double fin_COP_d)
+{
     SingleStageControl::set_aero_coef(dCL, dCD, dCM, fin_z, fin_COP_d);
     Axis A;
-    for(unsigned i = 0; i < 3; i++){
-        A.data[i] = this->const_planer_term*this->fins[i].span.x();
-        A.data[i+3] = this->const_planer_term*this->fins[i].span.y();
+    for(unsigned i = 0; i < 3; i++)
+    {
+        A.data[i] = this->const_planer_term*this->fins[i].span.x;
+        A.data[i+3] = this->const_planer_term*this->fins[i].span.y;
         A.data[i+6] = this->const_axial_term;
     }
     this->solve3 = A.get_inverse();
@@ -189,7 +195,7 @@ void SingleStageControl_3::set_aero_coef(double dCL, double dCD, double dCM, dou
 
 void SingleStageControl_3::command_fins(const Vector& commanded_torque) {
 
-    Vector command_torque_scaled = commanded_torque * (1.0/this->sensors.get_measured_dynamic_pressure());
+    Vector command_torque_scaled = commanded_torque * (1.0/this->sensors->get_measured_dynamic_pressure());
 
     Vector angles = this->solve3*command_torque_scaled;
     this->fins[0].commanded_deflection = angles.data[0];
@@ -197,16 +203,17 @@ void SingleStageControl_3::command_fins(const Vector& commanded_torque) {
     this->fins[2].commanded_deflection = angles.data[2];
 }
 
-SingleStageControl_4::SingleStageControl_4(SingleStageRocket& r) : SingleStageControl(r,4) {}
+SingleStageControl_4::SingleStageControl_4() : SingleStageControl(4) {}
 
 void SingleStageControl_4::command_fins(const Vector& commanded_torque) {
 
     std::array<double,4> beta;
-    for(unsigned i = 0; i < 4; i++) {
-        beta[i] = 1 + this->fins[i].span.x() + this->fins[i].span.y();
+    for(unsigned i = 0; i < 4; i++)
+    {
+        beta[i] = 1 + this->fins[i].span.x + this->fins[i].span.y;
     }
-    auto num = (commanded_torque.x() + commanded_torque.y())/this->const_planer_term + commanded_torque.z()/this->const_axial_term;
-    auto den = this->sensors.get_measured_dynamic_pressure()*std::accumulate(beta.begin(),beta.end(),0);
+    auto num = (commanded_torque.x + commanded_torque.y)/this->const_planer_term + commanded_torque.z/this->const_axial_term;
+    auto den = this->sensors->get_measured_dynamic_pressure()*std::accumulate(beta.begin(),beta.end(),0);
 
     auto lambda = num/den;
     this->fins[0].commanded_deflection = lambda*beta[0];
