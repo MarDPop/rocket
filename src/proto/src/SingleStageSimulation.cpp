@@ -113,33 +113,37 @@ void SingleStageSimulation::load(std::string fn){
     }
 
     int NFINS = std::stoi(data[0]);
+
+    SingleStageControl* control;
     if(NFINS == 3) {
-        this->rocket.control = std::make_unique<SingleStageControl_3>();
+        control = new SingleStageControl_3();
     } else if (NFINS == 4) {
-        this->rocket.control = std::make_unique<SingleStageControl_4>();
+        control = new SingleStageControl_4();
     } else {
-        throw std::runtime_error("Currently only 3 or 4 fins are supported");
+        control = new SingleStageControl_0();
+        std::err << "Currently only 3 or 4 fins are supported. No control will be run";
     }
 
-    this->rocket.control->set_rocket(&this->rocket);
+    control->set_rocket(&this->rocket);
 
-    this->rocket.control->set_aero_coef(std::stod(data[1]),std::stod(data[2]),std::stod(data[3]),std::stod(data[4]),std::stod(data[5]));
+    control->set_aero_coef(std::stod(data[1]),std::stod(data[2]),std::stod(data[3]),std::stod(data[4]),std::stod(data[5]));
 
     data = util::split(lines[7 + nPoints]);
     if(data.size() < 5) {
         throw std::runtime_error("Not enough Fin Info: " + std::to_string(data.size()) + " < 5. Reminder: {K1,K2,C2,slew,limit}");
     }
 
-    this->rocket.control->set_controller_terms(std::stod(data[0]),std::stod(data[1]),std::stod(data[2]));
-    this->rocket.control->set_system_limits(std::stod(data[3]),std::stod(data[4]));
+    control->set_controller_terms(std::stod(data[0]),std::stod(data[1]),std::stod(data[2]));
+    control->set_system_limits(std::stod(data[3]),std::stod(data[4]));
 
     data = util::split(lines[8 + nPoints]);
     if(data.size() == 6) {
-        this->rocket.control->set_chute(std::stod(data[0]),std::stod(data[1]),std::stod(data[2]),std::stod(data[3]),std::stod(data[4]),std::stod(data[5]));
+        control->set_chute(std::stod(data[0]),std::stod(data[1]),std::stod(data[2]),std::stod(data[3]),std::stod(data[4]),std::stod(data[5]));
     } else {
         std::cout << "no chute modeled.\n";
     }
 
+    this->rocket.control.reset(control);
 }
 
 void print_out(SingleStageRocket& rocket, const char* fn) {

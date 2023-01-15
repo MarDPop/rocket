@@ -242,6 +242,11 @@ namespace Cartesian {
             return out;
         }
 
+        inline double mag() const
+        {
+            return this->data[0]*this->data[0] + this->data[1]*this->data[1] + this->data[2]*this->data[2];
+        }
+
         inline double norm() const
         {
             return sqrt(this->data[0]*this->data[0] + this->data[1]*this->data[1] + this->data[2]*this->data[2]);
@@ -299,6 +304,52 @@ namespace Cartesian {
             memcpy(this->data,b.data,sizeof(this->data));
         }
 
+        inline void rotation_matrix_from_angle_axis(const double angle, const Vector& axis)
+        {
+            double c = cos(angle);
+            double s = sin(angle);
+            double c1 = 1 - c;
+            double xc = axis.x*c1;
+            double yc = axis.y*c1;
+            this->data[0] = c + axis.x*xc;
+            this->data[4] = c + axis.y*yc;
+            this->data[8] = c + axis.z*axis.z*c1;
+            double uc = axis.x*yc;
+            double us = axis.z*s;
+            this->data[1] = uc - us;
+            this->data[3] = uc + us;
+            uc = axis.z*xc;
+            us = axis.y*s;
+            this->data[2] = uc + us;
+            this->data[6] = uc - us;
+            uc = axis.z*yc;
+            us = axis.x*s;
+            this->data[5] = uc - us;
+            this->data[7] = uc + us;
+        }
+
+        inline Axis(const double angle, const Vector& axis)
+        {
+            this->rotation_matrix_from_angle_axis(angle,axis);
+        }
+
+        inline void set_from_azimuth_elevation(const double azimuth, const double elevation)
+        {
+            double cphi = cos(azimuth);
+            double sphi = sin(azimuth);
+            double stheta = sin(elevation);
+            double ctheta = sqrt(1 - stheta*stheta);
+            this->axis.x.x = cphi;
+            this->axis.x.y = -sphi;
+            this->axis.x.z = 0;
+            this->axis.y.x = ctheta*sphi;
+            this->axis.y.y = ctheta*cphi;
+            this->axis.y.z = -stheta;
+            this->axis.z.x = stheta*sphi;
+            this->axis.z.y = stheta*cphi;
+            this->axis.z.z = ctheta;
+        }
+
         inline void zero()
         {
             memset(this->data,0,sizeof(this->data));
@@ -327,7 +378,8 @@ namespace Cartesian {
         inline Axis operator+(const Axis& b) const noexcept
         {
             Axis a;
-            for(int i = 0; i < 9; i++) {
+            for(int i = 0; i < 9; i++)
+            {
                 a.data[i] = this->data[i] + b.data[i];
             }
             return a;
@@ -361,7 +413,8 @@ namespace Cartesian {
 
         inline void operator*=(double b) noexcept
         {
-            for(int i = 0; i < 9; i++) {
+            for(int i = 0; i < 9; i++)
+            {
                 this->data[i] *= b;
             }
         }
@@ -370,7 +423,8 @@ namespace Cartesian {
         {
             Vector b;
             int irow = 0;
-            for(int i = 0; i < 3; i++){
+            for(int i = 0; i < 3; i++)
+            {
                 b.data[i] = this->data[irow]*a.data[0] + this->data[irow + 1]*a.data[1] + this->data[irow + 2]*a.data[2];
                 irow += 3;
             }
@@ -408,7 +462,8 @@ namespace Cartesian {
         inline static void mult(const Axis& A, const Vector& b, Vector& x) noexcept
         {
             int irow = 0;
-            for(int i = 0; i < 3; i++){
+            for(int i = 0; i < 3; i++)
+            {
                 x.data[i] = A.data[irow]*b.data[0] + A.data[irow + 1]*b.data[1] + A.data[irow + 2]*b.data[2];
                 irow += 3;
             }
@@ -729,28 +784,5 @@ namespace Cartesian {
         }
 
     };
-
-    inline void rotation_matrix_angle_axis(const double angle, const Vector& axis, Axis& mat) {
-        double c = cos(angle);
-        double s = sin(angle);
-        double c1 = 1 - c;
-        double xc = axis.x*c1;
-        double yc = axis.y*c1;
-        mat.data[0] = c + axis.x*xc;
-        mat.data[4] = c + axis.y*yc;
-        mat.data[8] = c + axis.z*axis.z*c1;
-        double uc = axis.x*yc;
-        double us = axis.z*s;
-        mat.data[1] = uc - us;
-        mat.data[3] = uc + us;
-        uc = axis.z*xc;
-        us = axis.y*s;
-        mat.data[2] = uc + us;
-        mat.data[6] = uc - us;
-        uc = axis.z*yc;
-        us = axis.x*s;
-        mat.data[5] = uc - us;
-        mat.data[7] = uc + us;
-    }
 
 }

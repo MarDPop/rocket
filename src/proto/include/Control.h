@@ -33,7 +33,7 @@ public:
         this->rocket = rocket;
     }
 
-    virtual void update(double time) = 0;
+    virtual void update(double time);
 };
 
 
@@ -91,6 +91,18 @@ protected:
 
     bool chute_deployed;
 
+    /*  */
+
+    void deflect_fins(double time);
+
+    void update_force();
+
+    void update_commands();
+
+    void chute_dynamics(double time);
+
+    virtual void command_fins(const Vector& commanded_torque) = 0;
+
 public:
 
     const unsigned NFINS;
@@ -108,16 +120,6 @@ public:
     void reset();
 
     void update(double time) override;
-
-    void deflect_fins(double time);
-
-    void update_force();
-
-    void update_commands();
-
-    void chute_dynamics(double time);
-
-    virtual void command_fins(const Vector& commanded_torque) = 0;
 
 };
 

@@ -2,6 +2,8 @@
 
 #include "../include/SingleStageRocket.h"
 
+void Control::update(double time) { }
+
 
 SingleStageControl::SingleStageControl(unsigned N) : NFINS(N) {
 

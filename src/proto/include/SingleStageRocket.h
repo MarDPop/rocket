@@ -13,55 +13,8 @@
 
 using namespace Cartesian;
 
-class SingleStageRocket {
-
-    /**
-    * Mass dry (kg)
-    */
-    double mass_empty;
-
-    /**
-    * Mass with propellant (kg)
-    */
-    double mass_full;
-
-    /**
-    * Inertia properties : Ixx, Izz, COG
-    */
-    double I_empty[3];
-
-    /**
-    * change in Inertia vs mass
-    */
-    double dIdm[3];
-
-    /**
-    *
-    */
-    void compute_acceleration(double time);
-
-public:
-
-    /**
-    * current mass  (kg)
-    */
-    double mass;
-
-    /**
-    * current principal moment of inertia cross axially (kg m2)
-    */
-    double Ixx;
-
-    /**
-    * current principal moment of inertia along axis  (kg m2)
-    */
-    double Izz;
-
-    /**
-    * current center of mass location from nose (m) [should be negative]
-    */
-    double COG;
-
+struct KinematicState
+{
     /**
     * Current position in ENU (m)
     */
@@ -91,23 +44,101 @@ public:
     * Current angular acceleration (rad/s)
     */
     Vector angular_acceleration;
+};
 
-    /* USEFUL EXPORTED VALUES */
+struct Inertia
+{
     /**
-    * current gravity (m/s2)
+    * current mass  (kg)
     */
-    double grav;
+    double mass;
 
     /**
-    * Internal struct definition to record states
+    * current principal moment of inertia cross axially (kg m2)
     */
-    struct Recording {
-        double t_interval = 0.25;
-        std::vector<Vector> position;
-        std::vector<Axis> orientation;
-        std::vector<double> mass;
-        std::vector<double> test_value;
-    };
+    double Ixx;
+
+    /**
+    * current principal moment of inertia along axis  (kg m2)
+    */
+    double Izz;
+
+    /**
+    * current center of mass location from nose (m) [should be negative]
+    */
+    double COG;
+};
+
+/**
+* Internal struct definition to record states
+*/
+struct Recording
+{
+    /**
+    * Time interval between recordings (sec)
+    */
+    double t_interval = 0.25;
+
+    /**
+    * Position (m)
+    */
+    std::vector<Vector> position;
+
+    /**
+    * Full CS orientation
+    */
+    std::vector<Axis> orientation;
+
+    /**
+    * Mass (kg)
+    */
+    std::vector<double> mass;
+
+    /**
+    * Any other test value we want
+    */
+    std::vector<double> test_value;
+};
+
+class SingleStageRocket
+{
+
+    bool not_empty = false;
+
+    /**
+    * Mass dry (kg)
+    */
+    double mass_empty;
+
+    /**
+    * Mass with propellant (kg)
+    */
+    double mass_full;
+
+    /**
+    * Inertia properties : Ixx, Izz, COG
+    */
+    double I_empty[3];
+
+    /**
+    * change in Inertia vs mass
+    */
+    double dIdm[3];
+
+    /**
+    *
+    */
+    void compute_acceleration(double time);
+
+    void step(double time, double dt);
+
+    void get_inertia();
+
+public:
+
+    Inertia inertia;
+
+    KinematicState state;
 
     Recording record;
 
@@ -117,14 +148,12 @@ public:
 
     SingleStageThruster thruster;
 
-    std::unique_ptr<SingleStageControl> control;
+    std::unique_ptr<Control> control;
 
     SingleStageRocket();
     ~SingleStageRocket();
 
-    void set_mass(double empty_mass, double full_mass, double I_empty[3], double I_full[3]);
-
-    void get_inertia();
+    void set_inertial_properties(double empty_mass, double full_mass, double I_empty[3], double I_full[3]);
 
     void init(double launch_angle, double launch_heading);
 
