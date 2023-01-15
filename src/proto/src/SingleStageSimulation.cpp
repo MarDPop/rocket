@@ -114,13 +114,13 @@ void SingleStageSimulation::load(std::string fn){
 
     int NFINS = std::stoi(data[0]);
 
-    SingleStageControl* control;
+    Control* control;
     if(NFINS == 3) {
         control = new SingleStageControl_3();
     } else if (NFINS == 4) {
         control = new SingleStageControl_4();
     } else {
-        std::err << "Currently only 3 or 4 fins are supported. No control will be run, but sensors will";
+        std::cerr << "Currently only 3 or 4 fins are supported. No control will be run, but sensors will";
 
         control = new Control();
 
@@ -135,22 +135,24 @@ void SingleStageSimulation::load(std::string fn){
 
     if(NFINS < 3 || NFINS > 4)
     {
-        break;
+        return;
     }
 
-    control->set_aero_coef(std::stod(data[1]),std::stod(data[2]),std::stod(data[3]),std::stod(data[4]),std::stod(data[5]));
+    SingleStageControl* c = reinterpret_cast<SingleStageControl*>(control);
+
+    c->set_aero_coef(std::stod(data[1]),std::stod(data[2]),std::stod(data[3]),std::stod(data[4]),std::stod(data[5]));
 
     data = util::split(lines[7 + nPoints]);
     if(data.size() < 5) {
         throw std::runtime_error("Not enough Fin Info: " + std::to_string(data.size()) + " < 5. Reminder: {K1,K2,C2,slew,limit}");
     }
 
-    control->set_controller_terms(std::stod(data[0]),std::stod(data[1]),std::stod(data[2]));
-    control->set_system_limits(std::stod(data[3]),std::stod(data[4]));
+    c->set_controller_terms(std::stod(data[0]),std::stod(data[1]),std::stod(data[2]));
+    c->set_system_limits(std::stod(data[3]),std::stod(data[4]));
 
     data = util::split(lines[8 + nPoints]);
     if(data.size() == 6) {
-        control->set_chute(std::stod(data[0]),std::stod(data[1]),std::stod(data[2]),std::stod(data[3]),std::stod(data[4]),std::stod(data[5]));
+        c->set_chute(std::stod(data[0]),std::stod(data[1]),std::stod(data[2]),std::stod(data[3]),std::stod(data[4]),std::stod(data[5]));
     } else {
         std::cout << "no chute modeled.\n";
     }

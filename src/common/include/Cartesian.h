@@ -740,12 +740,17 @@ namespace Cartesian {
             data[3] *= n;
         }
 
-        inline double dot(const Quaternion& q)
+        inline double dot(const Quaternion& q) const
         {
             return this->data[0]*q.data[0] + this->data[1]*q.data[1] + this->data[2]*q.data[2] + this->data[3]*q.data[3];
         }
 
-        inline Quaternion operator*(const Quaternion& q)
+        inline void operator=(const Quaternion& q)
+        {
+            memcpy(data,q.data,sizeof(data));
+        }
+
+        inline Quaternion operator*(const Quaternion& q) const
         {
             Quaternion p;
             p.data[0] = this->data[0]*q.data[0] - this->data[1]*q.data[1] - this->data[2]*q.data[2] - this->data[3]*q.data[3];
@@ -755,7 +760,7 @@ namespace Cartesian {
             return p;
         }
 
-        inline Quaternion operator*(double a)
+        inline Quaternion operator*(double a) const
         {
             Quaternion p;
             p.data[0] = this->data[0]*a;
@@ -765,7 +770,7 @@ namespace Cartesian {
             return p;
         }
 
-        inline Quaternion operator+(const Quaternion& q)
+        inline Quaternion operator+(const Quaternion& q) const
         {
             Quaternion p;
             p.data[0] = this->data[0] + q.data[0];
@@ -775,7 +780,7 @@ namespace Cartesian {
             return p;
         }
 
-        inline Quaternion operator-(const Quaternion& q)
+        inline Quaternion operator-(const Quaternion& q) const
         {
             Quaternion p;
             p.data[0] = this->data[0] - q.data[0];
@@ -787,13 +792,12 @@ namespace Cartesian {
 
         static inline Quaternion slerp(const Quaternion& q0, const Quaternion& q1, double t)
         {
-            // Calculate angle between them.
             double dot = q0.dot(q1);
-            // if qa=qb or qa=-qb then theta = 0 and we can return qa
+
             constexpr double THRESHOLD = 0.99995;
             if (dot >= THRESHOLD)
             {
-                Quaternion result = q0 + (q1 – q0)*t;
+                Quaternion result = q0 + (q1 - q0)*t;
                 result.normalize();
                 return result;
             }

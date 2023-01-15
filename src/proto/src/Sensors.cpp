@@ -44,8 +44,8 @@ void Sensors::set_sensor_variances(double sigma_pressure, double sigma_temperatu
 
 void Sensors::measure_quantities(const SingleStageRocket& rocket) {
     // add delay
-    this->measured.angular_velocity = rocket.angular_velocity;
-    this->measured.acceleration = rocket.acceleration;
+    this->measured.angular_velocity = rocket.state.angular_velocity;
+    this->measured.acceleration = rocket.state.acceleration;
 
     for(int i = 0; i < 3; i++) {
         this->measured.angular_velocity.data[i] += this->gyro_variance(this->generator);
