@@ -23,7 +23,7 @@ void SingleStageAerodynamics::set_coef(double* coef) {
 }
 
 void SingleStageAerodynamics::compute_aero_values() {
-    Vector air_velocity = this->rocket.velocity - this->rocket.altitude_table.wind.wind;
+    Vector air_velocity = this->rocket.state.velocity - this->rocket.altitude_table.wind.wind;
 
     this->aero_values.airspeed = air_velocity.norm();
 
@@ -57,9 +57,9 @@ void SingleStageAerodynamics::update() {
         }
     }
 
-    double proj = rocket.CS.axis.z.dot(this->aero_values.unit_v_air);
+    double proj = rocket.state.CS.axis.z.dot(this->aero_values.unit_v_air);
 
-    this->moment = rocket.angular_velocity*(this->CM_alpha_dot*this->aero_values.dynamic_pressure);
+    this->moment = rocket.state.angular_velocity*(this->CM_alpha_dot*this->aero_values.dynamic_pressure);
 
     if (proj > 0.99998) {
         this->force = this->aero_values.unit_v_air*(CD0_compressible*this->aero_values.dynamic_pressure);
@@ -68,7 +68,7 @@ void SingleStageAerodynamics::update() {
 
     double AoA = (proj > 0.9) ? sqrt(2 - 2*proj) : acos(proj);
 
-    Vector arm = this->aero_values.unit_v_air.cross(rocket.CS.axis.z);
+    Vector arm = this->aero_values.unit_v_air.cross(rocket.state.CS.axis.z);
 
     this->moment += arm*(this->CM_alpha*this->aero_values.dynamic_pressure);
 

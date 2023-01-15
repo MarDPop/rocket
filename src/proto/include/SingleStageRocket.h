@@ -130,7 +130,7 @@ class SingleStageRocket
     */
     void compute_acceleration(double time);
 
-    void step(double time, double dt);
+    void step(double& time, double dt);
 
     void get_inertia();
 

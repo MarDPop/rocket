@@ -7,17 +7,17 @@
 
 void SingleStageRocket::compute_acceleration(double time)
 {
-    this->altitude_table.set(this->position[2], time);
+    this->altitude_table.set(this->state.position.z, time);
 
     this->aerodynamics.update();
 
     this->state.acceleration = this->aerodynamics.force;
     this->state.angular_acceleration = this->aerodynamics.moment;
 
-    if(this->inertia.mass > this->mass_empty)
+    if(this->not_empty)
     {
         this->thruster.set(this->altitude_table.values->pressure);
-        this->state.acceleration += this->CS.axis.z * this->thruster.thrust;
+        this->state.acceleration += this->state.CS.axis.z * this->thruster.thrust;
     }
 
     if(this->control)
@@ -29,17 +29,17 @@ void SingleStageRocket::compute_acceleration(double time)
     }
 
     this->state.acceleration *= (1.0/this->inertia.mass);
-    this->state.acceleration.data[2] -= this->altitude_table.values->gravity;
+    this->state.acceleration.z -= this->altitude_table.values->gravity;
 
     Axis I_inertial = this->state.CS.get_transpose(); // might have to transpose CS
     int i = 0;
     for(; i < 6;i++)
     {
-        I_inertial.data[i] *= this->Ixx;
+        I_inertial.data[i] *= this->inertia.Ixx;
     }
     for(; i < 9;i++)
     {
-        I_inertial.data[i] *= this->Izz;
+        I_inertial.data[i] *= this->inertia.Izz;
     }
     //Vector Iw = I_inertial * this->angular_velocity;
     //Vector rhs = this->angular_acceleration - this->angular_velocity.cross(Iw);
@@ -71,7 +71,7 @@ void SingleStageRocket::step(double& time, double dt)
 
     // Compute mass changes, no need to recompute at next step
     if(this->not_empty) {
-        this->mass -= this->thruster.mass_rate*dt;
+        this->inertia.mass -= this->thruster.mass_rate*dt;
         this->get_inertia();
     }
 
@@ -82,8 +82,8 @@ void SingleStageRocket::step(double& time, double dt)
 
     double dt_half = dt*0.5;
 
-    this->position = state0.position + (state0.velocity + this->state.velocity)*dt_half;
-    this->velocity = state0.velocity + (state0.accleration + this->state.acceleration)*dt_half;
+    this->state.position = state0.position + (state0.velocity + this->state.velocity)*dt_half;
+    this->state.velocity = state0.velocity + (state0.acceleration + this->state.acceleration)*dt_half;
 
     angle_axis = (state0.angular_velocity + this->state.angular_velocity)*dt_half;
     this->state.angular_velocity = state0.angular_velocity + (state0.angular_acceleration + this->state.angular_acceleration)*dt_half;
@@ -135,9 +135,6 @@ void SingleStageRocket::set_inertial_properties(double empty_mass, double full_m
     this->dIdm[0] = (I_full[0] - I_empty[0])/dm;
     this->dIdm[1] = (I_full[1] - I_empty[1])/dm;
     this->dIdm[2] = (I_full[2] - I_empty[2])/dm; // dCOG
-    this->Ixx = I_full[0];
-    this->Izz = I_full[1];
-    this->COG = I_full[2];
 }
 
 

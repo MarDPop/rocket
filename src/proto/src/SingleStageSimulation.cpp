@@ -55,7 +55,7 @@ void SingleStageSimulation::load(std::string fn){
     double m_full = std::stod(data[0]);
     double I_full[3] = {std::stod(data[1]),std::stod(data[2]),std::stod(data[3])};
 
-    this->rocket.set_mass(m_empty,m_full,I_empty,I_full);
+    this->rocket.set_inertial_properties(m_empty,m_full,I_empty,I_full);
 
     data = util::split(lines[2]);
     if(data.size() < 4) {
@@ -120,11 +120,23 @@ void SingleStageSimulation::load(std::string fn){
     } else if (NFINS == 4) {
         control = new SingleStageControl_4();
     } else {
-        control = new SingleStageControl_0();
-        std::err << "Currently only 3 or 4 fins are supported. No control will be run";
+        std::err << "Currently only 3 or 4 fins are supported. No control will be run, but sensors will";
+
+        control = new Control();
+
+        control->sensors.reset(new Sensors());
+
+        control->filter.reset(new FilterNone());
     }
 
     control->set_rocket(&this->rocket);
+
+    this->rocket.control.reset(control);
+
+    if(NFINS < 3 || NFINS > 4)
+    {
+        break;
+    }
 
     control->set_aero_coef(std::stod(data[1]),std::stod(data[2]),std::stod(data[3]),std::stod(data[4]),std::stod(data[5]));
 
@@ -142,8 +154,6 @@ void SingleStageSimulation::load(std::string fn){
     } else {
         std::cout << "no chute modeled.\n";
     }
-
-    this->rocket.control.reset(control);
 }
 
 void print_out(SingleStageRocket& rocket, const char* fn) {

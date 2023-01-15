@@ -613,6 +613,12 @@ namespace Cartesian {
                 double scalar;
                 Vector vec;
             } components;
+            struct {
+                double w;
+                double x;
+                double y;
+                double z;
+            };
         };
 
         Quaternion() {}
@@ -626,6 +632,15 @@ namespace Cartesian {
         Quaternion(const Quaternion& v)
         {
             memcpy(data,v.data,sizeof(data));
+        }
+
+        Quaternion(double angle, const Vector& axis)
+        {
+            angle *= 0.5;
+            double s = sin(angle);
+            // note that angle divided by 2 so scalar always positive (angle must be less than full rotation)
+            this->data[0] = sqrt(1-s*s); // aka cos(angle / 2)
+            this->components.vec = axis * s;
         }
 
         Quaternion(const Axis& a)
@@ -701,12 +716,12 @@ namespace Cartesian {
             return q;
         }
 
-        inline Vector& get_vector()
+        inline Vector& vector()
         {
             return components.vec;
         }
 
-        inline double get_scalar()
+        inline double scalar()
         {
             return components.scalar;
         }
@@ -723,6 +738,73 @@ namespace Cartesian {
             data[1] *= n;
             data[2] *= n;
             data[3] *= n;
+        }
+
+        inline double dot(const Quaternion& q)
+        {
+            return this->data[0]*q.data[0] + this->data[1]*q.data[1] + this->data[2]*q.data[2] + this->data[3]*q.data[3];
+        }
+
+        inline Quaternion operator*(const Quaternion& q)
+        {
+            Quaternion p;
+            p.data[0] = this->data[0]*q.data[0] - this->data[1]*q.data[1] - this->data[2]*q.data[2] - this->data[3]*q.data[3];
+            p.data[1] = this->data[0]*q.data[1] + this->data[1]*q.data[0] + this->data[2]*q.data[3] - this->data[3]*q.data[2];
+            p.data[2] = this->data[0]*q.data[2] - this->data[1]*q.data[3] + this->data[2]*q.data[0] + this->data[3]*q.data[1];
+            p.data[3] = this->data[0]*q.data[3] + this->data[1]*q.data[2] - this->data[2]*q.data[1] + this->data[3]*q.data[0];
+            return p;
+        }
+
+        inline Quaternion operator*(double a)
+        {
+            Quaternion p;
+            p.data[0] = this->data[0]*a;
+            p.data[1] = this->data[1]*a;
+            p.data[2] = this->data[2]*a;
+            p.data[3] = this->data[3]*a;
+            return p;
+        }
+
+        inline Quaternion operator+(const Quaternion& q)
+        {
+            Quaternion p;
+            p.data[0] = this->data[0] + q.data[0];
+            p.data[1] = this->data[1] + q.data[1];
+            p.data[2] = this->data[2] + q.data[2];
+            p.data[3] = this->data[3] + q.data[3];
+            return p;
+        }
+
+        inline Quaternion operator-(const Quaternion& q)
+        {
+            Quaternion p;
+            p.data[0] = this->data[0] - q.data[0];
+            p.data[1] = this->data[1] - q.data[1];
+            p.data[2] = this->data[2] - q.data[2];
+            p.data[3] = this->data[3] - q.data[3];
+            return p;
+        }
+
+        static inline Quaternion slerp(const Quaternion& q0, const Quaternion& q1, double t)
+        {
+            // Calculate angle between them.
+            double dot = q0.dot(q1);
+            // if qa=qb or qa=-qb then theta = 0 and we can return qa
+            constexpr double THRESHOLD = 0.99995;
+            if (dot >= THRESHOLD)
+            {
+                Quaternion result = q0 + (q1 – q0)*t;
+                result.normalize();
+                return result;
+            }
+            dot = std::min(std::max(-1.0,dot), 1.0);
+
+            double theta = acos(dot)*t;
+
+            Quaternion q2 = q1 - q0*dot;
+            q2.normalize();
+
+            return q0*cos(theta) + q2*sin(theta);
         }
 
         inline Axis to_rotation_matrix() const
@@ -761,26 +843,6 @@ namespace Cartesian {
             dq.data[2] = 0.5*(this->components.scalar*angular_rate.y - this->components.vec.x*angular_rate.z + this->components.vec.z*angular_rate.x);
             dq.data[3] = 0.5*(this->components.scalar*angular_rate.z + this->components.vec.x*angular_rate.y - this->components.vec.y*angular_rate.x);
             return dq;
-        }
-
-        inline double w()
-        {
-            return data[0];
-        }
-
-        inline double x()
-        {
-            return data[1];
-        }
-
-        inline double y()
-        {
-            return data[2];
-        }
-
-        inline double z()
-        {
-            return data[3];
         }
 
     };

@@ -2,10 +2,22 @@
 
 #include "../include/SingleStageRocket.h"
 
-void Control::update(double time) { }
+void Control::update(double time)
+{
+    if(this->sensors)
+    {
+        this->sensors->update(*this->rocket,time);
+
+        if(this->filter)
+        {
+            this->filter->update(*this->sensors,time);
+        }
+    }
+}
 
 
-SingleStageControl::SingleStageControl(unsigned N) : NFINS(N) {
+SingleStageControl::SingleStageControl(unsigned N) : NFINS(N)
+{
 
     for(unsigned i = 0; i < NFINS;i++){
         this->fins[i].span.zero();
@@ -47,7 +59,7 @@ void SingleStageControl::set_aero_coef(double dCL, double dCD, double dCM, doubl
     this->z = fin_COP_z;
     this->d = fin_COP_d;
     this->const_axial_term = dCL*fin_COP_d;
-    this->const_planer_term = dCM - (z - this->rocket->COG)*dCL; // remember z should be negative distance from nose
+    this->const_planer_term = dCM - (z - this->rocket->inertia.COG)*dCL; // remember z should be negative distance from nose
 }
 
 
@@ -87,7 +99,7 @@ void SingleStageControl::update_force() {
     this->dForce.zero();
 
     double axial_term = this->dCLdTheta*this->d;
-    double planar_term = this->dCMdTheta - (this->z - this->rocket->COG)*this->dCLdTheta;
+    double planar_term = this->dCMdTheta - (this->z - this->rocket->inertia.COG)*this->dCLdTheta;
 
     for(unsigned i = 0; i < NFINS;i++) {
         auto& fin = this->fins[i];
@@ -106,8 +118,8 @@ void SingleStageControl::update_force() {
     this->dMoment *= this->rocket->aerodynamics.aero_values.dynamic_pressure;
     this->dForce *= this->rocket->aerodynamics.aero_values.dynamic_pressure;
     // remember currently in body frame
-    this->dMoment = this->rocket->CS.transpose_mult(this->dMoment);
-    this->dForce = this->rocket->CS.transpose_mult(this->dForce);
+    this->dMoment = this->rocket->state.CS.transpose_mult(this->dMoment);
+    this->dForce = this->rocket->state.CS.transpose_mult(this->dForce);
 }
 
 
@@ -140,7 +152,7 @@ void SingleStageControl::chute_dynamics(double time) {
 
     this->dForce = this->rocket->aerodynamics.aero_values.unit_v_air * (CDA*this->rocket->aerodynamics.aero_values.dynamic_pressure);
     // assume arm is nose
-    Vector::cross((this->rocket->CS.axis.z * -this->rocket->COG),this->dForce,this->dMoment);
+    Vector::cross((this->rocket->state.CS.axis.z * -this->rocket->inertia.COG),this->dForce,this->dMoment);
 }
 
 
