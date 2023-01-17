@@ -35,12 +35,15 @@ void SingleStageThruster::reset() {
     this->idx = 0;
 };
 
-void SingleStageThruster::set(double pressure) {
-    if(this->is_constant) {
+void SingleStageThruster::set(double pressure)
+{
+    if(this->is_constant)
+    {
         return;
     }
 
-    while(this->idx < this->idx_final && pressure < this->pressures[this->idx + 1]) {
+    while(this->idx < this->idx_final && pressure < this->pressures[this->idx + 1])
+    {
         this->idx++;
 
         double dp = 1.0 / (this->pressures[this->idx+1] - this->pressures[this->idx]);

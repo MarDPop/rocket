@@ -27,7 +27,10 @@ void SingleStageAerodynamics::compute_aero_values() {
 
     this->aero_values.airspeed = air_velocity.norm();
 
-    this->aero_values.unit_v_air = air_velocity * (1.0/this->aero_values.airspeed);
+    if(this->aero_values.airspeed > 1e-3)
+    {
+        this->aero_values.unit_v_air = air_velocity * (1.0/this->aero_values.airspeed);
+    }
 
     this->aero_values.mach = this->aero_values.airspeed * this->rocket.altitude_table.values->inv_sound_speed;
 
@@ -62,7 +65,7 @@ void SingleStageAerodynamics::update() {
     this->moment = rocket.state.angular_velocity*(this->CM_alpha_dot*this->aero_values.dynamic_pressure);
 
     if (proj > 0.99998) {
-        this->force = this->aero_values.unit_v_air*(CD0_compressible*this->aero_values.dynamic_pressure);
+        this->force = this->aero_values.unit_v_air*(-CD0_compressible*this->aero_values.dynamic_pressure);
         return;
     }
 

@@ -64,9 +64,7 @@ void SingleStageSimulation::load(std::string fn){
 
     this->rocket.altitude_table.set_ground(std::stod(data[0]),std::stod(data[1]),std::stod(data[2]),std::stod(data[3]), 9.806);
 
-    data = util::split(lines[3]);
-
-    if(lines[3].size() > 1 && data[2].compare("skip") != 0) {
+    if(lines[3].size() > 5) {
         try {
             this->rocket.altitude_table.wind.load(lines[3]);
         } catch(...) {}
@@ -91,15 +89,19 @@ void SingleStageSimulation::load(std::string fn){
 
     unsigned int nPoints = std::stoi(data[1]);
 
-    for(unsigned int i = 0; i < nPoints; i++) {
+    for(unsigned int i = 0; i < nPoints; i++)
+    {
         data = util::split(lines[6+i]);
-        if(data.size() < 3) {
+        if(data.size() < 3)
+        {
             throw std::runtime_error("Not enough thruster data in row");
         }
         this->rocket.thruster.add_thrust_point(std::stod(data[0]),std::stod(data[1]),std::stod(data[2]));
     }
 
-    if(lines.size() == 6 + nPoints){
+    if(lines.size() == 6 + nPoints)
+    {
+        std::cout << "No control set \n";
         return;
     }
 
@@ -120,7 +122,7 @@ void SingleStageSimulation::load(std::string fn){
     } else if (NFINS == 4) {
         control = new SingleStageControl_4();
     } else {
-        std::cerr << "Currently only 3 or 4 fins are supported. No control will be run, but sensors will";
+        std::cout << "Currently only 3 or 4 fins are supported. No control will be run, but sensors will";
 
         control = new Control();
 
@@ -128,6 +130,8 @@ void SingleStageSimulation::load(std::string fn){
 
         control->filter.reset(new FilterNone());
     }
+
+    std::cout << "rocket with " << NFINS << " will be run\n";
 
     control->set_rocket(&this->rocket);
 
@@ -158,11 +162,12 @@ void SingleStageSimulation::load(std::string fn){
     }
 }
 
-void print_out(SingleStageRocket& rocket, const char* fn) {
-
+void print_out(SingleStageRocket& rocket, const char* fn)
+{
     FILE* file = fopen(fn,"w");
 
-    if(!file) {
+    if(!file)
+    {
         throw std::invalid_argument("could not open file.");
     }
 
@@ -187,7 +192,7 @@ void SingleStageSimulation::run(const char* fn) {
 
     this->rocket.init(this->launch_angle,this->launch_heading);
 
-    this->rocket.launch(0.1);
+    this->rocket.launch(1.0/256.0);
 
     std::cout << "Printing." << std::endl;
 

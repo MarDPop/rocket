@@ -97,6 +97,17 @@ namespace Cartesian {
         }
     }
 
+    inline void rodriguez_rotation(double* angle_axis, double* vec, double* rotated_vec)
+    {
+        double s = sin(angle_axis[3]);
+        double c = sqrt(1 - s*s);
+        double c1 = (1 - c) * dot(angle_axis, vec);
+        cross(angle_axis,vec,rotated_vec);
+        rotated_vec[0] = rotated_vec[0]*s + vec[0]*c + vec[0]*c1;
+        rotated_vec[1] = rotated_vec[1]*s + vec[1]*c + vec[1]*c1;
+        rotated_vec[2] = rotated_vec[2]*s + vec[2]*c + vec[2]*c1;
+    }
+
     struct Vector
     {
 
@@ -314,18 +325,18 @@ namespace Cartesian {
             this->data[0] = c + axis.x*xc;
             this->data[4] = c + axis.y*yc;
             this->data[8] = c + axis.z*axis.z*c1;
-            double uc = axis.x*yc;
-            double us = axis.z*s;
-            this->data[1] = uc - us;
-            this->data[3] = uc + us;
-            uc = axis.z*xc;
-            us = axis.y*s;
-            this->data[2] = uc + us;
-            this->data[6] = uc - us;
-            uc = axis.z*yc;
-            us = axis.x*s;
-            this->data[5] = uc - us;
-            this->data[7] = uc + us;
+            c = axis.x*yc;
+            c1 = axis.z*s;
+            this->data[1] = c - c1;
+            this->data[3] = c + c1;
+            c = axis.z*xc;
+            c1 = axis.y*s;
+            this->data[2] = c + c1;
+            this->data[6] = c - c1;
+            c = axis.z*yc;
+            c1 = axis.x*s;
+            this->data[5] = c - c1;
+            this->data[7] = c + c1;
         }
 
         inline Axis(const double angle, const Vector& axis)
@@ -333,21 +344,10 @@ namespace Cartesian {
             this->rotation_matrix_from_angle_axis(angle,axis);
         }
 
-        inline void set_from_azimuth_elevation(const double azimuth, const double elevation)
+        inline void set_from_euler_angle(const double roll, const double pitch, const double yaw)
         {
-            double cphi = cos(azimuth);
-            double sphi = sin(azimuth);
-            double stheta = sin(elevation);
-            double ctheta = sqrt(1 - stheta*stheta);
-            this->axis.x.x = cphi;
-            this->axis.x.y = -sphi;
-            this->axis.x.z = 0;
-            this->axis.y.x = ctheta*sphi;
-            this->axis.y.y = ctheta*cphi;
-            this->axis.y.z = -stheta;
-            this->axis.z.x = stheta*sphi;
-            this->axis.z.y = stheta*cphi;
-            this->axis.z.z = ctheta;
+            // aka roll pitch yaw
+
         }
 
         inline void zero()
@@ -603,6 +603,14 @@ namespace Cartesian {
 
     };
 
+    struct AngleAxis
+    {
+        double angle;
+        Vector axis;
+
+
+    };
+
     struct Quaternion {
 
 
@@ -850,5 +858,6 @@ namespace Cartesian {
         }
 
     };
+
 
 }

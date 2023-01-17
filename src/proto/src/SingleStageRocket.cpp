@@ -115,10 +115,24 @@ SingleStageRocket::~SingleStageRocket(){}
 
 void SingleStageRocket::init(double launch_angle, double launch_heading)
 {
-
     memset(&this->state,0,sizeof(KinematicState));
 
-    this->state.CS.set_from_azimuth_elevation(launch_heading, 1.5707963267948966192 - launch_angle);
+    double cphi = cos(launch_heading);
+    double sphi = sin(launch_heading);
+    double stheta = sin(1.5707963267948966192 - launch_angle);
+    double ctheta = sqrt(1 - stheta*stheta);
+
+    // z rotation by launch_heading
+    // y rotation by launch_angle
+    this->state.CS.axis.x.x = cphi*stheta;
+    this->state.CS.axis.x.y = -sphi*stheta;
+    this->state.CS.axis.x.z = -ctheta;
+    this->state.CS.axis.y.x = sphi;
+    this->state.CS.axis.y.y = cphi;
+    this->state.CS.axis.y.z = 0;
+    this->state.CS.axis.z.x = ctheta*sphi;
+    this->state.CS.axis.z.y = ctheta*cphi;
+    this->state.CS.axis.z.z = stheta;
 
     this->inertia.mass = this->mass_full;
     this->get_inertia();
