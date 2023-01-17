@@ -623,7 +623,7 @@ namespace Cartesian {
     struct Quaternion {
 
 
-        alignas(32) union
+        union alignas(32)
         {
             double data[4];
             struct {

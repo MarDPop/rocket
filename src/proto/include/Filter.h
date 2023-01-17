@@ -37,7 +37,7 @@ public:
         return this->computed_state.velocity;
     }
 
-    inline const Axis& get_computed_CS() const {
+    inline Axis get_computed_CS() const {
         return (this->computed_state.orientation.to_rotation_matrix());
     }
 

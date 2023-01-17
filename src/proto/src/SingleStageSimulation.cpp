@@ -142,7 +142,7 @@ void SingleStageSimulation::load(std::string fn){
         return;
     }
 
-    SingleStageControl* c = reinterpret_cast<SingleStageControl*>(control);
+    SingleStageControl* c = dynamic_cast<SingleStageControl*>(control);
 
     c->set_aero_coef(std::stod(data[1]),std::stod(data[2]),std::stod(data[3]),std::stod(data[4]),std::stod(data[5]));
 

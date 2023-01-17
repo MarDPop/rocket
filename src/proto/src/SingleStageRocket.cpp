@@ -174,5 +174,7 @@ void SingleStageRocket::launch(double dt)
 
             this->state.CS.gram_schmidt_orthogonalize();
         }
+
+        std::cout << "\r" << time << std::flush;
     }
 }

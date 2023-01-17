@@ -42,7 +42,8 @@ void SingleStageAerodynamics::update() {
 
     this->compute_aero_values();
 
-    if(this->aero_values.airspeed < 1e-2){
+    if(this->aero_values.airspeed < 1e-2)
+    {
         this->force.zero();
         this->moment.zero();
         return;
