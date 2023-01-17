@@ -124,15 +124,14 @@ void SingleStageRocket::init(double launch_angle, double launch_heading)
 
     // z rotation by launch_heading
     // y rotation by launch_angle
-    this->state.CS.axis.x.x = cphi*stheta;
-    this->state.CS.axis.x.y = -sphi*stheta;
-    this->state.CS.axis.x.z = -ctheta;
+    // y axis points north at zero heading
     this->state.CS.axis.y.x = sphi;
     this->state.CS.axis.y.y = cphi;
     this->state.CS.axis.y.z = 0;
-    this->state.CS.axis.z.x = ctheta*sphi;
-    this->state.CS.axis.z.y = ctheta*cphi;
+    this->state.CS.axis.z.x = ctheta*cphi;
+    this->state.CS.axis.z.y = ctheta*-sphi;
     this->state.CS.axis.z.z = stheta;
+    Vector::cross(this->state.CS.axis.y,this->state.CS.axis.z,this->state.CS.axis.x);
 
     this->inertia.mass = this->mass_full;
     this->get_inertia();
@@ -172,6 +171,8 @@ void SingleStageRocket::launch(double dt)
             }
 
             time_record += this->record.t_interval;
+
+            this->state.CS.gram_schmidt_orthogonalize();
         }
     }
 }

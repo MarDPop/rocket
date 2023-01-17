@@ -532,6 +532,15 @@ namespace Cartesian {
             return Inv;
         }
 
+        void gram_schmidt_orthogonalize()
+        {
+            this->axis.z.normalize();
+            this->axis.x -= this->axis.z*( this->axis.x.dot(this->axis.z) );
+            this->axis.x.normalize();
+            this->axis.y -= this->axis.z*( this->axis.y.dot(this->axis.z) ) - this->axis.x*( this->axis.y.dot(this->axis.x) );
+            this->axis.y.normalize();
+        }
+
     };
 
     struct Spherical {

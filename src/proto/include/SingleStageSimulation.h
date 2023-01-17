@@ -7,7 +7,7 @@ class SingleStageSimulation {
 
     SingleStageRocket rocket;
 
-    double launch_angle = 0;
+    double launch_angle = 0.1;
 
     double launch_heading = 0;
 

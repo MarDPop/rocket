@@ -64,7 +64,7 @@ void SingleStageAerodynamics::update() {
 
     this->moment = rocket.state.angular_velocity*(this->CM_alpha_dot*this->aero_values.dynamic_pressure);
 
-    if (proj > 0.99998) {
+    if (proj > 0.999999) {
         this->force = this->aero_values.unit_v_air*(-CD0_compressible*this->aero_values.dynamic_pressure);
         return;
     }
@@ -73,19 +73,27 @@ void SingleStageAerodynamics::update() {
 
     Vector arm = this->aero_values.unit_v_air.cross(rocket.state.CS.axis.z);
 
-    this->moment += arm*(this->CM_alpha*this->aero_values.dynamic_pressure);
+    this->moment -= arm*(this->CM_alpha*this->aero_values.dynamic_pressure);
+
+    // could not use AoA but instead sAoA = arm.norm()
 
     double CL,CD;
-    if(AoA > this->stall_angle) {
-        CD = CD0_compressible + this->K*this->CL_max*this->CL_max*arm.norm()*this->constant_term;
-        if(AoA > 2*this->stall_angle) {
+    if(AoA > this->stall_angle)
+    {
+        CD = CD0_compressible + this->K*this->CL_max*this->CL_max*arm.norm()*this->constant_term; // norm of arm is equal to sin of angle which is approx lift curve
+        if(AoA > 2*this->stall_angle)
+        {
             this->force = this->aero_values.unit_v_air*(-CD*this->aero_values.dynamic_pressure);
             return;
-        } else {
+        }
+        else
+        {
             double frac = 1.0/(5*(AoA - this->stall_angle) + 1.0);
             CL = frac*this->CL_max;
         }
-    } else {
+    }
+    else
+    {
         CL = this->CL_alpha*AoA;
         CD = CD0_compressible + this->K*CL*CL;
     }
@@ -93,7 +101,7 @@ void SingleStageAerodynamics::update() {
     Vector lift = arm.cross(this->aero_values.unit_v_air);
     double v = lift.norm();
     if(v > 1e-8) {
-        CL /= v;
+        CL /= v; //
     }
 
     this->force = (lift*CL - this->aero_values.unit_v_air*CD)*this->aero_values.dynamic_pressure;
