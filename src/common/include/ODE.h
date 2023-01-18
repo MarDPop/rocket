@@ -17,76 +17,76 @@ class Recording {
 
     std::vector< std::array<double,N> > states;
 
-	inline static int bisect(const std::vector<double>& data, const double& val) {
-		int lo = 0;
-		int hi = data.size()-1;
-		int mid = (lo + hi)/2;
-		while (lo != mid) {
-			if(val > data[mid]) {
-				lo = mid;
-			} else {
-				hi = mid;
-			}
-			mid = (lo + hi)/2;
-		}
-		return mid;
-	}
-
 public:
 
-	inline void clear() {
+	inline void clear()
+	{
 		this->times.clear();
 		this->states.clear();
 	}
 
-	inline void add(const double& time, std::array<double,N> state) {
+	inline void add(const double& time, std::array<double,N> state)
+	{
 		this->times.push_back(time);
 		this->states.push_back(state);
 	}
 
-	inline void set_record_interval(const double& record_interval) {
+	inline void set_record_interval(const double& record_interval)
+	{
 		this->record_interval = record_interval;
 	}
 
-	inline double get_record_interval(){
+	inline double get_record_interval()
+	{
 		return this->record_interval;
 	}
 
-	inline int number_entries() const {
+	inline int number_entries() const
+	{
 		return this->times.size();
 	}
 
-	inline std::vector<double> get_times() const {
+	inline std::vector<double> get_times() const
+	{
 		return this->times;
 	}
 
-	inline std::vector< std::array<double,N> > get_states() const {
+	inline std::vector< std::array<double,N> > get_states() const
+	{
 		return this->states;
 	}
 
-	inline double time_at(int idx) const {
+	inline double time_at(int idx) const
+	{
 		return this->times[idx];
 	}
 
-	inline double final_time() const {
+	inline double final_time() const
+    {
 		return this->times.back();
 	}
 
-	inline std::array<double,N> state_at(int idx) const {
+	inline std::array<double,N> state_at(int idx) const
+	{
 		return this->states[idx];
 	}
 
-    inline std::array<double,N> get(const double& time) const {
-        int idx = bisect(this->times,time);
-        const std::array<double,N> & lo = this->states[idx];
-        const std::array<double,N> & hi = this->states[idx+1];
+    inline std::array<double,N> get(const double& time) const
+    {
+        auto it = std::lower_bound(this->times.begin(), this->times.end(),time);
+        if(it == this->times.end())
+        {
+            return this->states.end();
+        }
+        int idx = std::distance(this->times.begin(),it);
+        std::array<double,N> lo = this->states[idx];
+        const std::array<double,N>& hi = this->states[idx+1];
 
-		std::array<double,N> out;
 		double delta = (time - times[idx])/(times[idx+1] - times[idx]);
         for(int i = 0; i < N;i++){
-            out[i] = lo[i] + (hi[i] - lo[i])*delta;
+            lo[i] += (hi[i] - lo[i])*delta;
         }
-        return out;
+        return lo;
     }
 
 	inline void save(const std::string& fn){
@@ -94,7 +94,7 @@ public:
 		pFile = fopen (fn.c_str(),"w");
 		const int n = this->times.size();
 		const char* tformat = "%12.6f";
-		const char* nformat = " %16.14f";
+		const char* nformat = " %.14e";
 		for (int i = 0 ; i < n; i++) {
 			const std::array<double,N>& state = this->states[i];
 			fprintf (pFile, tformat, this->times[i]);
@@ -159,16 +159,19 @@ public:
         int nSteps = 0;
         double record_time = HUGE_NEG_NUMBER;
 		this->state = x0;
-        while(nSteps++ < maxSteps && this->time < time_final){
+        while(nSteps++ < maxSteps && this->time < time_final)
+        {
 
-            if(this->time >= record_time){
+            if(this->time >= record_time)
+                {
                 this->recording.add(this->time,this->state);
                 record_time = this->time + this->recording.get_record_interval();
             }
 
             this->step();
 
-            if(dynamics->stop() || this->stop(this->state,this->time)){
+            if(dynamics->stop() || this->stop(this->state,this->time))
+            {
                 break;
             }
         }

@@ -162,39 +162,47 @@ void SingleStageSimulation::load(std::string fn){
     }
 }
 
-void print_out(SingleStageRocket& rocket, const char* fn)
-{
-    FILE* file = fopen(fn,"w");
+void SingleStageSimulation::run(const char* fn) {
 
-    if(!file)
+    this->output = fopen(fn,"w");
+
+    if(!this->output)
     {
         throw std::invalid_argument("could not open file.");
     }
 
-    fprintf(file,"39.94426809919236 -104.94474985717818 1606.0\n");
-
-    int nLines = rocket.record.position.size();
-
-    for(int i = 0; i < nLines; i++) {
-        const double* pos = rocket.record.position[i].data;
-        const double* q = rocket.record.orientation[i].data;
-        const double m = rocket.record.mass[i];
-        fprintf(file,"%7.2f % .6e % .6e % .6e % 10.8f % 10.8f % 10.8f % 10.8f % 10.8f % 10.8f % 10.8f % 10.8f % 10.8f % .6e\n",
-                    i*rocket.record.t_interval, pos[0], pos[1], pos[2], q[0], q[1], q[2], q[3], q[4], q[5], q[6], q[7], q[8], m);
-    }
-
-    fclose(file);
-}
-
-void SingleStageSimulation::run(const char* fn) {
+    fprintf(this->output,"39.94426809919236 -104.94474985717818 1606.0\n");
 
     std::cout << "Running Simulation." << std::endl;
 
     this->rocket.init(this->launch_angle,this->launch_heading);
 
-    this->rocket.launch(1.0/256.0);
+    double dt = 1.0/256.0;
+    double time = 0;
+    double time_record = 0;
 
-    std::cout << "Printing." << std::endl;
+    while(time < 10000)
+    {
+        this->rocket.step(time,dt);
 
-    print_out(this->rocket, fn);
+        if(time > time_record)
+        {
+            if(std::isnan(this->rocket.state.position.z) || this->rocket.state.position.z < -0.5) {
+                break;
+            }
+
+            const double* pos = this->rocket.state.position.data;
+            const double* q = this->rocket.state.CS.data;
+            fprintf(this->output,"%7.2f % .6e % .6e % .6e % 10.8f % 10.8f % 10.8f % 10.8f % 10.8f % 10.8f % 10.8f % 10.8f % 10.8f % .6e\n",
+                    time, pos[0], pos[1], pos[2], q[0], q[1], q[2], q[3], q[4], q[5], q[6], q[7], q[8], this->rocket.inertia.mass);
+
+            time_record += this->record.t_interval;
+
+            this->rocket.state.CS.gram_schmidt_orthogonalize();
+        }
+
+        std::cout << "\r" << time << std::flush;
+    }
+
+    fclose(this->output);
 }

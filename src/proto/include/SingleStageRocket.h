@@ -69,39 +69,9 @@ struct Inertia
     double COG;
 };
 
-/**
-* Internal struct definition to record states
-*/
-struct Recording
-{
-    /**
-    * Time interval between recordings (sec)
-    */
-    double t_interval = 0.25;
-
-    /**
-    * Position (m)
-    */
-    std::vector<Vector> position;
-
-    /**
-    * Full CS orientation
-    */
-    std::vector<Axis> orientation;
-
-    /**
-    * Mass (kg)
-    */
-    std::vector<double> mass;
-
-    /**
-    * Any other test value we want
-    */
-    std::vector<double> test_value;
-};
-
 class SingleStageRocket
 {
+friend class SingleStageSimulation;
 
     bool not_empty = false;
 
@@ -140,8 +110,6 @@ public:
 
     KinematicState state;
 
-    Recording record;
-
     AltitudeTable altitude_table;
 
     SingleStageAerodynamics aerodynamics;
@@ -156,9 +124,6 @@ public:
     void set_inertial_properties(double empty_mass, double full_mass, double I_empty[3], double I_full[3]);
 
     void init(double launch_angle, double launch_heading);
-
-    void launch(double dt);
-
 
 };
 

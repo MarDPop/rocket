@@ -149,32 +149,3 @@ void SingleStageRocket::set_inertial_properties(double empty_mass, double full_m
     this->dIdm[1] = (I_full[1] - I_empty[1])/dm;
     this->dIdm[2] = (I_full[2] - I_empty[2])/dm; // dCOG
 }
-
-
-void SingleStageRocket::launch(double dt)
-{
-    double time = 0;
-    double time_record = 0;
-
-    while(time < 10000)
-    {
-        this->step(time,dt);
-
-        if(time > time_record)
-        {
-            this->record.position.push_back(this->state.position);
-            this->record.orientation.push_back(this->state.CS);
-            this->record.mass.push_back(this->inertia.mass);
-
-            if(std::isnan(this->state.position.z) || this->state.position.z < -0.5) {
-                break;
-            }
-
-            time_record += this->record.t_interval;
-
-            this->state.CS.gram_schmidt_orthogonalize();
-        }
-
-        std::cout << "\r" << time << std::flush;
-    }
-}
