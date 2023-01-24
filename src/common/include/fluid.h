@@ -13,6 +13,8 @@ class flow {
 
 public:
 
+    static constexpr double R_GAS = 8.31446261815324;
+
     inline flow(double gamma) : k(gamma), k1(gamma-1), k2(gamma+1), k3(k1*0.5), k4(k2*0.5), k5(k4/k1) {}
 
     inline static double beta(double M, double k) {
@@ -40,9 +42,10 @@ public:
         return pow((1 + 0.5*k1*M*M)/tmp,tmp/k1)/M;
     }
 
-    inline static double normal_shock_sqmach_ratio(double M2, double k) {
+    inline static double normal_shock_downstream_mach_sq(double M, double k) {
         double k1 = k-1;
-        return (k1*M2 +2 )/(2*k*M2 - k1);
+        double M2 = M*M;
+        return (k1*M2 + 2)/(2*k*M2 - k1);
     }
 
     inline static double normal_shock_total_pressure_ratio(double M, double k) {
@@ -60,9 +63,14 @@ public:
         return (2*k*M2 - k1)*(k1*M2 + 2)/(k2*k2*M2);
     }
 
-    inline static double normal_shock_static_pressure_ratio(double M, double k) {
+    inline static double normal_shock_desnity_ratio(double M, double k) {
         double M2 = M*M;
         return (k+1)*M2/((k-1)*M2 + 2);
+    }
+
+    inline static double normal_shock_static_pressure_ratio(double M, double k) {
+        double M2 = M*M;
+        return (2*k*M2 + 1 - k)/(k+1);
     }
 };
 

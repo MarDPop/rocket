@@ -24,7 +24,8 @@ Nozzle::Nozzle(){}
 
 Nozzle::~Nozzle(){}
 
-double Nozzle::get_thrust(double ambient_pressure) {
+double Nozzle::get_thrust(double ambient_pressure)
+{
     double M_exit = Nozzle::isentropic_exit_mach(this->area_ratio,this->combustor->gamma);
     double beta = 1.0 + 0.5*(this->combustor->gamma-1)*M_exit*M_exit;
     double T_exit = this->combustor->T_total/beta;
@@ -60,7 +61,8 @@ double Nozzle::isentropic_exit_mach(double area_ratio, double k) {
     return M_guess;
 }
 
-double Nozzle::isentropic_exit_mach(double area_ratio, double k, double M_guess) {
+double Nozzle::isentropic_exit_mach(double area_ratio, double k, double M_guess)
+{
     double k1 = k - 1;
     double k2 = (k + 1)*0.5;
     double ex = k2/k1;

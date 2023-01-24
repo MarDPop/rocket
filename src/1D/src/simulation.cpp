@@ -1,7 +1,3 @@
 #include "../include/simulation.h"
 
-namespace Simulation1D {
-
-
-
-}
+void Simulation1D::run(){}

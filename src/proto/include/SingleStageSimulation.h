@@ -46,7 +46,7 @@ class SingleStageSimulation
 
     Recording record;
 
-    double launch_angle = 0.05;
+    double launch_angle = 0.02;
 
     double launch_heading = 0;
 
@@ -59,6 +59,6 @@ public:
 
     void load(std::string fn);
 
-    void run(const char* fn);
+    void run(std::string fn);
 
 };

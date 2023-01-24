@@ -57,6 +57,8 @@ struct Fuel_KNSU : Fuel {
     /*
         pressure in Pa
         temperature in K
+
+        burn rate in cm/s?
     */
     inline double burn_rate(double pressure, double temperature) {
         if(pressure > 4.1e6) {
@@ -189,7 +191,7 @@ public:
 
 };
 
-class SugarThruster : public SolidThruster {
+class SugarThruster : public virtual SolidThruster {
 
 
 public:

@@ -162,9 +162,9 @@ void SingleStageSimulation::load(std::string fn){
     }
 }
 
-void SingleStageSimulation::run(const char* fn) {
+void SingleStageSimulation::run(std::string fn) {
 
-    this->output = fopen(fn,"w");
+    this->output = fopen(fn.c_str(),"w");
 
     if(!this->output)
     {

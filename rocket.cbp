@@ -412,7 +412,6 @@
 		<Unit filename="lib/Eigen/src/plugins/MatrixCwiseUnaryOps.h" />
 		<Unit filename="lib/Eigen/src/plugins/ReshapedMethods.h" />
 		<Unit filename="resources/reactions/reactions.json" />
-		<Unit filename="src/1D/include/Vehicle.h" />
 		<Unit filename="src/1D/include/physics.h" />
 		<Unit filename="src/1D/include/simulation.h" />
 		<Unit filename="src/1D/include/structures.h" />
@@ -420,7 +419,6 @@
 		<Unit filename="src/1D/src/physics.cpp" />
 		<Unit filename="src/1D/src/simulation.cpp" />
 		<Unit filename="src/1D/src/thruster.cpp" />
-		<Unit filename="src/1D/src/vehicle.cpp" />
 		<Unit filename="src/6DOF/include/Action.h" />
 		<Unit filename="src/6DOF/include/Aerodynamics.h" />
 		<Unit filename="src/6DOF/include/Atmosphere.h" />
@@ -440,6 +438,8 @@
 		<Unit filename="src/6DOF/src/StageDynamics.cpp" />
 		<Unit filename="src/6DOF/src/Thruster.cpp" />
 		<Unit filename="src/6DOF/src/Vehicle.cpp" />
+		<Unit filename="src/CFD/include/fluid.h" />
+		<Unit filename="src/CFD/include/structures.h" />
 		<Unit filename="src/app/main.cpp" />
 		<Unit filename="src/app/single_sim.cpp" />
 		<Unit filename="src/app/test.cpp" />
