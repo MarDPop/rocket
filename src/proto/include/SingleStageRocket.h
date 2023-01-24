@@ -114,7 +114,7 @@ public:
 
     SingleStageAerodynamics aerodynamics;
 
-    SingleStageThruster thruster;
+    std::unique_ptr<SingleStageThruster> thruster;
 
     std::unique_ptr<Control> control;
 

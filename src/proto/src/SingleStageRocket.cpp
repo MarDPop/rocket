@@ -16,8 +16,8 @@ void SingleStageRocket::compute_acceleration(double time)
 
     if(this->not_empty)
     {
-        this->thruster.set(this->altitude_table.values->pressure);
-        this->state.acceleration += this->state.CS.axis.z * this->thruster.thrust;
+        this->thruster->set(this->altitude_table.values->pressure, time);
+        this->state.acceleration += this->state.CS.axis.z * this->thruster->get_thrust();
     }
 
     if(this->control)
@@ -71,7 +71,7 @@ void SingleStageRocket::step(double& time, double dt)
 
     // Compute mass changes, no need to recompute at next step
     if(this->not_empty) {
-        this->inertia.mass -= this->thruster.mass_rate*dt;
+        this->inertia.mass -= this->thruster->get_mass_rate()*dt;
         this->get_inertia();
     }
 

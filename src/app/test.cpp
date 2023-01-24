@@ -5,7 +5,6 @@
 #include "../common/include/RocketShape.h"
 #include "../common/include/Cartesian.h"
 #include "../1D/include/thruster.h"
-#include "../1D/include/Vehicle.h"
 #include "../6DOF/include/Vehicle.h"
 #include "../6DOF/include/Stage.h"
 #include "../util/include/Simulation.h"

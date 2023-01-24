@@ -3,7 +3,8 @@
 #include "../../1D/include/thruster.h"
 #include <vector>
 
-class SingleStageThruster {
+class SingleStageThruster
+{
 
 protected:
 
@@ -27,8 +28,8 @@ public:
         return this->mass_rate;
     }
 
-    virtual void set(double pressure, double time);
-}
+    virtual void set(double pressure, double time) {}
+};
 
 
 class PressureThruster : public virtual SingleStageThruster {
@@ -67,6 +68,10 @@ class ComputedThruster : public virtual SingleStageThruster
         double mass;
         double Ixx;
         double Izz;
+
+        performance_values(){}
+        performance_values(double a, double b, double c, double d, double e, double f) :
+            chamber_pressure(a), ideal_exit_velocity(b), mass_rate(c), mass(d), Ixx(e) , Izz(f) {}
     };
 
     double _area_ratio;

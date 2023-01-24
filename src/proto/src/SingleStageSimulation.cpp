@@ -89,6 +89,7 @@ void SingleStageSimulation::load(std::string fn){
 
     unsigned int nPoints = std::stoi(data[1]);
 
+    PressureThruster* thruster = new PressureThruster();
     for(unsigned int i = 0; i < nPoints; i++)
     {
         data = util::split(lines[6+i]);
@@ -96,8 +97,10 @@ void SingleStageSimulation::load(std::string fn){
         {
             throw std::runtime_error("Not enough thruster data in row");
         }
-        this->rocket.thruster.add_thrust_point(std::stod(data[0]),std::stod(data[1]),std::stod(data[2]));
+        thruster->add_thrust_point(std::stod(data[0]),std::stod(data[1]),std::stod(data[2]));
     }
+
+    this->rocket.thruster.reset(thruster);
 
     if(lines.size() == 6 + nPoints)
     {
