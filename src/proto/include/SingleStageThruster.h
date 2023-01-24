@@ -29,6 +29,8 @@ public:
     }
 
     virtual void set(double pressure, double time) {}
+
+    virtual void load(std::string fn);
 };
 
 
@@ -55,6 +57,8 @@ public:
     void reset();
 
     void set(double pressure, double time) override;
+
+    void load(std::string fn) override;
 
 };
 
@@ -103,8 +107,9 @@ public:
     double Izz;
 
     ComputedThruster();
-    ComputedThruster(std::string fn);
     ~ComputedThruster();
+
+    void load(std::string fn) override;
 
     void set(double pressure, double time) override;
 
@@ -119,5 +124,7 @@ public:
                   double bore_radius,
                   double throat_radius,
                   double exit_radius);
+
+    void save(std::string fn);
 
 };

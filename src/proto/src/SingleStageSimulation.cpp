@@ -82,37 +82,45 @@ void SingleStageSimulation::load(std::string fn){
 
     this->rocket.aerodynamics.set_coef(coef);
 
-    data = util::split(lines[5]);
-    if(data.size() < 2) {
-        throw std::runtime_error("Need to Set Thruster Points");
-    }
-
-    unsigned int nPoints = std::stoi(data[1]);
-
-    PressureThruster* thruster = new PressureThruster();
-    for(unsigned int i = 0; i < nPoints; i++)
+    if(lines[5].size() < 6)
     {
-        data = util::split(lines[6+i]);
-        if(data.size() < 3)
-        {
-            throw std::runtime_error("Not enough thruster data in row");
-        }
-        thruster->add_thrust_point(std::stod(data[0]),std::stod(data[1]),std::stod(data[2]));
+        throw std::runtime_error("Need to Set Thruster File");
     }
 
-    this->rocket.thruster.reset(thruster);
+    try {
+        auto ext = util::get_extension(lines[5]);
+        if(ext == "pthruster")
+        {
+            PressureThruster* thruster = new PressureThruster();
+            thruster->load(lines[5]);
+            this->rocket.thruster.reset(thruster);
+        }
+        else if (ext == "cthruster")
+        {
+            ComputedThruster* thruster = new ComputedThruster();
+            thruster->load(lines[5]);
+            this->rocket.thruster.reset(thruster);
+        }
+        else if (ext == "sthruster")
+        {
+            SingleStageThruster* thruster = new SingleStageThruster();
+            thruster->load(lines[5]);
+            this->rocket.thruster.reset(thruster);
+        }
+    } catch(...) {}
 
-    if(lines.size() == 6 + nPoints)
+    if(lines.size() == 6)
     {
         std::cout << "No control set \n";
         return;
     }
 
-    if(lines.size() < 9 + nPoints){
+    if(lines.size() < 9)
+    {
         throw std::runtime_error("Not enough Fin Info");
     }
 
-    data = util::split(lines[6 + nPoints]);
+    data = util::split(lines[6]);
     if(data.size() < 6) {
         throw std::runtime_error("Not enough Fin Info: " + std::to_string(data.size()) + " < 6. Reminder: {NFINS,dSCL,dSCM,dSCD,COP_z,COP_radial}");
     }
@@ -149,7 +157,7 @@ void SingleStageSimulation::load(std::string fn){
 
     c->set_aero_coef(std::stod(data[1]),std::stod(data[2]),std::stod(data[3]),std::stod(data[4]),std::stod(data[5]));
 
-    data = util::split(lines[7 + nPoints]);
+    data = util::split(lines[7]);
     if(data.size() < 5) {
         throw std::runtime_error("Not enough Fin Info: " + std::to_string(data.size()) + " < 5. Reminder: {K1,K2,C2,slew,limit}");
     }
@@ -157,7 +165,7 @@ void SingleStageSimulation::load(std::string fn){
     c->set_controller_terms(std::stod(data[0]),std::stod(data[1]),std::stod(data[2]));
     c->set_system_limits(std::stod(data[3]),std::stod(data[4]));
 
-    data = util::split(lines[8 + nPoints]);
+    data = util::split(lines[8]);
     if(data.size() == 6) {
         c->set_chute(std::stod(data[0]),std::stod(data[1]),std::stod(data[2]),std::stod(data[3]),std::stod(data[4]),std::stod(data[5]));
     } else {

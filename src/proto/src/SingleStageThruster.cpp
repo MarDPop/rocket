@@ -11,6 +11,20 @@ SingleStageThruster::SingleStageThruster(){}
 SingleStageThruster::SingleStageThruster(double t, double isp) : thrust(t), mass_rate(t/(isp*9.806)) {}
 SingleStageThruster::~SingleStageThruster(){}
 
+void SingleStageThruster::load(std::string fn)
+{
+    std::ifstream myfile(fn);
+
+    if(myfile.is_open())
+    {
+        std::string line; getline( myfile, line );
+        auto row = util::split(line);
+        this->thrust = std::stod(row[0]);
+        this->mass_rate = this->thrust/(9.806*std::stod(row[1]));
+        myfile.close();
+    }
+}
+
 void PressureThruster::add_thrust_point(double pressure, double thrust, double mass_rate) {
 
     if(this->pressures.size() > 0 && pressure > this->pressures.back()) {
@@ -59,11 +73,32 @@ void PressureThruster::set(double pressure, double time)
     this->mass_rate = this->mass_rates[this->idx] + this->dM*delta;
 };
 
-ComputedThruster::ComputedThruster(){}
-
-ComputedThruster::ComputedThruster(std::string fn)
+void PressureThruster::load(std::string fn)
 {
     std::ifstream myfile(fn);
+    pressures.clear();
+    thrusts.clear();
+    mass_rates.clear();
+    if(myfile.is_open())
+    {
+        for( std::string line; getline( myfile, line ); )
+        {
+            auto row = util::split(line);
+            pressures.push_back(std::stod(row[0]));
+            thrusts.push_back(std::stod(row[1]));
+            mass_rates.push_back(std::stod(row[2]));
+        }
+        myfile.close();
+    }
+}
+
+ComputedThruster::ComputedThruster(){}
+
+void ComputedThruster::load(std::string fn)
+{
+    std::ifstream myfile(fn);
+    _times.clear();
+    _values.clear();
     if(myfile.is_open()){
         for( std::string line; getline( myfile, line ); ){
             auto row = util::split(line);
@@ -317,3 +352,8 @@ void ComputedThruster::set(double pressure, double time)
         this->thrust = v_exit*mass_rate;
     }
 };
+
+void ComputedThruster::save(std::string fn)
+{
+
+}

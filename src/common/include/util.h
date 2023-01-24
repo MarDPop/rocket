@@ -24,6 +24,17 @@ namespace util {
         return out;
     }
 
+    inline std::string get_extension(std::string fn)
+    {
+        std::string ext;
+        int idx = fn.size()-1;
+        while(idx-- != 0 && fn[idx] != '.') {}
+        while(++idx != fn.size()){
+            ext.push_back(idx);
+        }
+        return ext;
+    }
+
     constexpr double POW10[16] = {1.0,0.1,0.01,0.001,1e-4,1e-5,1e-6,1e-7,1e-8,1e-9,1e-10,1e-11,1e-12,1e-13,1e-14,1e-15};
 
     inline double fast_stod(const char* buffer, int start_idx, const int end_idx) {
