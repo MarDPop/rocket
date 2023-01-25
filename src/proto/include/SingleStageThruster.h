@@ -114,6 +114,24 @@ class ComputedThruster : public virtual SingleStageThruster
 
 public:
 
+    struct generate_args
+    {
+        double burn_coef;
+        double burn_exp;
+        double fuel_density;
+        double fuel_heating;
+        double gamma;
+        double mw;
+        double length;
+        double radius;
+        double bore_radius;
+        double throat_radius;
+        double exit_radius;
+        double half_angle;
+        double segment_gap;
+        int n_segments;
+    };
+
     double mass;
     double Ixx;
     double Izz;
@@ -130,17 +148,7 @@ public:
         this->_tidx = 0;
     }
 
-    void generate(double burn_coef,
-                  double burn_exp,
-                  double fuel_density,
-                  double fuel_heating,
-                  double gamma,
-                  double mw,
-                  double length,
-                  double radius,
-                  double bore_radius,
-                  double throat_radius,
-                  double exit_radius);
+    void generate(const generate_args& args);
 
     void save(std::string fn);
 

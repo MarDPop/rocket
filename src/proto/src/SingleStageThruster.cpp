@@ -224,54 +224,46 @@ void ComputedThruster::set_nozzle_parameters(double frozen_gamma, double mw, dou
     this->_pressure_ratio_normal_exit = this->_pressure_ratio_ideal * p_ratio_normal;
 }
 
-void ComputedThruster::generate(double burn_coef,
-                  double burn_exp,
-                  double fuel_density,
-                  double fuel_heating,
-                  double gamma,
-                  double mw,
-                  double length,
-                  double radius,
-                  double bore_radius,
-                  double throat_radius,
-                  double exit_radius)
+void ComputedThruster::generate(const generate_args& args)
 {
-    double throat_area = M_PI*throat_radius*throat_radius;
-    double exit_area = M_PI*exit_radius*exit_radius;
+    double throat_area = M_PI*args.throat_radius*args.throat_radius;
+    double exit_area = M_PI*args.exit_radius*args.exit_radius;
 
-    this->set_nozzle_parameters(gamma, mw, throat_area, exit_area, 0.2);
+    this->set_nozzle_parameters(args.gamma, args.mw, args.throat_area, args.exit_area, 0.2);
 
-    double R_frozen = flow::R_GAS / mw;
-    double k1 = gamma - 1;
-    double k2 = gamma + 1;
+    double R_frozen = flow::R_GAS / args.mw;
+    double k1 = args.gamma - 1;
+    double k2 = args.gamma + 1;
     double k3 = 1/k1;
-    double ex = -k1/gamma;
+    double ex = -k1/args.gamma;
 
-    double c = gamma*R_frozen;
+    double c = args.gamma*R_frozen;
     double cp = c/k1;
 
-    double exit_mach_supersonic = Nozzle::isentropic_exit_mach(this->_area_ratio,gamma);
+    double exit_mach_supersonic = Nozzle::isentropic_exit_mach(this->_area_ratio,args.gamma);
 
-    double V = M_PI*bore_radius*bore_radius*length;
+    double V = M_PI*args.bore_radius*args.bore_radius*args.length;
     double P = 100000;
     double T = 297;
     double rho = P/(R_frozen*T);
     double M = V*rho; // air kg /m3
     double E = M*cp*T;
-    double A_burn = M_PI*bore_radius*2*length;
-    double R = bore_radius;
 
-    double L2 = length*length;
-    double R2 = radius*radius;
+    double A_const = M_PI*2*args.length;
+    double A_burn = args.bore_radius*A_const;
+    double R = args.bore_radius;
+
+    double L2 = args.length*args.length;
+    double R2 = args.radius*args.radius;
 
     double P_ambient = P;
     double P_crit = P/this->_pressure_ratio_critical;
     double P_normalize = 1.0/100000.0;
-    double m_constant = pow(2/k2,0.5*k2/k1)*throat_area;
+    double m_constant = pow(2/k2,0.5*k2/k1)*args.throat_area;
     double T_throat_const = 1.0/(1 + k1*0.5);
     double T_exit_const = 1.0/(1 + k1*0.5*exit_mach_supersonic*exit_mach_supersonic);
 
-    double M_fuel = (M_PI*radius*radius*length - V)*fuel_density;
+    double M_fuel = (M_PI*args.radius*args.radius*length - V)*args.fuel_density;
 
     double dt = 1e-5; // use variable dt to reduce points
     const int recording_count = 100;
@@ -306,13 +298,13 @@ void ComputedThruster::generate(double burn_coef,
             mdot = rho_exit*exit_area*exit_v;
         }
 
-        double burn_rate = burn_coef*pow(P*P_normalize,burn_exp);
+        double burn_rate = args.burn_coef*pow(P*P_normalize,args.burn_exp);
         double dr = burn_rate*dt;
         double dV = A_burn*dr;
         double dA = 2*M_PI*length*dr; // check
-        double dM_in = fuel_density*dV;
+        double dM_in = args.fuel_density*dV;
         double dM_out = mdot*dt;
-        double dE_in = fuel_heating*dM_in;
+        double dE_in = args.fuel_heating*dM_in;
 
         double dE_out = cp*T*dM_out + dM_out*0.5*exit_v*exit_v;
 
