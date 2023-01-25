@@ -87,7 +87,8 @@ void SingleStageSimulation::load(std::string fn){
         throw std::runtime_error("Need to Set Thruster File");
     }
 
-    try {
+    try
+    {
         auto ext = util::get_extension(lines[5]);
         if(ext == "pthruster")
         {
@@ -100,6 +101,7 @@ void SingleStageSimulation::load(std::string fn){
             ComputedThruster* thruster = new ComputedThruster();
             thruster->load(lines[5]);
             this->rocket.thruster.reset(thruster);
+            thruster->save("asfsa");
         }
         else if (ext == "sthruster")
         {

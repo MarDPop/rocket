@@ -66,12 +66,20 @@ class ComputedThruster : public virtual SingleStageThruster
 {
     struct performance_values
     {
-        double chamber_pressure;
-        double ideal_exit_velocity;
-        double mass_rate;
-        double mass;
-        double Ixx;
-        double Izz;
+        union
+        {
+            std::array<double,6> v;
+            struct
+            {
+                double chamber_pressure;
+                double ideal_exit_velocity;
+                double mass_rate;
+                double mass;
+                double Ixx;
+                double Izz;
+            };
+        };
+
 
         performance_values(){}
         performance_values(double a, double b, double c, double d, double e, double f) :
@@ -96,9 +104,13 @@ class ComputedThruster : public virtual SingleStageThruster
 
     std::vector<performance_values> _dvalues;
 
-    int _tidx;
+    unsigned _tidx = 0;
 
     void set_nozzle_parameters(double frozen_gamma, double mw, double throat_area, double exit_area, double half_angle);
+
+    void load_precomputed(const std::vector<std::string>& lines);
+
+    void load_parameter_set(const std::vector<std::string>& lines);
 
 public:
 
@@ -113,8 +125,13 @@ public:
 
     void set(double pressure, double time) override;
 
-    void generate(double A_b,
-                  double n_exp,
+    inline void reset_tidx()
+    {
+        this->_tidx = 0;
+    }
+
+    void generate(double burn_coef,
+                  double burn_exp,
                   double fuel_density,
                   double fuel_heating,
                   double gamma,

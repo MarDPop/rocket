@@ -6,17 +6,14 @@
 #include <cstdio>
 #include <exception>
 
-#ifndef M_PI
-    #define M_PI 3.14159265358979323846
-#endif
-
 #include <float.h>
 
 int main(int argc, char *argv[]) {
 
     _clearfp();
-    unsigned int current_word = 0;
-    _controlfp_s(&current_word, ~_EM_ZERODIVIDE & ~_EM_OVERFLOW & ~_EM_INVALID , _MCW_EM);
+    unsigned current_word = 0;
+    const unsigned int SERIOUS_FP_EXCEPTIONS = _EM_DENORMAL | _EM_ZERODIVIDE | _EM_INVALID;
+    _controlfp_s(&current_word, ~SERIOUS_FP_EXCEPTIONS , _MCW_EM);
 
     if(argc < 3) {
         throw std::invalid_argument("need input and output file.");

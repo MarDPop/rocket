@@ -26,11 +26,15 @@ namespace util {
 
     inline std::string get_extension(std::string fn)
     {
+        if(fn.size() < 2)
+        {
+            return fn;
+        }
         std::string ext;
-        int idx = fn.size()-1;
+        unsigned idx = fn.size()-1;
         while(idx-- != 0 && fn[idx] != '.') {}
         while(++idx != fn.size()){
-            ext.push_back(idx);
+            ext.push_back(fn[idx]);
         }
         return ext;
     }

@@ -7,6 +7,8 @@
 #include "../../common/include/util.h"
 #include "../../common/include/fluid.h"
 
+#include <iostream>
+
 SingleStageThruster::SingleStageThruster(){}
 SingleStageThruster::SingleStageThruster(double t, double isp) : thrust(t), mass_rate(t/(isp*9.806)) {}
 SingleStageThruster::~SingleStageThruster(){}
@@ -90,6 +92,10 @@ void PressureThruster::load(std::string fn)
         }
         myfile.close();
     }
+    else
+    {
+        throw std::invalid_argument("could not load file for thruster");
+    }
 }
 
 ComputedThruster::ComputedThruster(){}
@@ -97,15 +103,56 @@ ComputedThruster::ComputedThruster(){}
 void ComputedThruster::load(std::string fn)
 {
     std::ifstream myfile(fn);
-    _times.clear();
-    _values.clear();
-    if(myfile.is_open()){
-        for( std::string line; getline( myfile, line ); ){
-            auto row = util::split(line);
-            _times.push_back(std::stod(row[0]));
-            _values.emplace_back(std::stod(row[1]),std::stod(row[2]),std::stod(row[3]),std::stod(row[4]),std::stod(row[5]),std::stod(row[6]));
+    if(myfile.is_open())
+    {
+        std::vector<std::string> lines;
+        bool first_line = true;
+        bool precomputed = false;
+        for( std::string line; getline( myfile, line ); )
+        {
+            if(first_line)
+            {
+                precomputed = (line == "PRECOMPUTED");
+                first_line = false;
+                continue;
+            }
+
+            if(line[0] == '#')
+            {
+                continue;
+            }
+            lines.push_back(line);
         }
         myfile.close();
+
+        if(precomputed)
+        {
+            this->load_precomputed(lines);
+        }
+        else
+        {
+            this->load_parameter_set(lines);
+        }
+    }
+    else
+    {
+        throw std::invalid_argument("could not load file for thruster");
+    }
+}
+
+void ComputedThruster::load_precomputed(const std::vector<std::string>& lines)
+{
+    _times.clear();
+    _values.clear();
+    _dvalues.clear();
+    _times.reserve(lines.size());
+    _values.reserve(lines.size());
+    _dvalues.reserve(lines.size());
+    for(auto line : lines)
+    {
+        auto row = util::split(line);
+        _times.push_back(std::stod(row[0]));
+        _values.emplace_back(std::stod(row[1]),std::stod(row[2]),std::stod(row[3]),std::stod(row[4]),std::stod(row[5]),std::stod(row[6]));
     }
 
     _dvalues.resize(_times.size());
@@ -113,10 +160,27 @@ void ComputedThruster::load(std::string fn)
     for(unsigned i = 1; i < _times.size(); i++)
     {
         double dt = 1.0/(_times[i] - _times[i-1]);
-        _dvalues[i].chamber_pressure = (_values[i].chamber_pressure - _values[i-1].chamber_pressure)*dt;
-        _dvalues[i].ideal_exit_velocity = (_values[i].ideal_exit_velocity - _values[i-1].ideal_exit_velocity)*dt;
-        _dvalues[i].mass = (_values[i].mass - _values[i-1].mass)*dt;
+        for(unsigned j = 0; j < 6; j++)
+        {
+            _dvalues[i].v[j] = (_values[i].v[j] - _values[i-1].v[j])*dt;
+        }
     }
+}
+
+void ComputedThruster::load_parameter_set(const std::vector<std::string>& lines)
+{
+    std::array<double,11> args;
+    if(lines.size() < 11)
+    {
+        throw std::runtime_error("thruster file does not contain enough parameters");
+    }
+    for(int i = 0; i < 11; i++)
+    {
+        auto row = util::split(lines[i]);
+        args[i] = std::stod(row[1]);
+    }
+
+    this->generate(args[0],args[1],args[2],args[3],args[4],args[5],args[6],args[7],args[8],args[9],args[10]);
 }
 
 inline double exit_mach(double gamma, double area_ratio)
@@ -202,6 +266,7 @@ void ComputedThruster::generate(double burn_coef,
 
     double P_ambient = P;
     double P_crit = P/this->_pressure_ratio_critical;
+    double P_normalize = 1.0/100000.0;
     double m_constant = pow(2/k2,0.5*k2/k1)*throat_area;
     double T_throat_const = 1.0/(1 + k1*0.5);
     double T_exit_const = 1.0/(1 + k1*0.5*exit_mach_supersonic*exit_mach_supersonic);
@@ -211,13 +276,16 @@ void ComputedThruster::generate(double burn_coef,
     double dt = 1e-5; // use variable dt to reduce points
     const int recording_count = 100;
     double recording_dt = recording_count*dt;
-    double t_record = recording_dt;
 
     double r2 = R*R + R2;
     Ixx = 0.5*M_fuel*r2;
     Izz = M_fuel*(0.25*r2 + 0.0833333333333333333333*L2);
+
+    _times.clear();
+    _values.clear();
+    _dvalues.clear();
     _times.push_back(0.0);
-    _values.emplace_back(P,0.0,0.0,M_fuel,Ixx,Izz);
+    _values.emplace_back(P,0.0,0.0,M_fuel + M,Ixx,Izz);
 
     double mdot = 0;
     double exit_v = 0;
@@ -226,8 +294,8 @@ void ComputedThruster::generate(double burn_coef,
     {
         if(P > P_crit)
         {
-            double T_throat = T*T_throat_const;
-            mdot = rho*m_constant*sqrt(c*T_throat);
+            exit_v = sqrt(c*T);
+            mdot = rho*m_constant*exit_v;
         }
         else
         {
@@ -235,18 +303,18 @@ void ComputedThruster::generate(double burn_coef,
             double beta = 1 + k1*0.5*exit_mach_sq;
             exit_v = sqrt(exit_mach_sq*c*T/beta);
             double rho_exit = rho*pow(1.0 + k1*0.5*exit_mach_sq,-k3);
-            mdot = rho*exit_area*exit_v;
+            mdot = rho_exit*exit_area*exit_v;
         }
 
-        double burn_rate = burn_coef*pow(P,burn_exp);
+        double burn_rate = burn_coef*pow(P*P_normalize,burn_exp);
         double dr = burn_rate*dt;
         double dV = A_burn*dr;
-        double dA = length*dr;
+        double dA = 2*M_PI*length*dr; // check
         double dM_in = fuel_density*dV;
         double dM_out = mdot*dt;
         double dE_in = fuel_heating*dM_in;
 
-        double dE_out = cp*T*mdot;
+        double dE_out = cp*T*dM_out + dM_out*0.5*exit_v*exit_v;
 
         E += (dE_in - dE_out);
         V += dV;
@@ -267,8 +335,8 @@ void ComputedThruster::generate(double burn_coef,
                 exit_v = exit_mach_supersonic*sqrt(c*T_exit);
             }
             r2 = R*R + R2;
-            Ixx = 0.5*M_fuel*r2;
-            Izz = M_fuel*(0.25*r2 + 0.0833333333333333333333*L2);
+            Ixx = M_fuel*(0.25*r2 + 0.0833333333333333333333*L2);
+            Izz = 0.5*(M_fuel*r2 + M*R*R);
             _times.push_back(_times.size()*recording_dt);
             _values.emplace_back(P,exit_v,mdot, M_fuel + M,Ixx,Izz);
             cnt = 0;
@@ -286,8 +354,7 @@ void ComputedThruster::generate(double burn_coef,
 
         if(P > P_crit)
         {
-            double T_throat = T*T_throat_const;
-            mdot = rho*m_constant*sqrt(c*T_throat);
+            mdot = rho*m_constant*sqrt(c*T);
             double T_exit = T*T_exit_const;
             exit_v = exit_mach_supersonic*sqrt(c*T_exit);
         }
@@ -297,7 +364,7 @@ void ComputedThruster::generate(double burn_coef,
             double beta = 1 + k1*0.5*exit_mach_sq;
             exit_v = sqrt(exit_mach_sq*c*T/beta);
             double rho_exit = rho*pow(1.0 + k1*0.5*exit_mach_sq,-k3);
-            mdot = rho*exit_area*exit_v;
+            mdot = rho_exit*exit_area*exit_v;
         }
 
         M -= mdot*recording_dt;
@@ -307,8 +374,21 @@ void ComputedThruster::generate(double burn_coef,
             break;
         }
 
+        Ixx = M*(0.25*R2 + 0.0833333333333333333333*L2);
+        Izz = 0.5*M*R2;
         _times.push_back(t_burnout + t);
-        _values.emplace_back(P,exit_v,mdot,M,0.0,0.0);
+        _values.emplace_back(P,exit_v,mdot,M,Ixx,Izz);
+    }
+
+    _dvalues.resize(_times.size());
+
+    for(unsigned i = 1; i < _times.size(); i++)
+    {
+        double dt = 1.0/(_times[i] - _times[i-1]);
+        for(unsigned j = 0; j < 6; j++)
+        {
+            _dvalues[i].v[j] = (_values[i].v[j] - _values[i-1].v[j])*dt;
+        }
     }
 
 }
@@ -355,5 +435,21 @@ void ComputedThruster::set(double pressure, double time)
 
 void ComputedThruster::save(std::string fn)
 {
+    std::ofstream file(fn);
 
+    if(file.is_open())
+    {
+        for(int i = 0; i < this->_times.size();i++)
+        {
+            file << this->_times[i];
+            for(int j = 0; j < 6; j++)
+            {
+                file << " " << std::to_string(this->_values[i].v[j]);
+            }
+            file << "\n";
+        }
+
+        file << std::endl;
+        file.close();
+    }
 }
