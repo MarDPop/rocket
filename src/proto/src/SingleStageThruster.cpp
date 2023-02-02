@@ -169,18 +169,21 @@ void ComputedThruster::load_precomputed(const std::vector<std::string>& lines)
 
 void ComputedThruster::load_parameter_set(const std::vector<std::string>& lines)
 {
-    std::array<double,11> args;
+    generate_args args;
     if(lines.size() < 11)
     {
         throw std::runtime_error("thruster file does not contain enough parameters");
     }
-    for(int i = 0; i < 11; i++)
+    double* darg = &args.burn_coef;
+    for(int i = 0; i < 12; i++)
     {
         auto row = util::split(lines[i]);
-        args[i] = std::stod(row[1]);
+        darg[i] = std::stod(row[1]);
     }
+    auto row = util::split(lines[12]);
+    args.n_segments = std::stoi(row[1]);
 
-    this->generate(args[0],args[1],args[2],args[3],args[4],args[5],args[6],args[7],args[8],args[9],args[10]);
+    this->generate(args);
 }
 
 inline double exit_mach(double gamma, double area_ratio)
@@ -229,7 +232,7 @@ void ComputedThruster::generate(const generate_args& args)
     double throat_area = M_PI*args.throat_radius*args.throat_radius;
     double exit_area = M_PI*args.exit_radius*args.exit_radius;
 
-    this->set_nozzle_parameters(args.gamma, args.mw, args.throat_area, args.exit_area, 0.2);
+    this->set_nozzle_parameters(args.gamma, args.mw, throat_area, exit_area, 0.2);
 
     double R_frozen = flow::R_GAS / args.mw;
     double k1 = args.gamma - 1;
@@ -251,27 +254,37 @@ void ComputedThruster::generate(const generate_args& args)
 
     double A_const = M_PI*2*args.length;
     double A_burn = args.bore_radius*A_const;
-    double R = args.bore_radius;
+    double core_radius = args.bore_radius;
 
-    double L2 = args.length*args.length;
-    double R2 = args.radius*args.radius;
+    double length_sq = args.length*args.length;
+    double outer_radius_sq = args.radius*args.radius;
 
     double P_ambient = P;
     double P_crit = P/this->_pressure_ratio_critical;
     double P_normalize = 1.0/100000.0;
-    double m_constant = pow(2/k2,0.5*k2/k1)*args.throat_area;
+    double m_constant = pow(2/k2,0.5*k2/k1)*throat_area;
     double T_throat_const = 1.0/(1 + k1*0.5);
     double T_exit_const = 1.0/(1 + k1*0.5*exit_mach_supersonic*exit_mach_supersonic);
 
-    double M_fuel = (M_PI*args.radius*args.radius*length - V)*args.fuel_density;
+    double M_fuel = (M_PI*outer_radius_sq*args.length - V)*args.fuel_density;
 
     double dt = 1e-5; // use variable dt to reduce points
     const int recording_count = 100;
     double recording_dt = recording_count*dt;
 
-    double r2 = R*R + R2;
+    double r2 = args.bore_radius*args.bore_radius + outer_radius_sq;
     Ixx = 0.5*M_fuel*r2;
-    Izz = M_fuel*(0.25*r2 + 0.0833333333333333333333*L2);
+    Izz = M_fuel*(0.25*r2 + 0.0833333333333333333333*length_sq);
+
+    if(args.n_segments > 1)
+    {
+        double cross_A = (args.n_segments - 1)*M_PI*(outer_radius_sq - args.bore_radius*args.bore_radius);
+        double cutVolume = cross_A*args.segment_gap;
+        V += cutVolume;
+        A_burn += 2*cross_A;
+
+        M_fuel -= cutVolume*args.fuel_density;
+    }
 
     _times.clear();
     _values.clear();
@@ -301,7 +314,7 @@ void ComputedThruster::generate(const generate_args& args)
         double burn_rate = args.burn_coef*pow(P*P_normalize,args.burn_exp);
         double dr = burn_rate*dt;
         double dV = A_burn*dr;
-        double dA = 2*M_PI*length*dr; // check
+        double dA = 2*M_PI*args.length*dr - args.n_segments*2*M_PI*core_radius*dr; // check
         double dM_in = args.fuel_density*dV;
         double dM_out = mdot*dt;
         double dE_in = args.fuel_heating*dM_in;
@@ -313,7 +326,7 @@ void ComputedThruster::generate(const generate_args& args)
         A_burn += dA;
         M += (dM_in - dM_out);
         M_fuel -= dM_in;
-        R += dr;
+        core_radius += dr;
 
         rho = M/V;
         T = E/(cp*M);
@@ -326,9 +339,9 @@ void ComputedThruster::generate(const generate_args& args)
                 double T_exit = T*T_exit_const;
                 exit_v = exit_mach_supersonic*sqrt(c*T_exit);
             }
-            r2 = R*R + R2;
-            Ixx = M_fuel*(0.25*r2 + 0.0833333333333333333333*L2);
-            Izz = 0.5*(M_fuel*r2 + M*R*R);
+            r2 = core_radius*core_radius + outer_radius_sq;
+            Ixx = M_fuel*(0.25*r2 + 0.0833333333333333333333*length_sq);
+            Izz = 0.5*(M_fuel*r2 + M*core_radius*core_radius);
             _times.push_back(_times.size()*recording_dt);
             _values.emplace_back(P,exit_v,mdot, M_fuel + M,Ixx,Izz);
             cnt = 0;
@@ -366,8 +379,8 @@ void ComputedThruster::generate(const generate_args& args)
             break;
         }
 
-        Ixx = M*(0.25*R2 + 0.0833333333333333333333*L2);
-        Izz = 0.5*M*R2;
+        Ixx = M*(0.25*outer_radius_sq + 0.0833333333333333333333*length_sq);
+        Izz = 0.5*M*outer_radius_sq;
         _times.push_back(t_burnout + t);
         _values.emplace_back(P,exit_v,mdot,M,Ixx,Izz);
     }
