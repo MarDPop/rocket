@@ -31,7 +31,10 @@ struct AeroValues {
 };
 
 
-class SingleStageAerodynamics {
+class SingleStageAerodynamics
+{
+
+    static constexpr double AOA_THRESHOLD = 1e-6;
 
     double CD0;
 
@@ -49,6 +52,10 @@ class SingleStageAerodynamics {
 
     double stall_angle;
 
+    double sin_stall_angle;
+
+    double sin_zero_lift_angle;
+
     double CL_max;
 
     double constant_term;
@@ -58,6 +65,19 @@ class SingleStageAerodynamics {
     SingleStageRocket& rocket;
 
     void compute_aero_values();
+
+    double get_parasitic_drag_from_mach(double mach);
+
+    double get_angle_of_attack();
+
+    struct aero_coef
+    {
+        double CL = 0.0;
+        double CD = 0.0;;
+        double CM = 0.0;;
+    };
+
+    aero_coef get_aero_coef(double sAoA);
 
 public:
 
