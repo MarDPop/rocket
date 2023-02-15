@@ -9,7 +9,7 @@
 
 #include <iostream>
 
-SingleStageThruster::SingleStageThruster(){}
+SingleStageThruster::SingleStageThruster() : thrust(0), mass_rate(0) {}
 SingleStageThruster::SingleStageThruster(double t, double isp) : thrust(t), mass_rate(t/(isp*9.806)) {}
 SingleStageThruster::~SingleStageThruster(){}
 
@@ -152,7 +152,7 @@ void ComputedThruster::load_precomputed(const std::vector<std::string>& lines)
     {
         auto row = util::split(line);
         _times.push_back(std::stod(row[0]));
-        _values.emplace_back(std::stod(row[1]),std::stod(row[2]),std::stod(row[3]),std::stod(row[4]),std::stod(row[5]),std::stod(row[6]));
+        _values.emplace_back(std::stod(row[1]),std::stod(row[2]),std::stod(row[3]),std::stod(row[4]),std::stod(row[5]),std::stod(row[6]),std::stod(row[7]));
     }
 
     _dvalues.resize(_times.size());
@@ -160,7 +160,7 @@ void ComputedThruster::load_precomputed(const std::vector<std::string>& lines)
     for(unsigned i = 1; i < _times.size(); i++)
     {
         double dt = 1.0/(_times[i] - _times[i-1]);
-        for(unsigned j = 0; j < 6; j++)
+        for(unsigned j = 0; j < _values[i].v.size(); j++)
         {
             _dvalues[i].v[j] = (_values[i].v[j] - _values[i-1].v[j])*dt;
         }
@@ -189,7 +189,7 @@ void ComputedThruster::load_parameter_set(const std::vector<std::string>& lines)
 inline double exit_mach(double gamma, double area_ratio)
 {
     double exp = (gamma+1)/(2*(gamma-1));
-    double lhs = area_ratio * pow(2/(gamma+1), 1.0/exp);
+    double lhs = area_ratio * pow((gamma+1)*0.5, exp);
 
     double g = (gamma - 1)*0.5;
 
@@ -200,7 +200,7 @@ inline double exit_mach(double gamma, double area_ratio)
     for(int i = 0; i < 20; i++)
     {
         double guess = pow(1 + g*M_guess*M_guess, exp ) / M_guess;
-        if(guess < lhs)
+        if(guess > lhs)
         {
             M_hi = M_guess;
         } else {
@@ -224,79 +224,104 @@ void ComputedThruster::set_nozzle_parameters(double frozen_gamma, double mw, dou
 
     double p_ratio_normal = flow::normal_shock_static_pressure_ratio(this->_ideal_exit_mach,frozen_gamma);
     this->_pressure_ratio_ideal = flow::p_static2p_total(this->_ideal_exit_mach,frozen_gamma);
-    this->_pressure_ratio_normal_exit = this->_pressure_ratio_ideal * p_ratio_normal;
+    this->_pressure_ratio_normal_exit = 1.0/p_ratio_normal;
 }
 
-void ComputedThruster::generate(const generate_args& args)
+void ComputedThruster::generate(const generate_args& args, const double P_AMBIENT)
 {
-    double throat_area = M_PI*args.throat_radius*args.throat_radius;
-    double exit_area = M_PI*args.exit_radius*args.exit_radius;
+    /* Get Geometry */
+    const double throat_area = M_PI*args.throat_radius*args.throat_radius*args.discharge_coef;
+    const double exit_area = M_PI*args.exit_radius*args.exit_radius;
 
     this->set_nozzle_parameters(args.gamma, args.mw, throat_area, exit_area, 0.2);
 
-    double R_frozen = flow::R_GAS / args.mw;
-    double k1 = args.gamma - 1;
-    double k2 = args.gamma + 1;
-    double k3 = 1/k1;
-    double ex = -k1/args.gamma;
+    // geometric constants
+    const double length_sq = args.length*args.length;
+    const double outer_radius_sq = args.radius*args.radius;
+    const double N1 = args.n_segments > 1 ? args.n_segments - 1 : 0.0;
+    const double Volume_empty = M_PI*outer_radius_sq*args.length;
 
-    double c = args.gamma*R_frozen;
-    double cp = c/k1;
+    /* get gas constants */
+    const double R_frozen = flow::R_GAS / args.mw;
+    const double k1 = args.gamma - 1;
+    const double k2 = args.gamma + 1;
+    const double k3 = 1/k1;
+    const double ex = -k1/args.gamma;
 
-    double exit_mach_supersonic = Nozzle::isentropic_exit_mach(this->_area_ratio,args.gamma);
+    const double c = args.gamma*R_frozen;
+    const double cp = c/k1;
+    const double cv = cp/args.gamma;
 
+    /* Computational Constants */
+    const double exit_mach_supersonic = Nozzle::isentropic_exit_mach(this->_area_ratio,args.gamma)*args.nozzle_efficiency;
+    const double P_crit = P_AMBIENT/this->_pressure_ratio_critical;
+    constexpr double BAR2PASCALS = 100000.0;
+    constexpr double P_NORMALIZE = 1.0/BAR2PASCALS;
+    const double m_constant = pow(2/k2,0.5*k2/k1)*throat_area;
+    const double T_exit_const = 1.0/(1 + k1*0.5*exit_mach_supersonic*exit_mach_supersonic);
+    const double dE_dM = args.fuel_heating*args.combustion_efficiency;
+
+    /* Initial Conditions */
+    // volume of control volume (m3)
     double V = M_PI*args.bore_radius*args.bore_radius*args.length;
-    double P = 100000;
-    double T = 297;
+    // pressure of control volume (Pa)
+    double P = P_AMBIENT;
+    // Temperature control volume (K)
+    double T = 300;
+    // density control volume (kg/m3)
     double rho = P/(R_frozen*T);
-    double M = V*rho; // air kg /m3
-    double E = M*cp*T;
+    // mass of control volume (kg)
+    double M = V*rho;
+    // internal energy of control volume (J)
+    double E = M*cv*T;
 
-    double A_const = M_PI*2*args.length;
-    double A_burn = args.bore_radius*A_const;
+    /* non control volume variables */
+    // Radius of core (m)
     double core_radius = args.bore_radius;
+    // Area of burning inside chamber (m2)
+    double A_burn = args.bore_radius*M_PI*2*args.length;
+    // Mass fuel remaining (kg)
+    double M_fuel = (Volume_empty - V)*args.fuel_density;
 
-    double length_sq = args.length*args.length;
-    double outer_radius_sq = args.radius*args.radius;
-
-    double P_ambient = P;
-    double P_crit = P/this->_pressure_ratio_critical;
-    double P_normalize = 1.0/100000.0;
-    double m_constant = pow(2/k2,0.5*k2/k1)*throat_area;
-    double T_throat_const = 1.0/(1 + k1*0.5);
-    double T_exit_const = 1.0/(1 + k1*0.5*exit_mach_supersonic*exit_mach_supersonic);
-
-    double M_fuel = (M_PI*outer_radius_sq*args.length - V)*args.fuel_density;
-
-    double dt = 1e-5; // use variable dt to reduce points
-    const int recording_count = 100;
-    double recording_dt = recording_count*dt;
-
+    /* Mass moment computations */
     double r2 = args.bore_radius*args.bore_radius + outer_radius_sq;
     Ixx = 0.5*M_fuel*r2;
     Izz = M_fuel*(0.25*r2 + 0.0833333333333333333333*length_sq);
 
+    /* Segments  Corrections */
+    double core_length = args.length;
     if(args.n_segments > 1)
     {
-        double cross_A = (args.n_segments - 1)*M_PI*(outer_radius_sq - args.bore_radius*args.bore_radius);
+        double cross_A = N1*M_PI*(outer_radius_sq - args.bore_radius*args.bore_radius);
         double cutVolume = cross_A*args.segment_gap;
         V += cutVolume;
         A_burn += 2*cross_A;
+        core_length -= 2*N1*args.segment_gap;
 
         M_fuel -= cutVolume*args.fuel_density;
     }
 
+    /* Prepare simulation */
+    // reset output
     _times.clear();
     _values.clear();
     _dvalues.clear();
     _times.push_back(0.0);
-    _values.emplace_back(P,0.0,0.0,M_fuel + M,Ixx,Izz);
+    _values.emplace_back(P,T,0.0,0.0,M_fuel + M,Ixx,Izz);
 
-    double mdot = 0;
-    double exit_v = 0;
+    // recording and time variables
+    double dt = 1e-6; // use variable dt to reduce points
+    const int recording_count = 1000;
+    double recording_dt = recording_count*dt;
     int cnt = 0;
+
+    /* Compute Main Burn */
     while(M_fuel > 0)
     {
+        // mass rate (kg/s)
+        double mdot;
+        // exit velocity (m/s)
+        double exit_v;
         if(P > P_crit)
         {
             exit_v = sqrt(c*T);
@@ -304,22 +329,22 @@ void ComputedThruster::generate(const generate_args& args)
         }
         else
         {
-            double exit_mach_sq = (pow(P_ambient/P,ex) - 1)*2*k3;
+            double exit_mach_sq = (pow(P_AMBIENT/P,ex) - 1)*2*k3;
             double beta = 1 + k1*0.5*exit_mach_sq;
             exit_v = sqrt(exit_mach_sq*c*T/beta);
             double rho_exit = rho*pow(1.0 + k1*0.5*exit_mach_sq,-k3);
             mdot = rho_exit*exit_area*exit_v;
         }
 
-        double burn_rate = args.burn_coef*pow(P*P_normalize,args.burn_exp);
+        double burn_rate = args.burn_coef*pow(P*P_NORMALIZE,args.burn_exp);
         double dr = burn_rate*dt;
         double dV = A_burn*dr;
-        double dA = 2*M_PI*args.length*dr - args.n_segments*2*M_PI*core_radius*dr; // check
+        double dA = 2*M_PI*core_length*dr - N1*4*M_PI*core_radius*dr; // check
         double dM_in = args.fuel_density*dV;
         double dM_out = mdot*dt;
-        double dE_in = args.fuel_heating*dM_in;
+        double dE_in = dE_dM*dM_in;
 
-        double dE_out = cp*T*dM_out + dM_out*0.5*exit_v*exit_v;
+        double dE_out = ((E+P*V)/M)*dM_out + dM_out*0.5*exit_v*exit_v; // cp*T = E/M
 
         E += (dE_in - dE_out);
         V += dV;
@@ -327,9 +352,10 @@ void ComputedThruster::generate(const generate_args& args)
         M += (dM_in - dM_out);
         M_fuel -= dM_in;
         core_radius += dr;
+        core_length -= 2*N1*dr;
 
         rho = M/V;
-        T = E/(cp*M);
+        T = E/(cv*M);
         P = rho*R_frozen*T;
 
         if(++cnt == recording_count)
@@ -343,19 +369,29 @@ void ComputedThruster::generate(const generate_args& args)
             Ixx = M_fuel*(0.25*r2 + 0.0833333333333333333333*length_sq);
             Izz = 0.5*(M_fuel*r2 + M*core_radius*core_radius);
             _times.push_back(_times.size()*recording_dt);
-            _values.emplace_back(P,exit_v,mdot, M_fuel + M,Ixx,Izz);
+            _values.emplace_back(P,T,exit_v,mdot, M_fuel + M,Ixx,Izz);
             cnt = 0;
         }
     }
 
+    /* Compute Fizzle */
+
     double P_burnout = _values.back().chamber_pressure;
+    double Temp_burnout = _values.back().chamber_temperature;
     double burnout_const = -sqrt(R_frozen*T)*m_constant/V;
     double t_burnout = cnt*dt + _times.back();
 
     for(int i = 0; i < 100; i++)
     {
         double t = i*recording_dt;
-        P = P_burnout*exp(burnout_const*t);
+        double frac = exp(burnout_const*t);
+        P = P_burnout*frac;
+        T = Temp_burnout*frac;
+
+        // mass rate (kg/s)
+        double mdot;
+        // exit velocity (m/s)
+        double exit_v;
 
         if(P > P_crit)
         {
@@ -365,7 +401,7 @@ void ComputedThruster::generate(const generate_args& args)
         }
         else
         {
-            double exit_mach_sq = (pow(P_ambient/P,ex) - 1)*2*k3;
+            double exit_mach_sq = (pow(P_AMBIENT/P,ex) - 1)*2*k3;
             double beta = 1 + k1*0.5*exit_mach_sq;
             exit_v = sqrt(exit_mach_sq*c*T/beta);
             double rho_exit = rho*pow(1.0 + k1*0.5*exit_mach_sq,-k3);
@@ -382,15 +418,17 @@ void ComputedThruster::generate(const generate_args& args)
         Ixx = M*(0.25*outer_radius_sq + 0.0833333333333333333333*length_sq);
         Izz = 0.5*M*outer_radius_sq;
         _times.push_back(t_burnout + t);
-        _values.emplace_back(P,exit_v,mdot,M,Ixx,Izz);
+        _values.emplace_back(P,T,exit_v,mdot,M,Ixx,Izz);
     }
 
     _dvalues.resize(_times.size());
 
+    const unsigned NV = _values[0].v.size();
+
     for(unsigned i = 1; i < _times.size(); i++)
     {
         double dt = 1.0/(_times[i] - _times[i-1]);
-        for(unsigned j = 0; j < 6; j++)
+        for(unsigned j = 0; j < NV; j++)
         {
             _dvalues[i].v[j] = (_values[i].v[j] - _values[i-1].v[j])*dt;
         }
@@ -414,13 +452,18 @@ void ComputedThruster::set(double pressure, double time)
 
     double chamber_pressure = vals.chamber_pressure + delta*dvals.chamber_pressure;
     double exit_velocity = vals.ideal_exit_velocity + delta*dvals.ideal_exit_velocity;
-    mass_rate = vals.mass_rate + delta*dvals.mass_rate;
-    mass = vals.mass + delta*dvals.mass;
+    this->mass_rate = vals.mass_rate + delta*dvals.mass_rate;
+    this->mass = vals.mass + delta*dvals.mass;
 
-    Ixx = vals.Ixx + delta*dvals.Ixx;
-    Izz = vals.Izz + delta*dvals.Izz;
+    this->Ixx = vals.Ixx + delta*dvals.Ixx;
+    this->Izz = vals.Izz + delta*dvals.Izz;
 
     double pressure_ratio = pressure / chamber_pressure;
+
+    if(pressure_ratio > 1)
+    {
+        return;
+    }
 
     if(pressure_ratio < this->_pressure_ratio_normal_exit)
     {
@@ -430,11 +473,12 @@ void ComputedThruster::set(double pressure, double time)
     }
     else
     {
-        double rhs = pow(pressure_ratio,(this->_gamma - 1) / this->_gamma);
-        double M_exit = sqrt((rhs - 1)*2/(this->_gamma - 1));
-        double v_exit = M_exit*sqrt(this->_gamma*flow::R_GAS/_mw*1000);
+        double chamber_temperature = vals.chamber_temperature + delta*dvals.chamber_temperature;
+        double temperature_ratio = pow(pressure_ratio,(1.0 - this->_gamma) / this->_gamma);
+        double M_exit = sqrt((temperature_ratio - 1.0)*2.0/(this->_gamma - 1.0));
+        double v_exit = M_exit*sqrt(this->_gamma*flow::R_GAS/_mw*chamber_temperature/temperature_ratio);
 
-        this->thrust = v_exit*mass_rate;
+        this->thrust = v_exit*this->mass_rate;
     }
 };
 
@@ -444,7 +488,7 @@ void ComputedThruster::save(std::string fn)
 
     if(file.is_open())
     {
-        for(int i = 0; i < this->_times.size();i++)
+        for(unsigned i = 0; i < this->_times.size();i++)
         {
             file << this->_times[i];
             for(int j = 0; j < 6; j++)

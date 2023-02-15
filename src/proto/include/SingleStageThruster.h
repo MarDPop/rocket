@@ -68,10 +68,11 @@ class ComputedThruster : public virtual SingleStageThruster
     {
         union
         {
-            std::array<double,6> v;
+            std::array<double,7> v;
             struct
             {
                 double chamber_pressure;
+                double chamber_temperature;
                 double ideal_exit_velocity;
                 double mass_rate;
                 double mass;
@@ -82,8 +83,8 @@ class ComputedThruster : public virtual SingleStageThruster
 
 
         performance_values(){}
-        performance_values(double a, double b, double c, double d, double e, double f) :
-            chamber_pressure(a), ideal_exit_velocity(b), mass_rate(c), mass(d), Ixx(e) , Izz(f) {}
+        performance_values(double p, double t, double v, double r, double m, double x, double z) :
+            chamber_pressure(p), chamber_temperature(t), ideal_exit_velocity(v), mass_rate(r), mass(m), Ixx(x) , Izz(z) {}
     };
 
     double _area_ratio;
@@ -129,6 +130,10 @@ public:
         double exit_radius;
         double half_angle;
         double segment_gap;
+        double combustion_efficiency;
+        double discharge_coef;
+        double chamber_efficiency;
+        double nozzle_efficiency;
         int n_segments;
     };
 
@@ -148,7 +153,7 @@ public:
         this->_tidx = 0;
     }
 
-    void generate(const generate_args& args);
+    void generate(const generate_args& args, const double p_ambient = 100000); // TODO: find a way to set p_ambient
 
     void save(std::string fn);
 
