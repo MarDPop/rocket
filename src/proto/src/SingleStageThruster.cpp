@@ -175,7 +175,7 @@ void ComputedThruster::load_parameter_set(const std::vector<std::string>& lines)
         throw std::runtime_error("thruster file does not contain enough parameters");
     }
     double* darg = &args.burn_coef;
-    for(int i = 0; i < 12; i++)
+    for(int i = 0; i < 17; i++)
     {
         auto row = util::split(lines[i]);
         darg[i] = std::stod(row[1]);
@@ -238,8 +238,9 @@ void ComputedThruster::generate(const generate_args& args, const double P_AMBIEN
     // geometric constants
     const double length_sq = args.length*args.length;
     const double outer_radius_sq = args.radius*args.radius;
+    const double bore_radius_sq = args.bore_radius*args.bore_radius;
     const double N1 = args.n_segments > 1 ? args.n_segments - 1 : 0.0;
-    const double Volume_empty = M_PI*outer_radius_sq*args.length;
+    const double Volume_Outlet = 0.33333333333*M_PI*(outer_radius_sq + args.exit_radius*(args.radius + args.exit_radius))*args.radius*0.5;
 
     /* get gas constants */
     const double R_frozen = flow::R_GAS / args.mw;
@@ -263,7 +264,7 @@ void ComputedThruster::generate(const generate_args& args, const double P_AMBIEN
 
     /* Initial Conditions */
     // volume of control volume (m3)
-    double V = M_PI*args.bore_radius*args.bore_radius*args.length;
+    double V = M_PI*bore_radius_sq*args.length + Volume_Outlet;
     // pressure of control volume (Pa)
     double P = P_AMBIENT;
     // Temperature control volume (K)
@@ -281,18 +282,13 @@ void ComputedThruster::generate(const generate_args& args, const double P_AMBIEN
     // Area of burning inside chamber (m2)
     double A_burn = args.bore_radius*M_PI*2*args.length;
     // Mass fuel remaining (kg)
-    double M_fuel = (Volume_empty - V)*args.fuel_density;
-
-    /* Mass moment computations */
-    double r2 = args.bore_radius*args.bore_radius + outer_radius_sq;
-    Ixx = 0.5*M_fuel*r2;
-    Izz = M_fuel*(0.25*r2 + 0.0833333333333333333333*length_sq);
+    double M_fuel = M_PI*args.length*(outer_radius_sq - bore_radius_sq)*args.fuel_density;
 
     /* Segments  Corrections */
     double core_length = args.length;
     if(args.n_segments > 1)
     {
-        double cross_A = N1*M_PI*(outer_radius_sq - args.bore_radius*args.bore_radius);
+        double cross_A = N1*M_PI*(outer_radius_sq - bore_radius_sq);
         double cutVolume = cross_A*args.segment_gap;
         V += cutVolume;
         A_burn += 2*cross_A;
@@ -300,6 +296,11 @@ void ComputedThruster::generate(const generate_args& args, const double P_AMBIEN
 
         M_fuel -= cutVolume*args.fuel_density;
     }
+
+    /* Mass moment computations */
+    double r2 = bore_radius_sq + outer_radius_sq;
+    Ixx = 0.5*M_fuel*r2;
+    Izz = M_fuel*(0.25*r2 + 0.0833333333333333333333*length_sq);
 
     /* Prepare simulation */
     // reset output
@@ -360,16 +361,17 @@ void ComputedThruster::generate(const generate_args& args, const double P_AMBIEN
 
         if(++cnt == recording_count)
         {
+            double T_chamber = T*args.chamber_efficiency;
             if(P > P_crit)
             {
-                double T_exit = T*T_exit_const;
+                double T_exit = T_chamber*T_exit_const;
                 exit_v = exit_mach_supersonic*sqrt(c*T_exit);
             }
             r2 = core_radius*core_radius + outer_radius_sq;
             Ixx = M_fuel*(0.25*r2 + 0.0833333333333333333333*length_sq);
             Izz = 0.5*(M_fuel*r2 + M*core_radius*core_radius);
             _times.push_back(_times.size()*recording_dt);
-            _values.emplace_back(P,T,exit_v,mdot, M_fuel + M,Ixx,Izz);
+            _values.emplace_back(P,T_chamber,exit_v,mdot, M_fuel + M,Ixx,Izz);
             cnt = 0;
         }
     }
@@ -491,9 +493,9 @@ void ComputedThruster::save(std::string fn)
         for(unsigned i = 0; i < this->_times.size();i++)
         {
             file << this->_times[i];
-            for(int j = 0; j < 6; j++)
+            for(auto v : this->_values[i].v)
             {
-                file << " " << std::to_string(this->_values[i].v[j]);
+                file << " " << std::to_string(v);
             }
             file << "\n";
         }
