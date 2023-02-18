@@ -2,6 +2,8 @@
 
 #include "../include/SingleStageRocket.h"
 
+Control::~Control(){}
+
 void Control::update(double time)
 {
     if(this->sensors)
@@ -14,7 +16,6 @@ void Control::update(double time)
         }
     }
 }
-
 
 SingleStageControl::SingleStageControl(unsigned N) : NFINS(N)
 {
@@ -162,24 +163,28 @@ void SingleStageControl::update(double time) {
 
     this->filter->update(*this->sensors, time);
 
-    if(this->chute_deployed) {
+    if(this->chute_deployed)
+    {
         this->chute_dynamics(time);
         return;
     }
 
-    if(this->sensors->get_measured_dynamic_pressure() < 1e-3) {
+    if(this->sensors->get_measured_dynamic_pressure() < 1e-3)
+    {
         return;
     }
 
     double ascent_rate = this->filter->get_computed_velocity()[2];
 
-    if(ascent_rate < -0.5) {
+    if(ascent_rate < -0.5)
+    {
         this->chute_deployed = true;
         this->chute_deployment_time = time;
         return;
     }
 
-    if(ascent_rate < 10) {
+    if(ascent_rate < 10)
+    {
         this->dMoment.zero();
         this->dForce.zero();
         this->time_old = time;

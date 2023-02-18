@@ -101,7 +101,8 @@ void SingleStageSimulation::load(std::string fn){
             ComputedThruster* thruster = new ComputedThruster();
             thruster->load(lines[5]);
             this->rocket.thruster.reset(thruster);
-            thruster->save("asfsa");
+            thruster->save("test/computed_thruster_file");
+            // need to correct for mass
         }
         else if (ext == "sthruster")
         {
@@ -190,7 +191,7 @@ void SingleStageSimulation::run(std::string fn) {
 
     this->rocket.init(this->launch_angle,this->launch_heading);
 
-    double dt = 1.0/256.0;
+    double dt = 1.0/512.0;
     double time = 0;
     double time_record = 0;
 
@@ -206,7 +207,7 @@ void SingleStageSimulation::run(std::string fn) {
 
             const double* pos = this->rocket.state.position.data;
             const double* q = this->rocket.state.CS.data;
-            fprintf(this->output,"%7.2f % .6e % .6e % .6e % 10.8f % 10.8f % 10.8f % 10.8f % 10.8f % 10.8f % 10.8f % 10.8f % 10.8f % .6e\n",
+            fprintf(this->output,"%7.2f % .6e % .6e % .6e % 12.10f % 12.10f % 12.10f % 12.10f % 12.10f % 12.10f % 12.10f % 12.10f % 12.10f % .6e\n",
                     time, pos[0], pos[1], pos[2], q[0], q[1], q[2], q[3], q[4], q[5], q[6], q[7], q[8], this->rocket.inertia.mass);
 
             time_record += this->record.t_interval;

@@ -107,6 +107,8 @@ class ComputedThruster : public virtual SingleStageThruster
 
     unsigned _tidx = 0;
 
+    unsigned _tidx_final = 0;
+
     void set_nozzle_parameters(double frozen_gamma, double mw, double throat_area, double exit_area, double half_angle);
 
     void load_precomputed(const std::vector<std::string>& lines);

@@ -117,7 +117,7 @@ void SingleStageAerodynamics::update()
     }
 
     // already compute damping moment
-    this->moment += rocket.state.angular_velocity*(this->CM_alpha_dot*this->aero_values.dynamic_pressure);
+    this->moment += rocket.state.angular_velocity*(this->CM_alpha_dot*this->rocket.altitude_table.values->density);
 
     // arm is the moment arm formed from the freestream, length of the arm is sin of angle between
     Vector arm = this->aero_values.unit_v_air.cross(rocket.state.CS.axis.z);

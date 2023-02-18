@@ -28,6 +28,8 @@ public:
 
     Vector dMoment;
 
+    virtual ~Control();
+
     inline void set_rocket(SingleStageRocket* rocket)
     {
         this->rocket = rocket;
