@@ -7,31 +7,34 @@
 
 void SingleStageRocket::compute_acceleration(double time)
 {
+    Vector total_force((char)0);
+    Vector total_moment((char)0);
+
     this->altitude_table.set(this->state.position.z, time);
 
     this->aerodynamics.update();
-
-    this->state.acceleration = this->aerodynamics.force;
-    this->state.angular_acceleration = this->aerodynamics.moment;
-
-    if(this->not_empty)
-    {
-        this->thruster->set(this->altitude_table.values->pressure, time);
-        this->state.acceleration += this->state.CS.axis.z * this->thruster->get_thrust();
-    }
 
     if(this->control)
     {
         this->control->update(time);
 
-        this->state.acceleration += this->control->dForce;
-        this->state.angular_acceleration += this->control->dMoment;
+        total_force += this->control->dForce;
+        total_moment += this->control->dMoment;
     }
 
-    this->state.acceleration *= (1.0/this->inertia.mass);
+    total_force += this->aerodynamics.force;
+    total_moment += this->aerodynamics.moment;
+
+    if(this->not_empty)
+    {
+        this->thruster->set(this->altitude_table.values->pressure, time);
+        total_force += this->state.CS.axis.z * this->thruster->get_thrust();
+    }
+
+    this->state.acceleration = total_force * (1.0/this->inertia.mass);
     this->state.acceleration.z -= this->altitude_table.values->gravity;
 
-    Axis I_inertial = this->state.CS.get_transpose(); // might have to transpose CS
+    Axis I_inertial = this->state.CS.get_transpose(); // rotate Inertia to inertial frame
     int i = 0;
     for(; i < 6;i++)
     {
@@ -41,10 +44,7 @@ void SingleStageRocket::compute_acceleration(double time)
     {
         I_inertial.data[i] *= this->inertia.Izz;
     }
-    //Vector Iw = I_inertial * this->angular_velocity;
-    //Vector rhs = this->angular_acceleration - this->angular_velocity.cross(Iw);
-    // this->angular_acceleration = I_inertial.get_inverse() * rhs;
-    this->state.angular_acceleration = I_inertial.get_inverse() * this->state.angular_acceleration;
+    this->state.angular_acceleration = I_inertial.get_inverse() * total_moment;
 }
 
 void SingleStageRocket::step(double& time, double dt)

@@ -6,7 +6,6 @@ SingleStageAerodynamics::SingleStageAerodynamics(SingleStageRocket& r) : rocket(
 
 void SingleStageAerodynamics::set_coef(double* coef)
 {
-
     this->CD0 = coef[0]*coef[5];
     this->CL_alpha = coef[1]*coef[5];
     this->CM_alpha = coef[2]*coef[5]*coef[6];

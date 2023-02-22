@@ -89,7 +89,7 @@ protected:
 
     double time_old;
 
-    double chute_deployment_time;
+    double chute_deployed_time;
 
     bool chute_deployed;
 

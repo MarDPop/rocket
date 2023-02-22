@@ -59,6 +59,6 @@ public:
 
     void load(std::string fn);
 
-    void run(std::string fn);
+    void run(std::string fn, const bool debug = false);
 
 };

@@ -176,7 +176,8 @@ void SingleStageSimulation::load(std::string fn){
     }
 }
 
-void SingleStageSimulation::run(std::string fn) {
+void SingleStageSimulation::run(std::string fn, const bool debug)
+{
 
     this->output = fopen(fn.c_str(),"w");
 
@@ -187,7 +188,18 @@ void SingleStageSimulation::run(std::string fn) {
 
     fprintf(this->output,"39.94426809919236 -104.94474985717818 1606.0\n");
 
+    std::ofstream debug_output;
+    if(debug)
+    {
+        std::cout << "Outputting Debug File" << std::endl;
+        debug_output.open("debug.txt");
+    }
+
     std::cout << "Running Simulation." << std::endl;
+
+    const std::string CS_FORMAT = "% 14.12f % 14.12f % 14.12f % 14.12f % 14.12f % 14.12f % 14.12f % 14.12f % 14.12f ";
+    const std::string POS_FORMAT = "% .6e % .6e % .6e ";
+    const std::string OUTPUT_FORMAT = "%8.3f " + POS_FORMAT + CS_FORMAT + "% .6e\n";
 
     this->rocket.init(this->launch_angle,this->launch_heading);
 
@@ -205,14 +217,26 @@ void SingleStageSimulation::run(std::string fn) {
                 break;
             }
 
+            this->rocket.state.CS.gram_schmidt_orthogonalize();
+
             const double* pos = this->rocket.state.position.data;
             const double* q = this->rocket.state.CS.data;
-            fprintf(this->output,"%7.2f % .6e % .6e % .6e % 12.10f % 12.10f % 12.10f % 12.10f % 12.10f % 12.10f % 12.10f % 12.10f % 12.10f % .6e\n",
+            fprintf(this->output,OUTPUT_FORMAT.c_str(),
                     time, pos[0], pos[1], pos[2], q[0], q[1], q[2], q[3], q[4], q[5], q[6], q[7], q[8], this->rocket.inertia.mass);
 
             time_record += this->record.t_interval;
 
-            this->rocket.state.CS.gram_schmidt_orthogonalize();
+            if(debug)
+            {
+                debug_output << time << " ";
+                auto computed_pos = this->rocket.control->filter->get_computed_position();
+                auto CS = this->rocket.control->filter->get_computed_CS();
+                char buf[150];
+                sprintf(buf,POS_FORMAT.c_str(), computed_pos[0],computed_pos[1],computed_pos[2]);
+                debug_output << buf;
+                sprintf(buf,CS_FORMAT.c_str(),CS[0],CS[1],CS[2],CS[3],CS[4],CS[5],CS[6],CS[7],CS[8]);
+                debug_output << buf << std::endl;
+            }
         }
 
         std::cout << "\r" << time << std::flush;

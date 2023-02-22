@@ -110,7 +110,6 @@ namespace Cartesian {
 
     struct Vector
     {
-
         union
         {
             double data[3];

@@ -36,7 +36,7 @@ SingleStageControl::SingleStageControl(unsigned N) : NFINS(N)
 
     this->sensors = std::make_unique<Sensors>();
 
-    this->filter = std::make_unique<FilterBasic>();
+    this->filter = std::make_unique<FilterNone>();
 }
 
 
@@ -118,7 +118,7 @@ void SingleStageControl::update_force() {
     }
     this->dMoment *= this->rocket->aerodynamics.aero_values.dynamic_pressure;
     this->dForce *= this->rocket->aerodynamics.aero_values.dynamic_pressure;
-    // remember currently in body frame
+    // remember currently in body frame, need to convert to inertial frame
     this->dMoment = this->rocket->state.CS.transpose_mult(this->dMoment);
     this->dForce = this->rocket->state.CS.transpose_mult(this->dForce);
 }
@@ -138,8 +138,9 @@ void SingleStageControl::update_commands() {
 }
 
 
-void SingleStageControl::chute_dynamics(double time) {
-    this->chute.frac_deployed = (time - this->chute_deployment_time)/this->chute.deployment_time;
+void SingleStageControl::chute_dynamics(double time)
+{
+    this->chute.frac_deployed = (time - this->chute_deployed_time)/this->chute.deployment_time;
     double CDA;
     if(this->chute.frac_deployed > 1) {
         CDA = this->chute.CD_deployed*this->chute.area_deployed;
@@ -151,9 +152,10 @@ void SingleStageControl::chute_dynamics(double time) {
 
     // chute is more complicated than this, but for now assume just a drag force
 
-    this->dForce = this->rocket->aerodynamics.aero_values.unit_v_air * (CDA*this->rocket->aerodynamics.aero_values.dynamic_pressure);
+    this->dForce = this->rocket->aerodynamics.aero_values.unit_v_air * (-CDA*this->rocket->aerodynamics.aero_values.dynamic_pressure);
     // assume arm is nose
-    Vector::cross((this->rocket->state.CS.axis.z * -this->rocket->inertia.COG),this->dForce,this->dMoment);
+
+    //Vector::cross((this->rocket->state.CS.axis.z * this->rocket->inertia.COG),this->dForce,this->dMoment);
 }
 
 
@@ -179,7 +181,7 @@ void SingleStageControl::update(double time) {
     if(ascent_rate < -0.5)
     {
         this->chute_deployed = true;
-        this->chute_deployment_time = time;
+        this->chute_deployed_time = time;
         return;
     }
 
