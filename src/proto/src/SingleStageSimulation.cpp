@@ -102,6 +102,9 @@ void SingleStageSimulation::load(std::string fn){
             thruster->load(lines[5]);
             this->rocket.thruster.reset(thruster);
             thruster->save("test/computed_thruster_file");
+            thruster->set(10000,0);
+            m_full = m_empty + thruster->mass;
+            this->rocket.set_inertial_properties(m_empty,m_full,I_empty,I_full);
             // need to correct for mass
         }
         else if (ext == "sthruster")
@@ -186,7 +189,7 @@ void SingleStageSimulation::run(std::string fn, const bool debug)
         throw std::invalid_argument("could not open file.");
     }
 
-    fprintf(this->output,"39.94426809919236 -104.94474985717818 1606.0\n");
+    fprintf(this->output,"% 12.9f % 12.9f % 9.5f\n", launch.latitude, launch.longitude, launch.altitude);
 
     std::ofstream debug_output;
     if(debug)
@@ -201,7 +204,7 @@ void SingleStageSimulation::run(std::string fn, const bool debug)
     const std::string POS_FORMAT = "% .6e % .6e % .6e ";
     const std::string OUTPUT_FORMAT = "%8.3f " + POS_FORMAT + CS_FORMAT + "% .6e\n";
 
-    this->rocket.init(this->launch_angle,this->launch_heading);
+    this->rocket.init(this->launch.pitch_angle,this->launch.heading);
 
     double dt = 1.0/512.0;
     double time = 0;
