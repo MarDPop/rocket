@@ -1,10 +1,29 @@
-#include "../include/SingleStageAerodynamics.h"
+#include "../include/Aerodynamics.h"
 
 #include "../include/SingleStageRocket.h"
 
-SingleStageAerodynamics::SingleStageAerodynamics(SingleStageRocket& r) : rocket(r) {}
+Aerodynamics::Aerodynamics(SingleStageRocket& r) : rocket(r) {}
 
-void SingleStageAerodynamics::set_coef(double* coef)
+void Aerodynamics::compute_aero_values()
+{
+    Vector air_velocity = this->rocket.state.velocity - this->rocket.altitude_table.wind.wind;
+
+    this->aero_values.airspeed = air_velocity.norm();
+
+    if(this->aero_values.airspeed > 1e-3)
+    {
+        this->aero_values.unit_v_air = air_velocity * (1.0/this->aero_values.airspeed);
+    }
+
+    this->aero_values.mach = this->aero_values.airspeed * this->rocket.altitude_table.values->inv_sound_speed;
+
+    double tmp = 1.0 + 0.2*this->aero_values.mach*this->aero_values.mach;
+    this->aero_values.dynamic_pressure = this->rocket.altitude_table.values->pressure*(tmp*tmp*tmp*sqrt(tmp) - 1.0);
+}
+
+SimpleAerodynamics::SimpleAerodynamics(SingleStageRocket& r) : Aerodynamics(r) {}
+
+void SimpleAerodynamics::set_coef(double* coef)
 {
     this->CD0 = coef[0]*coef[5];
     this->CL_alpha = coef[1]*coef[5];
@@ -22,24 +41,7 @@ void SingleStageAerodynamics::set_coef(double* coef)
 
 }
 
-void SingleStageAerodynamics::compute_aero_values()
-{
-    Vector air_velocity = this->rocket.state.velocity - this->rocket.altitude_table.wind.wind;
-
-    this->aero_values.airspeed = air_velocity.norm();
-
-    if(this->aero_values.airspeed > 1e-3)
-    {
-        this->aero_values.unit_v_air = air_velocity * (1.0/this->aero_values.airspeed);
-    }
-
-    this->aero_values.mach = this->aero_values.airspeed * this->rocket.altitude_table.values->inv_sound_speed;
-
-    double tmp = 1.0 + 0.2*this->aero_values.mach*this->aero_values.mach;
-    this->aero_values.dynamic_pressure = this->rocket.altitude_table.values->pressure*(tmp*tmp*tmp*sqrt(tmp) - 1.0);
-}
-
-double SingleStageAerodynamics::get_parasitic_drag_from_mach(double mach)
+double SimpleAerodynamics::get_parasitic_drag_from_mach(double mach)
 {
     if (this->aero_values.mach < 0.5)
     {
@@ -58,16 +60,16 @@ double SingleStageAerodynamics::get_parasitic_drag_from_mach(double mach)
     }
 }
 
-double SingleStageAerodynamics::get_angle_of_attack()
+double SimpleAerodynamics::get_angle_of_attack()
 {
     double proj = std::min(1.0, rocket.state.CS.axis.z.dot(this->aero_values.unit_v_air));
 
     return (proj > 0.9) ? sqrt(2.0 - 2*proj) : acos(proj);
 }
 
-SingleStageAerodynamics::aero_coef SingleStageAerodynamics::get_aero_coef(double sAoA)
+SimpleAerodynamics::aero_coef SimpleAerodynamics::get_aero_coef(double sAoA)
 {
-    SingleStageAerodynamics::aero_coef output;
+    SimpleAerodynamics::aero_coef output;
 
     output.CD = this->get_parasitic_drag_from_mach(this->aero_values.mach);
 
@@ -101,7 +103,7 @@ SingleStageAerodynamics::aero_coef SingleStageAerodynamics::get_aero_coef(double
     return output;
 }
 
-void SingleStageAerodynamics::update()
+void SimpleAerodynamics::update()
 {
     // Get aerodynamic quantities needed for computation
     this->compute_aero_values();

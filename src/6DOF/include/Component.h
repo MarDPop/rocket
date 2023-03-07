@@ -1,21 +1,28 @@
 #pragma once
 
-#include "../../common/include/Cartesian.h"
+#include "../../../lib/Eigen/Dense"
 
 class Vehicle;
 
-class Component {
+class Component
+{
 protected:
 
     Vehicle* vehicle = nullptr;
 
-public:
-
-    Cartesian::Vector center;
+    Eigen::Vector3d center;
 
     double mass;
 
-    inline void set_vehicle(Vehicle* vehicle) {
+    Eigen::Matrix3d inertiaMatrix;
+
+public:
+
+    Component();
+    ~Component();
+
+    inline void set_vehicle(Vehicle* vehicle)
+    {
         this->vehicle = vehicle;
     }
 

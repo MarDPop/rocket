@@ -1,4 +1,4 @@
-#include "../include/SingleStageThruster.h"
+#include "../include/Thruster.h"
 
 #include <fstream>
 #include <cmath>

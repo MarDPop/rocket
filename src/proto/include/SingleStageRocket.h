@@ -6,9 +6,9 @@
 
 #include "../../common/include/Cartesian.h"
 
-#include "SingleStageAerodynamics.h"
+#include "Aerodynamics.h"
 #include "Control.h"
-#include "SingleStageThruster.h"
+#include "Thruster.h"
 #include "Atmosphere.h"
 
 using namespace Cartesian;
@@ -112,7 +112,7 @@ public:
 
     AltitudeTable altitude_table;
 
-    SingleStageAerodynamics aerodynamics;
+    std::unique_ptr<Aerodynamics> aerodynamics;
 
     std::unique_ptr<SingleStageThruster> thruster;
 

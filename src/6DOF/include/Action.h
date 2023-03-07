@@ -1,15 +1,12 @@
 #pragma once
 
-#include "../../common/include/Cartesian.h"
+#include "../../../lib/Eigen/Dense"
 
-using namespace Cartesian;
-
-struct Action {
-
-    Vector force;
-    Vector moment;
-    Vector center;
+struct Action
+{
+    Eigen::Vector3d force;
+    Eigen::Vector3d moment;
+    Eigen::Vector3d center;
 
     virtual void update(double time) = 0;
-
 };

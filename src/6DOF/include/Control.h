@@ -5,7 +5,8 @@ struct ControlInput {
 
 };
 
-class Control {
+class Control
+{
 
 public:
 

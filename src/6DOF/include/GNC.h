@@ -4,7 +4,8 @@
 
 struct Vehicle;
 
-class GNC : public Action {
+class GNC : public Action
+{
 
     Vehicle* vehicle;
 

@@ -176,14 +176,12 @@
 
 1662820879 c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\1d\include\physics.h
 
-1674540733 source:c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\app\test.cpp
+1678043127 source:c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\app\test.cpp
 	<iostream>
-	"../1D/include/structures.h"
 	"../common/include/structures.h"
 	"../common/include/util.h"
 	"../common/include/RocketShape.h"
 	"../common/include/Cartesian.h"
-	"../1D/include/thruster.h"
 	"../6DOF/include/Vehicle.h"
 	"../6DOF/include/Stage.h"
 	"../util/include/Simulation.h"
@@ -244,10 +242,10 @@
 	"Aerodynamics.h"
 	"Thruster.h"
 
-1663811296 c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\6dof\include\action.h
-	"../../common/include/Cartesian.h"
+1678043319 c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\6dof\include\action.h
+	"../../../lib/Eigen/Dense"
 
-1662820879 c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\6dof\include\gnc.h
+1678042486 c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\6dof\include\gnc.h
 	"Action.h"
 
 1671291132 c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\6dof\include\aerodynamics.h
@@ -267,8 +265,8 @@
 	<vector>
 	<string>
 
-1663812688 c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\6dof\include\component.h
-	"../../common/include/Cartesian.h"
+1678043466 c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\6dof\include\component.h
+	"../../../lib/Eigen/Dense"
 
 1666019799 c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\6dof\include\vehicle.h
 	<vector>
@@ -1793,8 +1791,8 @@
 	"../../common/include/fluid.h"
 	<iostream>
 
-1676644531 c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\proto\include\singlestagethruster.h
-	"../../1D/include/thruster.h"
+1677448258 c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\proto\include\singlestagethruster.h
+	"../include/thruster.h"
 	<vector>
 
 1672978841 source:c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\proto\src\air.cpp
@@ -1818,14 +1816,14 @@
 	<string>
 	"../../common/include/util.h"
 
-1674541620 c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\proto\include\singlestagerocket.h
+1678080557 c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\proto\include\singlestagerocket.h
 	<vector>
 	<memory>
 	<string>
 	"../../common/include/Cartesian.h"
-	"SingleStageAerodynamics.h"
+	"Aerodynamics.h"
 	"Control.h"
-	"SingleStageThruster.h"
+	"Thruster.h"
 	"Atmosphere.h"
 
 1676480763 c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\proto\include\singlestageaerodynamics.h
@@ -1902,4 +1900,39 @@
 	"../include/SingleStageRocket.h"
 	"../../../lib/Eigen/Dense"
 	<cmath>
+
+1678080640 c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\proto\include\thruster.h
+	"../include/thruster1D.h"
+	<vector>
+
+1674441164 source:c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\proto\src\thruster.cpp
+	"../include/thruster.h"
+	"../../common/include/fluid.h"
+	"../../common/include/util.h"
+	<fstream>
+	<iostream>
+	<cmath>
+
+1677106941 source:c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\app\proto.cpp
+	<iostream>
+	"../common/include/util.h"
+	"../common/include/Cartesian.h"
+	"../proto/include/SingleStageSimulation.h"
+	<string>
+	<cstdio>
+	<exception>
+	<float.h>
+
+1678080211 c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\proto\include\aerodynamics.h
+	"Atmosphere.h"
+	"../../common/include/Cartesian.h"
+
+1678080626 source:c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\6dof\src\component.cpp
+	"../include/Component.h"
+
+1674438272 c:\users\mariu\onedrive\documents\repos\rocket\rocket\src\proto\include\thruster1d.h
+	<vector>
+	<cmath>
+	<memory>
+	"../../common/include/Constants.h"
 

@@ -23,7 +23,7 @@
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Compiler>
-                                        <Add option="-std=c++17" />
+					<Add option="-std=c++17" />
 					<Add option="-O2" />
 				</Compiler>
 				<Linker>
@@ -37,10 +37,6 @@
 		<Unit filename="Makefile" />
 		<Unit filename="README.txt" />
 		<Unit filename="build.sh" />
-		<Unit filename="gui/app.java">
-			<Option compile="0" />
-			<Option link="0" />
-		</Unit>
 		<Unit filename="lib/Eigen/AccelerateSupport" />
 		<Unit filename="lib/Eigen/Cholesky" />
 		<Unit filename="lib/Eigen/CholmodSupport" />
@@ -413,13 +409,6 @@
 		<Unit filename="lib/Eigen/src/plugins/MatrixCwiseUnaryOps.h" />
 		<Unit filename="lib/Eigen/src/plugins/ReshapedMethods.h" />
 		<Unit filename="resources/reactions/reactions.json" />
-		<Unit filename="src/1D/include/physics.h" />
-		<Unit filename="src/1D/include/simulation.h" />
-		<Unit filename="src/1D/include/structures.h" />
-		<Unit filename="src/1D/include/thruster.h" />
-		<Unit filename="src/1D/src/physics.cpp" />
-		<Unit filename="src/1D/src/simulation.cpp" />
-		<Unit filename="src/1D/src/thruster.cpp" />
 		<Unit filename="src/6DOF/include/Action.h" />
 		<Unit filename="src/6DOF/include/Aerodynamics.h" />
 		<Unit filename="src/6DOF/include/Atmosphere.h" />
@@ -428,6 +417,7 @@
 		<Unit filename="src/6DOF/include/Control.h" />
 		<Unit filename="src/6DOF/include/GNC.h" />
 		<Unit filename="src/6DOF/include/Gravity.h" />
+		<Unit filename="src/6DOF/include/Resource.h" />
 		<Unit filename="src/6DOF/include/Stage.h" />
 		<Unit filename="src/6DOF/include/StageDynamics.h" />
 		<Unit filename="src/6DOF/include/Thruster.h" />
@@ -435,15 +425,15 @@
 		<Unit filename="src/6DOF/src/Aerodynamics.cpp" />
 		<Unit filename="src/6DOF/src/Atmosphere.cpp" />
 		<Unit filename="src/6DOF/src/Body.cpp" />
+		<Unit filename="src/6DOF/src/Component.cpp" />
 		<Unit filename="src/6DOF/src/Stage.cpp" />
 		<Unit filename="src/6DOF/src/StageDynamics.cpp" />
 		<Unit filename="src/6DOF/src/Thruster.cpp" />
 		<Unit filename="src/6DOF/src/Vehicle.cpp" />
-		<Unit filename="src/CFD/include/fluid.h" />
-		<Unit filename="src/CFD/include/structures.h" />
 		<Unit filename="src/app/main.cpp" />
-		<Unit filename="src/app/single_sim.cpp" />
+		<Unit filename="src/app/proto.cpp" />
 		<Unit filename="src/app/test.cpp" />
+		<Unit filename="src/app/tests.h" />
 		<Unit filename="src/common/include/Cartesian.h" />
 		<Unit filename="src/common/include/CircularArray.h" />
 		<Unit filename="src/common/include/Constants.h" />
@@ -464,25 +454,27 @@
 		<Unit filename="src/common/include/util.h" />
 		<Unit filename="src/common/src/Geodesy.cpp" />
 		<Unit filename="src/common/src/Planet.cpp" />
+		<Unit filename="src/proto/include/Aerodynamics.h" />
 		<Unit filename="src/proto/include/Atmosphere.h" />
 		<Unit filename="src/proto/include/Control" />
 		<Unit filename="src/proto/include/Control.h" />
 		<Unit filename="src/proto/include/Filter.h" />
 		<Unit filename="src/proto/include/Sensors.h" />
-		<Unit filename="src/proto/include/SingleStageAerodynamics.h" />
 		<Unit filename="src/proto/include/SingleStageRocket.h" />
 		<Unit filename="src/proto/include/SingleStageSimulation.h" />
-		<Unit filename="src/proto/include/SingleStageThruster.h" />
+		<Unit filename="src/proto/include/Thruster.h" />
 		<Unit filename="src/proto/include/WindHistory.h" />
+		<Unit filename="src/proto/include/thruster1D.h" />
+		<Unit filename="src/proto/src/Aerodynamics.cpp" />
 		<Unit filename="src/proto/src/Atmosphere.cpp" />
 		<Unit filename="src/proto/src/Control.cpp" />
 		<Unit filename="src/proto/src/Filter.cpp" />
 		<Unit filename="src/proto/src/Sensors.cpp" />
-		<Unit filename="src/proto/src/SingleStageAerodynamics.cpp" />
 		<Unit filename="src/proto/src/SingleStageRocket.cpp" />
 		<Unit filename="src/proto/src/SingleStageSimulation.cpp" />
-		<Unit filename="src/proto/src/SingleStageThruster.cpp" />
+		<Unit filename="src/proto/src/Thruster.cpp" />
 		<Unit filename="src/proto/src/WindHistory.cpp" />
+		<Unit filename="src/proto/src/thruster1D.cpp" />
 		<Unit filename="src/util/include/Simulation.h" />
 		<Unit filename="src/util/src/Simulation.cpp" />
 		<Extensions />

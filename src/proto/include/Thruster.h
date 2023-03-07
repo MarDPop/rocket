@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../1D/include/thruster.h"
+#include "../include/thruster1D.h"
 #include <vector>
 
 class SingleStageThruster
