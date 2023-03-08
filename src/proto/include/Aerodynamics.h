@@ -115,7 +115,7 @@ class SimpleAerodynamics : public virtual Aerodynamics
 
 public:
 
-    SingleStageAerodynamics(SingleStageRocket& r);
+    SimpleAerodynamics(SingleStageRocket& r);
 
     void set_coef(double* coef);
 

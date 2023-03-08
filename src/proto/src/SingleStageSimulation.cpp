@@ -80,7 +80,7 @@ void SingleStageSimulation::load(std::string fn){
         coef[i] = std::stod(data[i]);
     }
 
-    SimpleAerodynamics* aero = new SimpleAerodynamics();
+    SimpleAerodynamics* aero = new SimpleAerodynamics(this->rocket);
     aero->set_coef(coef);
 
     this->rocket.aerodynamics.reset(aero);

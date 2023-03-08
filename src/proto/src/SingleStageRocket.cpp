@@ -12,23 +12,27 @@ void SingleStageRocket::compute_acceleration(double time)
 
     this->altitude_table.set(this->state.position.z, time);
 
-    this->aerodynamics.update();
-
     if(this->control)
     {
         this->control->update(time);
-
-        total_force += this->control->dForce;
-        total_moment += this->control->dMoment;
     }
 
-    total_force += this->aerodynamics.force;
-    total_moment += this->aerodynamics.moment;
+    this->aerodynamics->update();
+
+    Vector total_force(this->aerodynamics->force);
+    Vector total_moment(this->aerodynamics->moment);
 
     if(this->not_empty)
     {
         this->thruster->set(this->altitude_table.values->pressure, time);
         total_force += this->state.CS.axis.z * this->thruster->get_thrust();
+    }
+
+    if(this->parachute->is_deployed())
+    {
+        this->parachute->update();
+        total_force += this->parachute->tether_force;
+        total_moment += this->state.CS.axis.z.cross(this->parachute->tether_force) * this->inertia.COG;
     }
 
     this->state.acceleration = total_force * (1.0/this->inertia.mass);

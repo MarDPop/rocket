@@ -459,6 +459,7 @@
 		<Unit filename="src/proto/include/Control" />
 		<Unit filename="src/proto/include/Control.h" />
 		<Unit filename="src/proto/include/Filter.h" />
+		<Unit filename="src/proto/include/Parachute.h" />
 		<Unit filename="src/proto/include/Sensors.h" />
 		<Unit filename="src/proto/include/SingleStageRocket.h" />
 		<Unit filename="src/proto/include/SingleStageSimulation.h" />

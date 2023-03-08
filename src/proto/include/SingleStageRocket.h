@@ -10,6 +10,7 @@
 #include "Control.h"
 #include "Thruster.h"
 #include "Atmosphere.h"
+#include "Parachute.h"
 
 using namespace Cartesian;
 
@@ -117,6 +118,8 @@ public:
     std::unique_ptr<SingleStageThruster> thruster;
 
     std::unique_ptr<Control> control;
+
+    std::unique_ptr<Parachute> parachute;
 
     SingleStageRocket();
     ~SingleStageRocket();
