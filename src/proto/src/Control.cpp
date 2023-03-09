@@ -2,7 +2,12 @@
 
 #include "../include/SingleStageRocket.h"
 
-Control::~Control(){}
+Control::~Control() {}
+
+void Control::compute_output(double time)
+{
+
+}
 
 void Control::update(double time)
 {
@@ -15,25 +20,12 @@ void Control::update(double time)
             this->filter->update(*this->sensors,time);
         }
     }
+
+    this->compute_output(time);
 }
 
-SingleStageControl::SingleStageControl(unsigned N) : NFINS(N)
+FinControl::FinControl(unsigned N) : NFINS(N)
 {
-
-    for(unsigned i = 0; i < NFINS;i++){
-        this->fins[i].span.zero();
-        this->fins[i].deflection = 0;
-    }
-
-    this->fins[0].span.x = 1.0;
-    double dtheta = 6.283185307179586476925286766559/NFINS;
-    for(unsigned i = 1; i < NFINS; i++){
-        this->fins[i].span.data[0] = cos(i*dtheta);
-        this->fins[i].span.data[1] = sin(i*dtheta);
-    }
-
-    this->chute_deployed = false;
-
     this->sensors = std::make_unique<Sensors>();
 
     this->filter = std::make_unique<FilterNone>();

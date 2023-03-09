@@ -148,3 +148,13 @@ void SimpleAerodynamics::update()
 
     this->force += lift;
 }
+
+void FinCoefficientAerodynamics::set_aero_coef(double dCL, double dCD, double dCM, double fin_COP_z, double fin_COP_d){
+    this->dCLdTheta = dCL; // remember that these already have fin area "built in"
+    this->dCDdTheta = dCD;
+    this->dCMdTheta = dCM;
+    this->z = fin_COP_z;
+    this->d = fin_COP_d;
+    this->const_axial_term = dCL*fin_COP_d;
+    this->const_planer_term = dCM - (z - this->rocket->inertia.COG)*dCL; // remember z should be negative distance from nose
+}

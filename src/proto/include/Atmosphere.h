@@ -4,7 +4,8 @@
 
 #include "WindHistory.h"
 
-struct AltitudeValues {
+struct AltitudeValues
+{
     double pressure;
     double temperature;
     double inv_sound_speed;
@@ -13,7 +14,29 @@ struct AltitudeValues {
     double gravity;
 };
 
-class AltitudeTable {
+class Atmosphere
+{
+public:
+
+    static constexpr double R_GAS = 8.31446261815324;
+
+    static constexpr double R_AIR = 287.052874;
+
+    static constexpr double AIR_CONST = 287.052874*1.4;
+
+    AltitudeValues values;
+
+    WindHistory wind;
+
+    Atmosphere();
+    virtual ~Atmosphere();
+
+    virtual void set(double alt, double time);
+
+};
+
+class AtmosphereTable : public virtual Atmosphere
+{
 
     /**
     * ground altitude from MSL (m)
@@ -53,24 +76,16 @@ class AltitudeTable {
     // values are precomputed to speed processing
     std::vector<AltitudeValues> air_table;
 
-    std::vector<double> grav_table; // TODO: move
+    std::vector<AltitudeValues> delta_air_table;
+
+    std::vector<double> altitudes;
 
     void compute_atmosphere(double maxAlt, double dH, double g0 = 9.806, double R0 = 6371000.0);
 
 public:
 
-    static constexpr double R_GAS = 8.31446261815324;
-
-    static constexpr double R_AIR = 287.052874;
-
-    static constexpr double AIR_CONST = 287.052874*1.4;
-
-    AltitudeValues* values;
-
-    WindHistory wind;
-
-    AltitudeTable();
-    ~AltitudeTable();
+    AtmosphereTable();
+    ~AtmosphereTable();
 
     void set_ground(double ground_altitude,
                     double ground_pressure,
@@ -79,6 +94,6 @@ public:
                     double g0 = 9.806,
                     double R0 = 6371000.0);
 
-    void set(double alt, double time);
+    void set(double alt, double time) override;
 };
 

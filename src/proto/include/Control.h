@@ -18,15 +18,13 @@ protected:
 
     SingleStageRocket* rocket = nullptr;
 
+    virtual void compute_output(double time);
+
 public:
 
     std::unique_ptr<Filter> filter;
 
     std::unique_ptr<Sensors> sensors;
-
-    Vector dForce;
-
-    Vector dMoment;
 
     virtual ~Control();
 
@@ -35,51 +33,11 @@ public:
         this->rocket = rocket;
     }
 
-    virtual void update(double time);
+    void update(double time);
 };
 
-
-struct Fin {
-    double deflection = 0; // first fin on + x axis, going counter clockwise
-    double commanded_deflection = 0; // first fin on + x axis, going counter clockwise
-    Vector span; // vector of the direction of the span of all fins
-    Vector lift; // vector of the direction of the lift of all fins
-};
-
-struct Chute {
-    double area_drogue;
-    double CD_drogue;
-    double area_deployed;
-    double CD_deployed;
-    double deployment_time = 1;
-    double chord_length;
-    double frac_deployed;
-};
-
-class SingleStageControl : public virtual Control {
-
-protected:
-    std::array<Fin, 4> fins;
-
-    Chute chute;
-
-    double z;
-
-    double d; // distance along span vector of  on Center of pressure
-
-    double dCMdTheta;
-
-    double dCDdTheta;
-
-    double dCLdTheta;
-
-    double const_axial_term;
-
-    double const_planer_term;
-
-    double max_theta = 0.1; // rad
-
-    double slew_rate = 0.5; // rad/s
+class FinControl : public virtual Control
+{
 
     double K1;
 
@@ -88,10 +46,6 @@ protected:
     double C2;
 
     double time_old;
-
-    double chute_deployed_time;
-
-    bool chute_deployed;
 
     /*  */
 
@@ -121,11 +75,11 @@ public:
 
     void reset();
 
-    void update(double time) override;
+    void compute_output(double time) override;
 
 };
 
-class SingleStageControl_3 : public virtual SingleStageControl {
+class SingleStageControl_3 : public virtual FinControl {
 
     Axis solve3;
 
@@ -139,7 +93,7 @@ public:
 
 };
 
-class SingleStageControl_4 : public virtual SingleStageControl {
+class SingleStageControl_4 : public virtual FinControl {
 
 public:
 

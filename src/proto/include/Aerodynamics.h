@@ -131,10 +131,44 @@ protected:
 
     std::array<double, NUMBER_FINS> current_fin_deflection;
 
+    double servo_rate;
+
 public:
 
     ControlledAerodynamics(SingleStageRocket& r);
     virtual ~ControlledAerodynamics();
+};
+
+template <unsigned NUMBER_FINS>
+class FinCoefficientAerodynamics : public virtual ControlledAerodynamics<NUMBER_FINS>
+{
+    std::array<Vector, NUMBER_FINS> fin_span_vector;
+
+    double z; // distance along z axis of span vectors from nose
+
+    double d; // distance along span vector of Center of pressure
+
+    double dCMdTheta;
+
+    double dCDdTheta;
+
+    double dCLdTheta;
+
+    double const_axial_term;
+
+    double const_planer_term;
+
+    double max_theta = 0.1; // rad
+
+    double slew_rate = 0.5; // rad/s
+
+public:
+
+    FinCoefficientAerodynamics(SingleStageRocket& r);
+    ~FinCoefficientAerodynamics();
+
+    void set_aero_coef(double dCL, double dCD, double dCM, double fin_COP_z, double fin_COP_d);
+
 };
 
 

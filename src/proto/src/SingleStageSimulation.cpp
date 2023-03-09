@@ -112,7 +112,7 @@ void SingleStageSimulation::load(std::string fn){
         }
         else if (ext == "sthruster")
         {
-            SingleStageThruster* thruster = new SingleStageThruster();
+            Thruster* thruster = new Thruster();
             thruster->load(lines[5]);
             this->rocket.thruster.reset(thruster);
         }

@@ -3,7 +3,7 @@
 #include "../include/thruster1D.h"
 #include <vector>
 
-class SingleStageThruster
+class Thruster
 {
 
 protected:
@@ -34,7 +34,7 @@ public:
 };
 
 
-class PressureThruster : public virtual SingleStageThruster {
+class PressureThruster : public virtual Thruster {
 
     std::vector<double> pressures;
 
@@ -62,7 +62,7 @@ public:
 
 };
 
-class ComputedThruster : public virtual SingleStageThruster
+class ComputedThruster : public virtual Thruster
 {
     struct performance_values
     {

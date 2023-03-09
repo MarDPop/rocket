@@ -111,11 +111,11 @@ public:
 
     KinematicState state;
 
-    AltitudeTable altitude_table;
+    std::unique_ptr<Atmosphere> atmosphere;
 
     std::unique_ptr<Aerodynamics> aerodynamics;
 
-    std::unique_ptr<SingleStageThruster> thruster;
+    std::unique_ptr<Thruster> thruster;
 
     std::unique_ptr<Control> control;
 
