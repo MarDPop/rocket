@@ -149,6 +149,22 @@ void SimpleAerodynamics::update()
     this->force += lift;
 }
 
+void ControlledAerodynamics::deflect_fins(double time)
+{
+    double max_angle = this->slew_rate*(time - this->time_old);
+    for(unsigned i = 0; i < NFINS;i++) {
+        auto& fin = this->fins[i];
+        double delta = fin.commanded_deflection - fin.deflection;
+        if(fabs(delta) > max_angle) {
+            fin.deflection += std::copysign(max_angle,delta);
+        } else {
+            fin.deflection = fin.commanded_deflection;
+        }
+
+        fin.deflection = std::copysign(std::min(fabs(fin.deflection),this->max_theta),fin.deflection);
+    }
+}
+
 void FinCoefficientAerodynamics::set_aero_coef(double dCL, double dCD, double dCM, double fin_COP_z, double fin_COP_d){
     this->dCLdTheta = dCL; // remember that these already have fin area "built in"
     this->dCDdTheta = dCD;
@@ -157,4 +173,35 @@ void FinCoefficientAerodynamics::set_aero_coef(double dCL, double dCD, double dC
     this->d = fin_COP_d;
     this->const_axial_term = dCL*fin_COP_d;
     this->const_planer_term = dCM - (z - this->rocket->inertia.COG)*dCL; // remember z should be negative distance from nose
+}
+
+
+
+
+void FinCoefficientAerodynamics::update_force() {
+    this->dMoment.zero();
+    this->dForce.zero();
+
+    double axial_term = this->dCLdTheta*this->d;
+    double planar_term = this->dCMdTheta - (this->z - this->rocket->inertia.COG)*this->dCLdTheta;
+
+    for(unsigned i = 0; i < NFINS;i++) {
+        auto& fin = this->fins[i];
+        double tmp = planar_term*fin.deflection;
+
+        this->dMoment.data[0] += fin.span.data[0]*tmp;
+        this->dMoment.data[1] += fin.span.data[1]*tmp;
+        this->dMoment.data[2] += fin.span.data[2]*axial_term*fin.deflection;
+
+        tmp = this->dCLdTheta*fin.deflection;
+
+        this->dForce.data[0] += fin.lift.data[0]*tmp;
+        this->dForce.data[1] += fin.lift.data[1]*tmp;
+        this->dForce.data[2] -= this->dCDdTheta*fin.deflection; // simply linear approximation for small angles
+    }
+    this->dMoment *= this->rocket->aerodynamics->aero_values.dynamic_pressure;
+    this->dForce *= this->rocket->aerodynamics->aero_values.dynamic_pressure;
+    // remember currently in body frame, need to convert to inertial frame
+    this->dMoment = this->rocket->state.CS.transpose_mult(this->dMoment);
+    this->dForce = this->rocket->state.CS.transpose_mult(this->dForce);
 }

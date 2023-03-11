@@ -6,69 +6,15 @@
 
 #include "../../common/include/Cartesian.h"
 
+#include "Kinematics.h"
+
 #include "Aerodynamics.h"
-#include "Control.h"
+#include "GNC.h"
 #include "Thruster.h"
 #include "Atmosphere.h"
 #include "Parachute.h"
 
 using namespace Cartesian;
-
-struct KinematicState
-{
-    /**
-    * Current position in ENU (m)
-    */
-    Vector position;
-
-    /**
-    * Current velocity in ENU (m/s)
-    */
-    Vector velocity;
-
-    /**
-    * Current position in ENU (m/s2)
-    */
-    Vector acceleration;
-
-    /**
-    * Current body frame in ENU (z axis is axial)
-    */
-    Axis CS;
-
-    /**
-    * Current angular speed (rad/s)
-    */
-    Vector angular_velocity;
-
-    /**
-    * Current angular acceleration (rad/s)
-    */
-    Vector angular_acceleration;
-};
-
-struct Inertia
-{
-    /**
-    * current mass  (kg)
-    */
-    double mass;
-
-    /**
-    * current principal moment of inertia cross axially (kg m2)
-    */
-    double Ixx;
-
-    /**
-    * current principal moment of inertia along axis  (kg m2)
-    */
-    double Izz;
-
-    /**
-    * current center of mass location from nose (m) [should be negative]
-    */
-    double COG;
-};
 
 class SingleStageRocket
 {
@@ -117,7 +63,7 @@ public:
 
     std::unique_ptr<Thruster> thruster;
 
-    std::unique_ptr<Control> control;
+    std::unique_ptr<GNC> gnc;
 
     std::unique_ptr<Parachute> parachute;
 

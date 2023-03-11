@@ -9,7 +9,8 @@
 
 using namespace Cartesian;
 
-struct altitude_cal {
+struct altitude_cal
+{
     double altitude;
     double g;
     double temperature;
@@ -19,7 +20,8 @@ struct altitude_cal {
     double accelerometer_cog_distance;
 };
 
-struct measured_quantities {
+struct measured_quantities
+{
     double static_pressure;
     double total_pressure;
     double temperature;
@@ -27,16 +29,37 @@ struct measured_quantities {
     Vector acceleration;
 };
 
-struct computed_quatities {
+struct computed_quatities
+{
     double mach_squared;
     double altitude;
     double airspeed;
     void set(const measured_quantities& measured, const altitude_cal& cal);
 };
 
+/*
+struct Measurements
+{
+
+};
+
+class SensorsBase
+{
+
+public:
+
+    SensorsBase();
+    ~SensorsBase();
+
+};
+*/
+
 class SingleStageRocket;
 
-class Sensors {
+
+
+class Sensors
+{
 
     std::default_random_engine generator;
 

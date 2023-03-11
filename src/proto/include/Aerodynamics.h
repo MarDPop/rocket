@@ -127,11 +127,7 @@ class ControlledAerodynamics : public virtual Aerodynamics
 {
 protected:
 
-    std::array<double, NUMBER_FINS> commanded_fin_deflection;
-
     std::array<double, NUMBER_FINS> current_fin_deflection;
-
-    double servo_rate;
 
 public:
 
@@ -144,23 +140,17 @@ class FinCoefficientAerodynamics : public virtual ControlledAerodynamics<NUMBER_
 {
     std::array<Vector, NUMBER_FINS> fin_span_vector;
 
+    std::array<Vector, NUMBER_FINS> fin_lift_vector;
+
     double z; // distance along z axis of span vectors from nose
 
     double d; // distance along span vector of Center of pressure
 
-    double dCMdTheta;
+    double dCMdTheta; // change in moment ( on span vector )
 
-    double dCDdTheta;
+    double dCDdTheta; // change in drag per angle
 
-    double dCLdTheta;
-
-    double const_axial_term;
-
-    double const_planer_term;
-
-    double max_theta = 0.1; // rad
-
-    double slew_rate = 0.5; // rad/s
+    double dCLdTheta; // change in lift ( on lift vector )
 
 public:
 

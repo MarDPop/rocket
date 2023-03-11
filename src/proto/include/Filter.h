@@ -2,30 +2,22 @@
 
 #include "../../common/include/Cartesian.h"
 
+#include "Kinematics.h"
+#include "Sensors.h"
+
 using namespace Cartesian;
-
-class Sensors;
-
-struct State_Filter
-{
-    Vector position;
-    Vector velocity;
-
-    Quaternion orientation;
-    Vector angular_velocity;
-};
 
 class Filter
 {
 protected:
 
-    State_Filter computed_state;
+    KinematicState computed_state;
 
 public:
 
     virtual void update(const Sensors& sensors, double t) = 0;
 
-    inline const State_Filter& get_computed_state() const {
+    inline const KinematicState& get_computed_state() const {
         return this->computed_state;
     }
 
@@ -62,7 +54,7 @@ class FilterBasic: public virtual Filter
 
     double t_old;
 
-    State_Filter state_old;
+    KinematicState state_old;
 
 public:
 
@@ -75,7 +67,7 @@ class FilterQuadraticSmooth: public virtual Filter
 
     double t_old;
 
-    State_Filter state_old;
+    KinematicState state_old;
 
 public:
 
