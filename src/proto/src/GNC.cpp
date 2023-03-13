@@ -1,20 +1,3 @@
-#include "../include/GNC.h"
-
-#include "../include/SingleStageRocket.h"
-
-GNC::GNC(const SingleStageRocket& _rocket) : rocket(_rocket) {}
-
-GNC::~GNC() {}
-
-void GNC::update(double time)
-{
-    auto estimated_state = this->navigation->get_estimated_state(this->rocket, time);
-
-    auto desired_state = this->guidance->get_commanded_state(estimated_state, time);
-
-    this->control->get_outputs(desired_state, estimated_state, time);
-}
-
 
 void SingleStageControl::set_controller_terms(double P_angle, double P_velocity, double C_velocity ){
     this->K1 = P_angle;

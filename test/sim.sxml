@@ -1,0 +1,8 @@
+<Simulation>
+	<RocketFile>rocket.rxml</RocketFile>
+	<Type>
+		Single
+	</Type>
+	<Atmosphere>
+	</Atmosphere>
+</Simulation>

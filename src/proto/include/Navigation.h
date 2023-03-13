@@ -18,5 +18,5 @@ public:
     Navigation();
     virtual ~Navigation();
 
-    virtual KinematicState get_estimated_state(const SingleStageRocket& rocket, double time) = 0;
+    virtual KinematicState get_estimated_state(const SingleStageRocket& rocket, double time);
 };

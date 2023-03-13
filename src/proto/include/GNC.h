@@ -1,7 +1,10 @@
 #pragma once
 
+#include "Control.h"
+#include "Guidanae.h"
+#include "Navigation.h"
+
 #include <memory>
-#include <array>
 
 class SingleStageRocket;
 
@@ -17,8 +20,14 @@ public:
 
     std::unique_ptr<Control> control;
 
-    GNC(const SingleStageRocket& _rocket);
-    virtual ~GNC();
+    inline GNC(const SingleStageRocket& _rocket) : rocket(_rocket) {}
 
-    void update(double time);
+    inline void update(double time)
+    {
+        auto estimated_state = this->navigation->get_estimated_state(this->rocket, time);
+
+        auto desired_state = this->guidance->get_commanded_state(estimated_state, time);
+
+        this->control->get_outputs(desired_state, estimated_state, time);
+    }
 };

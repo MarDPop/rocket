@@ -1,22 +1,32 @@
 #pragma once
 
-#include "../include/thruster1D.h"
+#include "Kinematics.h"
 #include <vector>
+#include <array>
 
 class Thruster
 {
 
 protected:
 
+    bool active = true;
+
     double thrust;
 
     double mass_rate;
+
+    Inertia inertia;
 
 public:
 
     SingleStageThruster();
     SingleStageThruster(double t, double isp);
     ~SingleStageThruster();
+
+    inline bool is_active()
+    {
+        return this->active;
+    }
 
     inline double get_thrust()
     {
@@ -26,6 +36,11 @@ public:
     inline double get_mass_rate()
     {
         return this->mass_rate;
+    }
+
+    inline const Inertia& get_inertia()
+    {
+        return this->inertia;
     }
 
     virtual void set(double pressure, double time) {}
@@ -50,7 +65,16 @@ class PressureThruster : public virtual Thruster {
 
     double dM;
 
+    double fuel_mass;
+
+    double time_old;
+
 public:
+
+    inline void set_fuel_mass(double mass)
+    {
+        this->fuel_mass = mass;
+    }
 
     void add_thrust_point(double pressure, double thrust, double mass_rate);
 

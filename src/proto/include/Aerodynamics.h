@@ -148,9 +148,9 @@ class FinCoefficientAerodynamics : public virtual ControlledAerodynamics<NUMBER_
 
     double dCMdTheta; // change in moment ( on span vector )
 
-    double dCDdTheta; // change in drag per angle
+    double dCDdTheta; // change in drag per angle ( on z axis, on center of pressure )
 
-    double dCLdTheta; // change in lift ( on lift vector )
+    double dCLdTheta; // change in lift ( on lift vector at center of pressure )
 
 public:
 
@@ -161,8 +161,8 @@ public:
 
 };
 
-
-class TabulatedAerodynamics_3 : public virtual ControlledAerodynamics<3>
+template <unsigned NUMBER_FINS>
+class TabulatedAerodynamics : public virtual ControlledAerodynamics<NUMBER_FINS>
 {
 
     union aero_key
@@ -187,7 +187,7 @@ class TabulatedAerodynamics_3 : public virtual ControlledAerodynamics<3>
 
 public:
 
-    TabulatedAerodynamics_3(SingleStageRocket& r);
+    TabulatedAerodynamics(SingleStageRocket& r);
 };
 
 

@@ -5,27 +5,35 @@
 #include <numeric>
 #include <iostream>
 
+void SingleStageRocket::update_inertia()
+{
+    const auto& fuel_inertia = this->thruster->get_inertia();
+
+    double cog_arm = inertia.COG - this->inertia.COG;
+
+    this->inertia.mass = this->inertia_empty.mass + fuel_inertia.mass;
+    this->inertia.Ixx = this->inertia_empty.Ixx + fuel_inertia.Ixx;
+    this->inertia.Izz = this->inertia_empty.Izz + fuel_inertia.Izz + fuel_inertia.mass*cog_arm*cog_arm;
+    this->inertia.COG = (this->inertia_empty.COG*this->inertia_empty.mass + fuel_inertia.COG*fuel_inertia.mass) / this->inertia.mass;
+}
+
 void SingleStageRocket::compute_acceleration(double time)
 {
-    Vector total_force((char)0);
-    Vector total_moment((char)0);
-
     this->altitude_table.set(this->state.position.z, time);
 
-    if(this->control)
-    {
-        this->control->update(time);
-    }
+    this->gnc.update(time);
 
     this->aerodynamics->update();
 
     Vector total_force(this->aerodynamics->force);
     Vector total_moment(this->aerodynamics->moment);
 
-    if(this->not_empty)
+    if(this->thruster->is_active())
     {
         this->thruster->set(this->altitude_table.values->pressure, time);
         total_force += this->state.CS.axis.z * this->thruster->get_thrust();
+
+        this->update_inertia();
     }
 
     if(this->parachute->is_deployed())
@@ -100,20 +108,7 @@ void SingleStageRocket::step(double& time, double dt)
     }
 }
 
-void SingleStageRocket::get_inertia()
-{
-    double dm = this->inertia.mass - this->mass_empty;
-    this->inertia.Ixx = this->I_empty[0] + this->dIdm[0]*dm;
-    this->inertia.Izz = this->I_empty[1] + this->dIdm[1]*dm;
-    this->inertia.COG = this->I_empty[2] + this->dIdm[2]*dm;
-
-    this->not_empty = dm > 0.0;
-}
-
-SingleStageRocket::SingleStageRocket() : aerodynamics(*this)
-{
-
-}
+SingleStageRocket::SingleStageRocket(){}
 
 SingleStageRocket::~SingleStageRocket(){}
 
@@ -136,20 +131,5 @@ void SingleStageRocket::init(double launch_angle, double launch_heading)
     this->state.CS.axis.z.y = ctheta*-sphi;
     this->state.CS.axis.z.z = stheta;
     Vector::cross(this->state.CS.axis.y,this->state.CS.axis.z,this->state.CS.axis.x);
-
-    this->inertia.mass = this->mass_full;
-    this->get_inertia();
 }
 
-void SingleStageRocket::set_inertial_properties(double empty_mass, double full_mass, double I_empty[3], double I_full[3])
-{
-    this->mass_empty = empty_mass;
-    this->mass_full = full_mass;
-    this->I_empty[0] = I_empty[0]; // Ixx
-    this->I_empty[1] = I_empty[1]; // Izz
-    this->I_empty[2] = I_empty[2]; // COG
-    double dm = full_mass - empty_mass;
-    this->dIdm[0] = (I_full[0] - I_empty[0])/dm;
-    this->dIdm[1] = (I_full[1] - I_empty[1])/dm;
-    this->dIdm[2] = (I_full[2] - I_empty[2])/dm; // dCOG
-}

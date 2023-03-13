@@ -55,6 +55,8 @@ class SingleStageSimulation
 
     Recording record;
 
+    std::unique_ptr<Atmosphere> atmosphere;
+
     Launch_Parameters launch;
 
     FILE* output;

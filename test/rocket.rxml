@@ -1,0 +1,13 @@
+<Rocket>
+	<Aerodynamics>
+		<Type></Type>
+	</Aerodynamics>
+	<Thruster>
+		<Type></Type>
+	</Thruster>
+	<Parachute>
+		
+	</Parachute>
+	<GNC>
+	</GNC>
+</Rocket>

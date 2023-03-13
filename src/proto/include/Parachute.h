@@ -10,7 +10,7 @@ class Parachute
 {
 protected:
 
-friend class SingleStageControl;
+friend class Control;
 
     /**
     * drag coefficient multiplied by area
@@ -46,5 +46,6 @@ public:
 
 class ConstrainedParachute : public virtual Parachute
 {
+public:
 
 };

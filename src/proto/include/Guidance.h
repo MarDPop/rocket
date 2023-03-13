@@ -16,7 +16,7 @@ public:
     Guidance();
     virtual ~Guidance();
 
-    virtual KinematicState get_commanded_state(const KinematicState& estimated_state, double time) = 0;
+    virtual KinematicState get_commanded_state(const KinematicState& estimated_state, double time);
 };
 
 class SimpleAscent : public virtual Guidance
@@ -25,5 +25,9 @@ class SimpleAscent : public virtual Guidance
 
 public:
 
-    KinematicState get_commanded_state(const KinematicState& estimated_state, double time);
+    Parachute* chute;
+
+    SimpleAscent();
+
+    KinematicState get_commanded_state(const KinematicState& estimated_state, double time) override;
 };
