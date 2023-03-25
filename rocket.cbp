@@ -411,6 +411,8 @@
 		<Unit filename="lib/fpm/fixed.hpp" />
 		<Unit filename="lib/fpm/ios.hpp" />
 		<Unit filename="lib/fpm/math.hpp" />
+		<Unit filename="lib/tinyxml/tinyxml2.cpp" />
+		<Unit filename="lib/tinyxml/tinyxml2.h" />
 		<Unit filename="resources/reactions/reactions.json" />
 		<Unit filename="src/6DOF/include/Action.h" />
 		<Unit filename="src/6DOF/include/Aerodynamics.h" />
@@ -477,9 +479,11 @@
 		<Unit filename="src/proto/include/thruster1D.h" />
 		<Unit filename="src/proto/src/Aerodynamics.cpp" />
 		<Unit filename="src/proto/src/Atmosphere.cpp" />
+		<Unit filename="src/proto/src/Control.cpp" />
 		<Unit filename="src/proto/src/Filter.cpp" />
-		<Unit filename="src/proto/src/GNC.cpp" />
 		<Unit filename="src/proto/src/Gravity.cpp" />
+		<Unit filename="src/proto/src/Guidance.cpp" />
+		<Unit filename="src/proto/src/Navigation.cpp" />
 		<Unit filename="src/proto/src/Parachute.cpp" />
 		<Unit filename="src/proto/src/Sensors.cpp" />
 		<Unit filename="src/proto/src/Servo.cpp" />

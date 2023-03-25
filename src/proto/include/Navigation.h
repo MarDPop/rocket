@@ -8,6 +8,9 @@
 
 class Navigation
 {
+protected:
+
+    KinematicState estimated_state;
 
     std::unique_ptr<Filter> filter;
 
@@ -18,5 +21,5 @@ public:
     Navigation();
     virtual ~Navigation();
 
-    virtual KinematicState get_estimated_state(const SingleStageRocket& rocket, double time);
+    virtual const KinematicState& get_estimated_state(const SingleStageRocket& rocket, double time);
 };

@@ -4,6 +4,8 @@
 
 #include "Servo.h"
 
+#include "Guidance.h"
+
 class Control
 {
 
@@ -12,7 +14,7 @@ public:
     Control();
     virtual ~Control();
 
-    virtual void get_outputs(const KinematicState& commanded_state, const KinematicState& estimated_state, double time) = 0;
+    virtual void get_outputs(const Commands& commands, const KinematicState& estimated_state, double time) = 0;
 
 };
 
@@ -30,5 +32,5 @@ public:
     FinControl();
     virtual ~FinControl();
 
-    void get_outputs(const KinematicState& commanded_state, const KinematicState& estimated_state, double time);
+    void get_outputs(const Commands& commands, const KinematicState& estimated_state, double time);
 };

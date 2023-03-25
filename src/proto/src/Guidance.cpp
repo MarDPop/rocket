@@ -1,25 +1,26 @@
 #include "Guidance.h"
 
-#include "../../common/include/Cartesian.h"
-
-using namespace Cartesian;
-
-KinematicState Guidance::get_commanded_state(const KinematicState& estimated_state, double time);
+Commands Guidance::get_commanded_state(const KinematicState& estimated_state, double time);
 {
-    return estimated_state;
+    return this->commands;
 }
 
-SimpleAscent::SimpleAscent()
-{
-    this->state.CS = Axis::eye();
-    this->state.velocity.zero();
-}
+SimpleAscent::SimpleAscent(){}
 
-KinematicState SimpleAscent::get_commanded_state(const KinematicState& estimated_state, double time)
+Commands SimpleAscent::get_commanded_state(const KinematicState& estimated_state, double time)
 {
-    if(!this->chute->is_deployed() && estimated_state.velocity.z < -1.0)
+    if(this->chute->is_deployed())
+    {
+        return this->commands;
+    }
+    else if (estimated_state.velocity.z < -1.0)
     {
         this->chute->deploy();
+        this->commands.force.zero();
+        this->commands.torque.zero();
+        return this->commands;
     }
-    return this->state;
+
+    Commands
+    return this->commands;
 }

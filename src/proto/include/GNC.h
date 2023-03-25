@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Control.h"
-#include "Guidanae.h"
+#include "Guidance.h"
 #include "Navigation.h"
 
 #include <memory>
@@ -24,10 +24,10 @@ public:
 
     inline void update(double time)
     {
-        auto estimated_state = this->navigation->get_estimated_state(this->rocket, time);
+        const auto& estimated_state = this->navigation->get_estimated_state(this->rocket, time);
 
-        auto desired_state = this->guidance->get_commanded_state(estimated_state, time);
+        const auto& commands = this->guidance->get_commands(estimated_state, time);
 
-        this->control->get_outputs(desired_state, estimated_state, time);
+        this->control->get_outputs(commands, estimated_state, time);
     }
 };

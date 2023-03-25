@@ -9,7 +9,7 @@ void SingleStageRocket::update_inertia()
 {
     const auto& fuel_inertia = this->thruster->get_inertia();
 
-    double cog_arm = inertia.COG - this->inertia.COG;
+    double cog_arm = fuel_inertia.COG - this->inertia.COG;
 
     this->inertia.mass = this->inertia_empty.mass + fuel_inertia.mass;
     this->inertia.Ixx = this->inertia_empty.Ixx + fuel_inertia.Ixx;
