@@ -1,6 +1,7 @@
 #include "../include/SingleStageRocket.h"
 
 #include "../../common/include/util.h"
+#include "../../../lib/tinyxml/tinyxml2.h"
 #include <fstream>
 #include <numeric>
 #include <iostream>
@@ -108,9 +109,38 @@ void SingleStageRocket::step(double& time, double dt)
     }
 }
 
-SingleStageRocket::SingleStageRocket(){}
+SingleStageRocket::SingleStageRocket(std::unique_ptr<Aerodynamics> a,
+                                     std::unique_ptr<Thruster> t,
+                                     std::unique_ptr<Parachute> p,
+                                     Atmosphere* atm) :
+                                        aerodynamics(std::move(a)),
+                                        thruster(std::move(t)),
+                                        parachute(std::move(p)),
+                                        atmosphere(atm) {}
 
 SingleStageRocket::~SingleStageRocket(){}
+
+SingleStageRocket SingleStageRocket::load(const char* fn, Atmosphere* atm)
+{
+    XMLDocument simDocument;
+    auto err = simDocument.LoadFile(fn);
+    if(err != tinyxml2::XML_SUCCESS) {
+        //Could not load file. Handle appropriately.
+        return;
+    }
+
+    auto* root = simDocument.RootElement();
+    if(!root) { return; }
+
+    auto* AerodynamicsElement = root->FirstChildElement("Aerodynamics");
+    auto* ThrusterElement = root->FirstChildElement("Thruster");
+    auto* ParachuteElement = root->FirstChildElement("Parachute");
+    auto* GNCElement = root->FirstChildElement("GNC");
+
+
+
+    return SingleStageRocket(std::move(aero),std::move(thruster),std::move(parachute),atm));
+}
 
 void SingleStageRocket::init(double launch_angle, double launch_heading)
 {

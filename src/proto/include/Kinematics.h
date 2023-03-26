@@ -27,12 +27,12 @@ struct KinematicState
     Axis CS;
 
     /**
-    * Current angular speed (rad/s)
+    * Current angular speed in body frame (rad/s)
     */
     Vector angular_velocity;
 
     /**
-    * Current angular acceleration (rad/s)
+    * Current angular acceleration in body frame (rad/s)
     */
     Vector angular_acceleration;
 };

@@ -12,13 +12,39 @@ SingleStageSimulation::~SingleStageSimulation() {}
 void SingleStageSimulation::load(std::string fn)
 {
     XMLDocument simDocument;
-    simDocument.load(fn);
+    auto err = doc.LoadFile(fn);
+    if(err != tinyxml2::XML_SUCCESS) {
+        //Could not load file. Handle appropriately.
+        return;
+    }
 
+    auto* root = simDocument.RootElement();
+    if(!root) { return; }
+
+    auto* RocketFileElement = root->FirstChildElement("Rocket");
+    const char* rocket_fn = RocketFileElement->attribute("File");
+
+    if(!rocket_fn){ return;}
+
+    auto* AtmosphereElement = root->FirstChildElement("Atmosphere");
+    if(AtmosphereElement)
+    {
+        double ground_altitude = AtmosphereElement->FirstChildElement("Altitude")->DoubleValue();
+        double ground_temperature = AtmosphereElement->FirstChildElement("Temperature")->DoubleValue();
+        double ground_pressure = AtmosphereElement->FirstChildElement("Pressure")->DoubleValue();
+        double lapse_rate = AtmosphereElement->FirstChildElement("LapseRate")->DoubleValue();
+        this->atmosphere = std::make_unique<SimpleAtmosphere>();
+    }
+    else
+    {
+        this->atmosphere = std::make_unique<Atmosphere>();
+    }
+
+    this->rocket = std::move(SingleStageRocket::load(rocket_fn,this->atmosphere.get()));
 }
 
 void SingleStageSimulation::run(std::string fn, const bool debug)
 {
-
     this->output = fopen(fn.c_str(),"w");
 
     if(!this->output)

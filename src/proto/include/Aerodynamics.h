@@ -45,6 +45,11 @@ protected:
     */
     void compute_aero_values();
 
+    /**
+    *
+    */
+    virtual void compute_forces();
+
 public:
 
     /**
@@ -67,7 +72,7 @@ public:
     virtual ~Aerodynamics();
 
 
-    virtual void update() = 0;
+    void update();
 };
 
 class SimpleAerodynamics : public virtual Aerodynamics
@@ -113,31 +118,20 @@ class SimpleAerodynamics : public virtual Aerodynamics
 
     aero_coef get_aero_coef(double sAoA);
 
+    void compute_forces() override;
+
 public:
 
     SimpleAerodynamics(SingleStageRocket& r);
 
     void set_coef(double* coef);
-
-    void update() override;
 };
 
 template <unsigned NUMBER_FINS>
-class ControlledAerodynamics : public virtual Aerodynamics
+class FinCoefficientAerodynamics : public virtual SimpleAerodynamics
 {
-protected:
-
     std::array<double, NUMBER_FINS> current_fin_deflection;
 
-public:
-
-    ControlledAerodynamics(SingleStageRocket& r);
-    virtual ~ControlledAerodynamics();
-};
-
-template <unsigned NUMBER_FINS>
-class FinCoefficientAerodynamics : public virtual ControlledAerodynamics<NUMBER_FINS>
-{
     std::array<Vector, NUMBER_FINS> fin_span_vector;
 
     std::array<Vector, NUMBER_FINS> fin_lift_vector;
@@ -162,8 +156,9 @@ public:
 };
 
 template <unsigned NUMBER_FINS>
-class TabulatedAerodynamics : public virtual ControlledAerodynamics<NUMBER_FINS>
+class TabulatedAerodynamics : public virtual Aerodynamics
 {
+    std::array<double, NUMBER_FINS> current_fin_deflection;
 
     union aero_key
     {

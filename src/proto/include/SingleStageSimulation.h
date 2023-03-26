@@ -1,8 +1,10 @@
 #pragma once
 
 #include "SingleStageRocket.h"
+#include "Atmosphere.h"
 #include <string>
 #include <vector>
+#include <memory>
 
 #include "../../common/include/Cartesian.h"
 

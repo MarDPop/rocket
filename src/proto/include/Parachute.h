@@ -10,8 +10,6 @@ class Parachute
 {
 protected:
 
-friend class Control;
-
     /**
     * drag coefficient multiplied by area
     */
@@ -23,8 +21,6 @@ friend class Control;
 
     bool deployed = false;
 
-    void deploy(double time);
-
     SingleStageRocket& rocket;
 
 public:
@@ -35,9 +31,20 @@ public:
     Parachute(SingleStageRocket& _rocket, double _CDA);
     ~Parachute();
 
+    inline bool reset()
+    {
+        this->deployed = false;
+    }
+
     inline bool is_deployed()
     {
         return this->deployed;
+    }
+
+    inline void deploy(double time)
+    {
+        this->deployed = true;
+        this->time_deployed = time;
     }
 
     virtual void update(double time);

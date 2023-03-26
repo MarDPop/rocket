@@ -37,16 +37,18 @@ public:
 
     GNC gnc;
 
-    std::unique_ptr<Aerodynamics> aerodynamics;
+    const std::unique_ptr<Aerodynamics> aerodynamics;
 
-    std::unique_ptr<Thruster> thruster;
+    const std::unique_ptr<Thruster> thruster;
 
-    std::unique_ptr<Parachute> parachute;
+    const std::unique_ptr<Parachute> parachute;
 
-    Atmosphere* atmosphere;
+    Atmosphere* const atmosphere;
 
-    SingleStageRocket();
+    SingleStageRocket(std::unique_ptr<Aerodynamics> a, std::unique_ptr<Thruster> t, std::unique_ptr<Parachute> p, Atmosphere* atm);
     ~SingleStageRocket();
+
+    static SingleStageRocket load(const char* fn);
 
     inline void set_inertial_properties(Inertia inertia_empty)
     {

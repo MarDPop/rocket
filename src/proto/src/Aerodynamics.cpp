@@ -2,8 +2,6 @@
 
 #include "../include/SingleStageRocket.h"
 
-Aerodynamics::Aerodynamics(SingleStageRocket& r) : rocket(r) {}
-
 void Aerodynamics::compute_aero_values()
 {
     Vector air_velocity = this->rocket.state.velocity - this->rocket.altitude_table.wind.wind;
@@ -19,6 +17,19 @@ void Aerodynamics::compute_aero_values()
 
     double tmp = 1.0 + 0.2*this->aero_values.mach*this->aero_values.mach;
     this->aero_values.dynamic_pressure = this->rocket.altitude_table.values->pressure*(tmp*tmp*tmp*sqrt(tmp) - 1.0);
+}
+
+Aerodynamics::Aerodynamics(SingleStageRocket& r) : rocket(r) {}
+
+void Aerodynamics::update()
+{
+    // Get aerodynamic quantities needed for computation
+    this->compute_aero_values();
+
+    this->force.zero();
+    this->moment.zero();
+
+    this->compute_forces();
 }
 
 SimpleAerodynamics::SimpleAerodynamics(SingleStageRocket& r) : Aerodynamics(r) {}
@@ -103,14 +114,8 @@ SimpleAerodynamics::aero_coef SimpleAerodynamics::get_aero_coef(double sAoA)
     return output;
 }
 
-void SimpleAerodynamics::update()
+void SimpleAerodynamics::compute_forces()
 {
-    // Get aerodynamic quantities needed for computation
-    this->compute_aero_values();
-
-    this->force.zero();
-    this->moment.zero();
-
     // if airspeed too low don't compute, (has divide by zero consequences anyway)
     if(this->aero_values.airspeed < 1e-2)
     {

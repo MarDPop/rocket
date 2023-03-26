@@ -6,12 +6,12 @@
 
 struct AltitudeValues
 {
-    double pressure;
-    double temperature;
-    double inv_sound_speed;
-    double density;
-    double dynamic_viscosity;
-    double gravity;
+    double pressure = 101325; // Pa
+    double temperature = 293.15; // K
+    double inv_sound_speed = 0.00291346724; // s/m
+    double density = 1.225; // kg/m3
+    double dynamic_viscosity = 1.803e-7; // Pa s
+    double gravity = 9.806; // m/s2
 };
 
 class Atmosphere

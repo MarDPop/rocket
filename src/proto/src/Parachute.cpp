@@ -8,7 +8,5 @@ Parachute::~Parachute() {}
 
 void Parachute::update()
 {
-
     this->tether_force = this->rocket.aerodynamics->aero_values.unit_v_air * (this->CDA*this->rocket.aerodynamics->aero_values.dynamic_pressure);
-
 }

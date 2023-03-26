@@ -6,11 +6,11 @@ class Servo
 {
     std::array<double,2> angle_range;
 
+    double voltage_to_angle;
+
     double max_torque;
 
     double slew_rate;
-
-    double voltage_to_angle;
 
     double commanded_angle;
 
@@ -23,19 +23,15 @@ public:
     Servo();
     virtual ~Servo();
 
-    inline void set_angle_range(std::array<double,2> _angle_range)
+    inline void set_performance(std::array<double,2> angle_range,
+                          double voltage_to_angle,
+                          double max_torque,
+                          double slew_rate)
     {
-        this->angle_range = _angle_range;
-    }
-
-    inline void set_max_torque(double _max_torque)
-    {
-        this->max_torque = _max_torque;
-    }
-
-    inline void set_slew_rate(double _slew_rate)
-    {
-        this->slew_rate = _slew_rate;
+        this->angle_range = angle_range;
+        this->voltage_to_angle = voltage_to_angle;
+        this->max_torque = max_torque;
+        this->slew_rate = slew_rate;
     }
 
     inline void set_commanded_angle(double _commanded_angle)
@@ -53,5 +49,5 @@ public:
         return this->angle;
     }
 
-    void update(double time);
+    void update(double torque, double time);
 };

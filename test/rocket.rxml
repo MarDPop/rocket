@@ -1,13 +1,14 @@
 <Rocket>
-	<Aerodynamics>
-		<Type></Type>
+	<Aerodynamics Type="SimpleAerodynamics">
 	</Aerodynamics>
 	<Thruster>
-		<Type></Type>
 	</Thruster>
 	<Parachute>
 		
 	</Parachute>
 	<GNC>
+		<Guidance></Guidance>
+		<Control></Control>
+		<Navigation></Navigation>
 	</GNC>
 </Rocket>

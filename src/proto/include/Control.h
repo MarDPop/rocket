@@ -14,16 +14,14 @@ public:
     Control();
     virtual ~Control();
 
-    virtual void get_outputs(const Commands& commands, const KinematicState& estimated_state, double time) = 0;
+    virtual void get_outputs(const Commands& commands, const KinematicState& estimated_state, double time);
 
 };
 
 template <unsigned NUMBER_FINS>
 class FinControl : public virtual Control
 {
-    double pointing_gain;
-
-    double velocity_gain;
+    double theta_gain = 0.0;
 
 public:
 
@@ -32,5 +30,10 @@ public:
     FinControl();
     virtual ~FinControl();
 
-    void get_outputs(const Commands& commands, const KinematicState& estimated_state, double time);
+    void set_theta_gain(double theta_gain)
+    {
+        this->theta_gain = theta_gain;
+    }
+
+    virtual void get_outputs(const Commands& commands, const KinematicState& estimated_state, double time);
 };

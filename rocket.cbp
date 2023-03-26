@@ -454,6 +454,7 @@
 		<Unit filename="src/common/include/SpecialMath.h" />
 		<Unit filename="src/common/include/Table.h" />
 		<Unit filename="src/common/include/Time.h" />
+		<Unit filename="src/common/include/Unit.h" />
 		<Unit filename="src/common/include/fluid.h" />
 		<Unit filename="src/common/include/structures.h" />
 		<Unit filename="src/common/include/util.h" />
