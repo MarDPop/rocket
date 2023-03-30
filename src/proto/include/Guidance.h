@@ -11,7 +11,7 @@ using namespace Cartesian;
 
 struct Commands
 {
-    Vector angular_velocity_in_body;
+    Vector axis_orientation;
     std::unordered_map<std::string, double> other_values;
 };
 
@@ -44,9 +44,9 @@ public:
 
 class VerticalAscent : public virtual Guidance
 {
-    double proportionalVelocityConstant = 0.0;
+    double proportional = 0.0;
 
-    double proportionalOrientationConstant = 0.0;
+    double damping = 0.0;
 
 public:
 
