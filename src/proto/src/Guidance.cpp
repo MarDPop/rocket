@@ -43,13 +43,13 @@ Commands VerticalAscent::get_commanded_state(const KinematicState& estimated_sta
     }
 
     //Vector velocity_correction_arm(-estimated_state.velocity.y,estimated_state.velocity.x,0.0);
-    //Vector orientation_correction_arm(-estimated_state.CS.z.y,estimated_state.CS.z.x,0.0);
 
-    double inertial_arm_x = -this->proportional*estimated_state.velocity.y ;
-    double inertial_arm_y = this->proportionalVelocityConstant*estimated_state.velocity.x;;
-    Vector inertial_arm(inertial_arm_x,inertial_arm_y,0.0);
+    double x_scaled = this->damping*estimated_state.acceleration.x - this->proportional*estimated_state.velocity.x;
+    double y_scaled = this->damping*estimated_state.acceleration.y - this->proportional*estimated_state.velocity.y;
 
-    this->commands.angular_velocity_in_body = estimated_state.CS*inertial_arm;
+    Vector rescaled_anti_vector(x_scaled,y_scaled,estimated_state.velocity.z);
+
+    this->commands.axis_orientation = rescaled_anti_vector * (1.0/rescaled_anti_vector.norm());
 
     return this->commands;
 }

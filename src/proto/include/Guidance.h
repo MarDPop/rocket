@@ -44,9 +44,9 @@ public:
 
 class VerticalAscent : public virtual Guidance
 {
-    double proportional = 0.0;
+    double proportional = 1.0;
 
-    double damping = 0.0;
+    double damping = 0.1;
 
 public:
 
