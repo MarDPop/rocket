@@ -19,7 +19,7 @@ public:
 };
 
 template <unsigned NUMBER_FINS>
-class FinControl : public virtual Control
+class FinControlSimple : public virtual Control
 {
     double fin_gain = 1.0;
 
@@ -27,19 +27,13 @@ class FinControl : public virtual Control
 
     double damping = 1.0;
 
-    double integration = 1.0;
-
-    double saturation_level = 1.0;
-
-    double integral_sum = 0;
-
-    double old_time = 0;
-
-    Vector get_desired_arm_magnitude(const Commands& commands, const KinematicState& estimated_state, double time);
+    Vector get_desired_arm_magnitude_body(const Commands& commands, const KinematicState& estimated_state, double time);
 
 public:
 
     std::array<Servo, NUMBER_FINS> servos;
+
+    std::array<Vector, NUMBER_FINS> fin_torque_arms;
 
     FinControl();
     virtual ~FinControl();
@@ -49,23 +43,11 @@ public:
         this->fin_gain = gain;
     }
 
-    inline void set_controller_values(double proportional, double damping, double integration, double saturation_level)
+    inline void set_controller_values(double proportional, double damping)
     {
         this->proportional = proportional;
         this->damping = damping;
-        this->integration = integration;
-        this->saturation_level = saturation_level;
     }
 
-    inline void reset_integrator()
-    {
-        this->integral_sum = 0;
-    }
-
-    inline void reset_time()
-    {
-        this->old_time = 0;
-    }
-
-    virtual void get_outputs(const Commands& commands, const KinematicState& estimated_state, double time);
+    void get_outputs(const Commands& commands, const KinematicState& estimated_state, double time) override;
 };

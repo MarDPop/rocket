@@ -522,7 +522,7 @@ namespace Cartesian {
             Inv.data[7] = this->data[1]*this->data[6] - this->data[0]*this->data[7];
             Inv.data[8] = this->data[0]*this->data[4] - this->data[1]*this->data[3];
 
-            double det = 1/(this->data[0]*Inv.data[0] + this->data[1]*Inv.data[3] + this->data[2]*Inv.data[6]);
+            double det = 1.0/(this->data[0]*Inv.data[0] + this->data[1]*Inv.data[3] + this->data[2]*Inv.data[6]);
 
             for(int i = 0; i < 9; i++) {
                 Inv.data[i] *= det;
