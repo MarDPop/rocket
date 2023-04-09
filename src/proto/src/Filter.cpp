@@ -14,7 +14,8 @@ void FilterNone::update(const Sensors& sensors, double t)
     double angle = angle_axis.norm();
     if(angle > 1e-6)
     {
-        this->computed_state.orientation = this->computed_state.orientation* Quaternion(angle,angle_axis); // TODO: check
+        Axis rotm(angle,angle_axis);
+        this->computed_state.CS = rotm * this->computed_state.CS; // TODO: check
     }
 }
 

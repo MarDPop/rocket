@@ -4,6 +4,8 @@
 #include <vector>
 #include <array>
 
+#include <string>
+
 class Thruster
 {
 
@@ -15,13 +17,13 @@ protected:
 
     double mass_rate;
 
-    Inertia inertia;
+    Inertia inertia_fuel;
 
 public:
 
-    SingleStageThruster();
-    SingleStageThruster(double t, double isp);
-    ~SingleStageThruster();
+    Thruster();
+    Thruster(double t, double isp);
+    ~Thruster();
 
     inline bool is_active()
     {
@@ -40,10 +42,20 @@ public:
 
     inline const Inertia& get_inertia()
     {
-        return this->inertia;
+        return this->inertia_fuel;
     }
 
-    virtual void set(double pressure, double time) {}
+    inline void set_fuel_COG(double COG) {
+        this->inertia_fuel.COG = COG;
+    }
+
+    inline void set_fuel_mass_properties(double mass, double Ixx, double Izz) {
+        this->inertia_fuel.mass = mass;
+        this->inertia_fuel.Ixx = Ixx;
+        this->inertia_fuel.Izz = Izz;
+    }
+
+    virtual void set(double pressure, double time);
 
     virtual void load(std::string fn);
 };
@@ -65,16 +77,9 @@ class PressureThruster : public virtual Thruster {
 
     double dM;
 
-    double fuel_mass;
-
     double time_old;
 
 public:
-
-    inline void set_fuel_mass(double mass)
-    {
-        this->fuel_mass = mass;
-    }
 
     void add_thrust_point(double pressure, double thrust, double mass_rate);
 
@@ -162,10 +167,6 @@ public:
         double nozzle_efficiency;
         int n_segments;
     };
-
-    double mass;
-    double Ixx;
-    double Izz;
 
     ComputedThruster();
     ~ComputedThruster();

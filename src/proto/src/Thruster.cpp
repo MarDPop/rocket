@@ -9,11 +9,13 @@
 
 #include <iostream>
 
-SingleStageThruster::SingleStageThruster() : thrust(0), mass_rate(0) {}
-SingleStageThruster::SingleStageThruster(double t, double isp) : thrust(t), mass_rate(t/(isp*9.806)) {}
-SingleStageThruster::~SingleStageThruster(){}
+Thruster::Thruster() : thrust(0), mass_rate(0) {}
+Thruster::Thruster(double t, double isp) : thrust(t), mass_rate(t/(isp*9.806)) {}
+Thruster::~Thruster(){}
 
-void SingleStageThruster::load(std::string fn)
+void Thruster::set(double pressure, double time) {}
+
+void Thruster::load(std::string fn)
 {
     std::ifstream myfile(fn);
 
@@ -254,7 +256,7 @@ void ComputedThruster::generate(const generate_args& args, const double P_AMBIEN
     const double cv = cp/args.gamma;
 
     /* Computational Constants */
-    const double exit_mach_supersonic = Nozzle::isentropic_exit_mach(this->_area_ratio,args.gamma)*args.nozzle_efficiency;
+    const double exit_mach_supersonic = this->_ideal_exit_mach*args.nozzle_efficiency;
     const double P_crit = P_AMBIENT/this->_pressure_ratio_critical;
     constexpr double BAR2PASCALS = 100000.0;
     constexpr double P_NORMALIZE = 1.0/BAR2PASCALS;
@@ -299,8 +301,11 @@ void ComputedThruster::generate(const generate_args& args, const double P_AMBIEN
 
     /* Mass moment computations */
     double r2 = bore_radius_sq + outer_radius_sq;
-    Ixx = 0.5*M_fuel*r2;
-    Izz = M_fuel*(0.25*r2 + 0.0833333333333333333333*length_sq);
+    double Ixx = 0.5*M_fuel*r2;
+    double Izz = M_fuel*(0.25*r2 + 0.0833333333333333333333*length_sq);
+    this->inertia_fuel.mass = M_fuel;
+    this->inertia_fuel.Ixx = Ixx;
+    this->inertia_fuel.Izz = Izz;
 
     /* Prepare simulation */
     // reset output
@@ -308,7 +313,7 @@ void ComputedThruster::generate(const generate_args& args, const double P_AMBIEN
     _values.clear();
     _dvalues.clear();
     _times.push_back(0.0);
-    _values.emplace_back(P,T,0.0,0.0,M_fuel + M,Ixx,Izz);
+    _values.emplace_back(P,T,0.0,0.0,M_fuel + M,this->inertia_fuel.Ixx,this->inertia_fuel.Izz);
 
     // recording and time variables
     double dt = 1e-6; // use variable dt to reduce points
@@ -408,9 +413,9 @@ void ComputedThruster::set(double pressure, double time)
         if(_tidx >= _tidx_final)
         {
             this->mass_rate = 0;
-            this->mass = 0;
-            this->Ixx = 0;
-            this->Izz = 0;
+            this->inertia_fuel.mass = 0;
+            this->inertia_fuel.Ixx = 0;
+            this->inertia_fuel.Izz = 0;
             return;
         }
         _tidx++;
@@ -424,10 +429,10 @@ void ComputedThruster::set(double pressure, double time)
     double chamber_pressure = vals.chamber_pressure + delta*dvals.chamber_pressure;
     double exit_velocity = vals.ideal_exit_velocity + delta*dvals.ideal_exit_velocity;
     this->mass_rate = vals.mass_rate + delta*dvals.mass_rate;
-    this->mass = vals.mass + delta*dvals.mass;
+    this->inertia_fuel.mass = vals.mass + delta*dvals.mass;
 
-    this->Ixx = vals.Ixx + delta*dvals.Ixx;
-    this->Izz = vals.Izz + delta*dvals.Izz;
+    this->inertia_fuel.Ixx = vals.Ixx + delta*dvals.Ixx;
+    this->inertia_fuel.Izz = vals.Izz + delta*dvals.Izz;
 
     double pressure_ratio = pressure / chamber_pressure;
 

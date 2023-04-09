@@ -1,11 +1,16 @@
-#include "Control.h"
+#include "../include/Control.h"
+
+#include "../include/Aerodynamics.h"
 
 void Control::get_outputs(const Commands& commands, const KinematicState& estimated_state, double time) {}
 
 template<unsigned NUMBER_FINS>
+FinControlSimple<NUMBER_FINS>::FinControlSimple(const FinControlAero<NUMBER_FINS>& _aero) : aero(_aero) {}
+
+template<unsigned NUMBER_FINS>
 Vector FinControlSimple<NUMBER_FINS>::get_desired_arm_magnitude_body(const Commands& commands, const KinematicState& estimated_state)
 {
-    Vector angle_diff_inertial = commands.axis_orientation.cross(estimated_state.CS.z);
+    Vector angle_diff_inertial = commands.z_axis.cross(estimated_state.CS.axis.z);
 
     Vector arm_inertial = angle_diff_inertial * this->proportional - estimated_state.angular_velocity * this->damping;
 
@@ -19,8 +24,8 @@ void FinControlSimple<NUMBER_FINS>::get_outputs(const Commands& commands, const 
 
     for(unsigned fin_idx = 0; fin_idx < NUMBER_FINS; fin_idx++)
     {
-        double angle = this->fin_gain*(arm.dot(this->fin_torque_arms[fin_idx]));
-        this->servos[fin_idx].set_commanded_angle(angle);
-        this->servos[fin_idx].update(time);
+        double angle = this->fin_gain*(arm.data[0]*aero.fin_span_vec_x[fin_idx] + arm.data[1]*aero.fin_span_vec_y[fin_idx]);
+        this->aero.servos[fin_idx].set_commanded_angle(angle);
+        this->aero.servos[fin_idx].update(time);
     }
 }

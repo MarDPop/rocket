@@ -52,16 +52,13 @@ struct Launch_Parameters
 
 class SingleStageSimulation
 {
-
     SingleStageRocket rocket;
-
-    Recording record;
 
     std::unique_ptr<Atmosphere> atmosphere;
 
-    Launch_Parameters launch;
+    Recording record;
 
-    FILE* output;
+    Launch_Parameters launch;
 
 public:
 

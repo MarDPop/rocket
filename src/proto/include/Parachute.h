@@ -4,6 +4,8 @@
 
 #include <array>
 
+class SingleStageRocket;
+
 using namespace Cartesian;
 
 class Parachute

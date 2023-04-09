@@ -7,11 +7,13 @@
 
 #include "../../common/include/Cartesian.h"
 
+class Parachute;
+
 using namespace Cartesian;
 
 struct Commands
 {
-    Vector axis_orientation;
+    Vector z_axis;
     std::unordered_map<std::string, double> other_values;
 };
 
@@ -39,7 +41,7 @@ public:
 
     SimpleAscent();
 
-    Commands get_commands(const KinematicState& estimated_state, double time) override;
+    const Commands& get_commands(const KinematicState& estimated_state, double time) override;
 };
 
 class VerticalAscent : public virtual Guidance
@@ -54,11 +56,11 @@ public:
 
     VerticalAscent();
 
-    inline void setProportionalConstants(double velocityK, double orientationK)
+    inline void setProportionalConstants(double P, double D)
     {
-        this->proportionalVelocityConstant = velocityK;
-        this->proportionalOrientationConstant = orientationK;
+        this->proportional = P;
+        this->damping = D;
     }
 
-    Commands get_commands(const KinematicState& estimated_state, double time) override;
+    const Commands& get_commands(const KinematicState& estimated_state, double time) override;
 };

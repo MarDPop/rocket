@@ -102,7 +102,7 @@ public:
     inline void calibrate(const altitude_cal& cal)
     {
         this->cal = cal;
-        this->cal.exp_const = -AltitudeTable::R_AIR / cal.g;
+        this->cal.exp_const = -Atmosphere::R_AIR / cal.g;
         this->cal.inverse_ref_pressure = 1.0/cal.pressure;
     }
 

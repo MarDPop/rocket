@@ -17,16 +17,6 @@ public:
 
 };
 
-class TimedThruster : public virtual Thruster1D {
-
-public:
-
-    double final_time = 1;
-
-    void update(double ambient_pressure, double time);
-
-};
-
 struct Fuel {
 
     static constexpr double KNSU_DENSITY = 1820; // kg / m3

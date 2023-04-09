@@ -4,6 +4,9 @@
 
 #include "../../common/include/Cartesian.h"
 #include "../../common/include/Table.h"
+#include "Servo.h"
+
+#include <memory>
 
 using namespace Cartesian;
 
@@ -118,7 +121,7 @@ class SimpleAerodynamics : public virtual Aerodynamics
 
     aero_coef get_aero_coef(double sAoA);
 
-    void compute_forces() override;
+    virtual void compute_forces() override;
 
 public:
 
@@ -128,14 +131,16 @@ public:
 };
 
 template <unsigned NUMBER_FINS>
-class FinCoefficientAerodynamics : public virtual SimpleAerodynamics
+struct FinControlAero
 {
-    std::array<double, NUMBER_FINS> current_fin_deflection;
+    std::array<std::unique_ptr<Servo>, NUMBER_FINS> servos;
+    std::array<double, NUMBER_FINS> fin_span_vec_x;
+    std::array<double, NUMBER_FINS> fin_span_vec_y;
+};
 
-    std::array<Vector, NUMBER_FINS> fin_span_vector;
-
-    std::array<Vector, NUMBER_FINS> fin_lift_vector;
-
+template <unsigned NUMBER_FINS>
+class FinCoefficientAerodynamics : public SimpleAerodynamics, virtual FinControlAero<NUMBER_FINS>
+{
     double z; // distance along z axis of span vectors from nose
 
     double d; // distance along span vector of Center of pressure
@@ -145,6 +150,12 @@ class FinCoefficientAerodynamics : public virtual SimpleAerodynamics
     double dCDdTheta; // change in drag per angle ( on z axis, on center of pressure )
 
     double dCLdTheta; // change in lift ( on lift vector at center of pressure )
+
+    double const_axial_term_lift;
+
+    double const_axial_term_drag;
+
+    void compute_forces() override;
 
 public:
 
@@ -156,7 +167,7 @@ public:
 };
 
 template <unsigned NUMBER_FINS>
-class TabulatedAerodynamics : public virtual Aerodynamics
+class TabulatedAerodynamics : public virtual Aerodynamics, virtual FinControlAero<NUMBER_FINS>
 {
     std::array<double, NUMBER_FINS> current_fin_deflection;
 

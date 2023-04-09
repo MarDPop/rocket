@@ -1,6 +1,12 @@
 #include "../include/Servo.h"
 
-void Servo::update(double time)
+#include <cmath>
+
+SimpleServo::SimpleServo() {}
+
+SimpleServo::~SimpleServo() {}
+
+void SimpleServo::update(double time)
 {
     double dt = time - this->time_ref;
 

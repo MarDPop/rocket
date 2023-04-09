@@ -23,6 +23,18 @@ friend class SingleStageSimulation;
 
     Inertia inertia_empty;
 
+    Inertia inertia;
+
+    GNC gnc;
+
+    std::unique_ptr<Aerodynamics> aerodynamics;
+
+    std::unique_ptr<Thruster> thruster;
+
+    std::unique_ptr<Parachute> parachute;
+
+    Atmosphere* atmosphere;
+
     void compute_acceleration(double time);
 
     void step(double& time, double dt);
@@ -31,28 +43,21 @@ friend class SingleStageSimulation;
 
 public:
 
-    Inertia inertia;
-
     KinematicState state;
 
-    GNC gnc;
-
-    const std::unique_ptr<Aerodynamics> aerodynamics;
-
-    const std::unique_ptr<Thruster> thruster;
-
-    const std::unique_ptr<Parachute> parachute;
-
-    Atmosphere* const atmosphere;
-
-    SingleStageRocket(std::unique_ptr<Aerodynamics> a, std::unique_ptr<Thruster> t, std::unique_ptr<Parachute> p, Atmosphere* atm);
+    SingleStageRocket();
     ~SingleStageRocket();
 
-    static SingleStageRocket load(const char* fn);
+    void load(const char* fn);
 
     inline void set_inertial_properties(Inertia inertia_empty)
     {
         this->inertia_empty = inertia_empty;
+    }
+
+    inline void set_atmosphere(Atmosphere* atmosphere)
+    {
+        this->atmosphere = atmosphere;
     }
 
     void init(double launch_angle, double launch_heading);

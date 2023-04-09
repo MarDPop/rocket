@@ -20,7 +20,7 @@ void SingleStageRocket::update_inertia()
 
 void SingleStageRocket::compute_acceleration(double time)
 {
-    this->altitude_table.set(this->state.position.z, time);
+    this->atmosphere->set(this->state.position.z, time);
 
     this->gnc.update(time);
 
@@ -31,21 +31,19 @@ void SingleStageRocket::compute_acceleration(double time)
 
     if(this->thruster->is_active())
     {
-        this->thruster->set(this->altitude_table.values->pressure, time);
+        this->thruster->set(this->atmosphere->values.pressure, time);
         total_force += this->state.CS.axis.z * this->thruster->get_thrust();
-
-        this->update_inertia();
     }
 
     if(this->parachute->is_deployed())
     {
-        this->parachute->update();
+        this->parachute->update(time);
         total_force += this->parachute->tether_force;
         total_moment += this->state.CS.axis.z.cross(this->parachute->tether_force) * this->inertia.COG;
     }
 
     this->state.acceleration = total_force * (1.0/this->inertia.mass);
-    this->state.acceleration.z -= this->altitude_table.values->gravity;
+    this->state.acceleration.z -= this->atmosphere->values.gravity;
 
     Axis I_inertial = this->state.CS.get_transpose(); // rotate Inertia to inertial frame
     int i = 0;
@@ -83,9 +81,9 @@ void SingleStageRocket::step(double& time, double dt)
     }
 
     // Compute mass changes, no need to recompute at next step
-    if(this->not_empty) {
+    if(this->thruster->is_active()) {
         this->inertia.mass -= this->thruster->get_mass_rate()*dt;
-        this->get_inertia();
+        this->update_inertia();
     }
 
     /* Huen step */
@@ -108,38 +106,73 @@ void SingleStageRocket::step(double& time, double dt)
         this->state.CS = Axis(angle,angle_axis)*state0.CS;
     }
 }
-
-SingleStageRocket::SingleStageRocket(std::unique_ptr<Aerodynamics> a,
-                                     std::unique_ptr<Thruster> t,
-                                     std::unique_ptr<Parachute> p,
-                                     Atmosphere* atm) :
-                                        aerodynamics(std::move(a)),
-                                        thruster(std::move(t)),
-                                        parachute(std::move(p)),
-                                        atmosphere(atm) {}
+SingleStageRocket::SingleStageRocket() : gnc(*this) {}
 
 SingleStageRocket::~SingleStageRocket(){}
 
-SingleStageRocket SingleStageRocket::load(const char* fn, Atmosphere* atm)
+Inertia loadInerta(tinyxml2::XMLElement* inertiaElement)
 {
-    XMLDocument simDocument;
-    auto err = simDocument.LoadFile(fn);
-    if(err != tinyxml2::XML_SUCCESS) {
-        //Could not load file. Handle appropriately.
-        return;
+
+}
+
+Aerodynamics* loadSimpleAerodynamics(tinyxml2::XMLElement* aeroElement, SingleStageRocket rocket&)
+{
+    SimpleAerodynamics
+    for
+}
+
+Aerodynamics* loadAerodynamics(tinyxml2::XMLElement* aeroElement, SingleStageRocket rocket&)
+{
+    const char* aeroType = AerodynamicsElement->attribute("Type");
+    Aerodynamics* aero;
+    switch (aeroType) {
+    case "SimpleAerodynamics":
+        aero = loadSimpleAerodynamics(aeroElement,rocket);
+        break;
+    default:
+        aero = new Aerodynamics(rocket);
+        break;
     }
+    return aero;
+}
+
+void SingleStageRocket::load(const char* fn)
+{
+    tinyxml2::XMLDocument simDocument;
+    auto err = simDocument.LoadFile(fn);
+    if(err != tinyxml2::XML_SUCCESS) { throw new std::exception("Couldn't load file"); }
 
     auto* root = simDocument.RootElement();
-    if(!root) { return; }
+    if(!root) { throw new std::exception("Couldn't find root element"); }
+
+    auto* InertiaElement = root->FirstChildElement("Inertia");
+    if(!InertiaElement) { throw new std::exception("No mass properties"); }
+
+    auto* ThrusterElement = root->FirstChildElement("Thruster");
+    if(!ThrusterElement) { throw new std::exception("No thruster"); }
 
     auto* AerodynamicsElement = root->FirstChildElement("Aerodynamics");
-    auto* ThrusterElement = root->FirstChildElement("Thruster");
     auto* ParachuteElement = root->FirstChildElement("Parachute");
     auto* GNCElement = root->FirstChildElement("GNC");
 
+    this.inertia = loadInerta(InertiaElement);
+
+    if(!AerodynamicsElement)
+    {
+        this->aerodynamics.reset( new Aerodynamics(rocket));
+    }
+    else
+    {
+        this->aerodynamics.reset(loadAerodynamics(AerodynamicsElement,rocket));
+    }
+
+    if(!GNCElement) {
+
+    } else {
+
+    }
 
 
-    return SingleStageRocket(std::move(aero),std::move(thruster),std::move(parachute),atm));
 }
 
 void SingleStageRocket::init(double launch_angle, double launch_heading)

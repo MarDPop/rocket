@@ -1,14 +1,46 @@
 <Rocket>
-	<Aerodynamics Type="SimpleAerodynamics">
+	<Inertia unit="SI"> 
+		<Mass></Mass>
+		<Ixx></Ixx>
+		<Izz></Izz>
+		<COG></COG>
+	</Inertia>
+	
+	<Aerodynamics Type="SimpleAerodynamics" unit="SI">
+		<CD0></CD0>
+		<CL_alpha></CL_alpha>
+		<CM_alpha></CM_alpha>
+		<CM_alpha_dot></CM_alpha_dot>
+		<InducedLiftK></InducedLiftK>
+		<RefArea></RefArea>
+		<RefLength></RefLength>
+		<StallAngle></StallAngle>
 	</Aerodynamics>
-	<Thruster>
+	
+	<Thruster Type="Thruster" unit="SI">
+		<Inertia unit="SI"> 
+			<Mass></Mass>
+			<Ixx></Ixx>
+			<Izz></Izz>
+			<COG></COG>
+		</Inertia>
+		<Thrust></Thrust>
+		<ISP></ISP>
 	</Thruster>
+	
 	<Parachute>
 		
 	</Parachute>
+	
 	<GNC>
-		<Guidance></Guidance>
-		<Control></Control>
-		<Navigation></Navigation>
+		<Guidance>
+		</Guidance>
+		<Control>
+		</Control>
+		<Navigation>
+		</Navigation>
 	</GNC>
 </Rocket>
+<!--
+
+-->

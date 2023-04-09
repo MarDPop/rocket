@@ -83,7 +83,7 @@ void AtmosphereTable::set(double alt, double time)
         return;
     }
 
-    if(altitudes < this->altitudes.front())
+    if(alt < this->altitudes.front())
     {
         this->values = this->air_table.front();
         return;

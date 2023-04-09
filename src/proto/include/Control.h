@@ -1,9 +1,7 @@
 #pragma once
 
 #include "Kinematics.h"
-
-#include "Servo.h"
-
+#include "Aerodynamics.h"
 #include "Guidance.h"
 
 class Control
@@ -27,20 +25,18 @@ class FinControlSimple : public virtual Control
 
     double damping = 1.0;
 
-    Vector get_desired_arm_magnitude_body(const Commands& commands, const KinematicState& estimated_state, double time);
+    Vector get_desired_arm_magnitude_body(const Commands& commands, const KinematicState& estimated_state);
+
+    FinControlAero<NUMBER_FINS>& aero;
 
 public:
 
-    std::array<Servo, NUMBER_FINS> servos;
-
-    std::array<Vector, NUMBER_FINS> fin_torque_arms;
-
-    FinControl();
-    virtual ~FinControl();
+    FinControlSimple(const FinControlAero<NUMBER_FINS>& _aero);
+    virtual ~FinControlSimple();
 
     inline void set_fin_gain(double fin_gain)
     {
-        this->fin_gain = gain;
+        this->fin_gain = fin_gain;
     }
 
     inline void set_controller_values(double proportional, double damping)

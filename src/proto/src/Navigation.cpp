@@ -1,8 +1,8 @@
-#include "Navigation.h"
+#include "../include/Navigation.h"
 
-KinematicState Navigation::get_estimated_state(const SingleStageRocket& rocket, double time)
+const KinematicState& Navigation::get_estimated_state(const SingleStageRocket& rocket, double time)
 {
-    this->sensors->update(*this->rocket, time);
+    this->sensors->update(rocket, time);
 
     this->filter->update(*this->sensors, time);
 

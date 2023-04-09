@@ -40,14 +40,16 @@ void SingleStageSimulation::load(std::string fn)
         this->atmosphere = std::make_unique<Atmosphere>();
     }
 
-    this->rocket = std::move(SingleStageRocket::load(rocket_fn,this->atmosphere.get()));
+    this->rocket.set_atmosphere(this.atmosphere.get());
+
+    this->rocket.load(rocket_fn));
 }
 
 void SingleStageSimulation::run(std::string fn, const bool debug)
 {
-    this->output = fopen(fn.c_str(),"w");
+    File* output = fopen(fn.c_str(),"w");
 
-    if(!this->output)
+    if(!output)
     {
         throw std::invalid_argument("could not open file.");
     }
@@ -87,7 +89,7 @@ void SingleStageSimulation::run(std::string fn, const bool debug)
 
             const double* pos = this->rocket.state.position.data;
             const double* q = this->rocket.state.CS.data;
-            fprintf(this->output,OUTPUT_FORMAT.c_str(),
+            fprintf(output,OUTPUT_FORMAT.c_str(),
                     time, pos[0], pos[1], pos[2], q[0], q[1], q[2], q[3], q[4], q[5], q[6], q[7], q[8], this->rocket.inertia.mass);
 
             time_record += this->record.t_interval;
@@ -95,11 +97,11 @@ void SingleStageSimulation::run(std::string fn, const bool debug)
             if(debug)
             {
                 debug_output << time << " ";
-                auto computed_pos = this->rocket.control->filter->get_computed_position();
-                auto CS = this->rocket.control->filter->get_computed_CS();
+                const auto& filtered_state = this->rocket.gnc->navigation->get_estimated_state(*this->rocket, time);
                 char buf[150];
-                sprintf(buf,POS_FORMAT.c_str(), computed_pos[0],computed_pos[1],computed_pos[2]);
+                sprintf(buf,POS_FORMAT.c_str(), filtered_state.position[0],filtered_state.position[1],filtered_state.position[2]);
                 debug_output << buf;
+                auto& CS = filtered_state.CS;
                 sprintf(buf,CS_FORMAT.c_str(),CS[0],CS[1],CS[2],CS[3],CS[4],CS[5],CS[6],CS[7],CS[8]);
                 debug_output << buf << std::endl;
             }
@@ -108,5 +110,5 @@ void SingleStageSimulation::run(std::string fn, const bool debug)
         std::cout << "\r" << time << std::flush;
     }
 
-    fclose(this->output);
+    fclose(output);
 }

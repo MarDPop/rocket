@@ -616,6 +616,15 @@ namespace Cartesian {
         double angle;
         Vector axis;
 
+        AngleAxis() {}
+        ~AngleAxis() {}
+
+        Axis get_rotation_matrix()
+        {
+            Axis rotm;
+
+            return rotm;
+        }
 
     };
 
