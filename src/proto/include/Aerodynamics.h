@@ -78,8 +78,9 @@ public:
     void update();
 };
 
-class SimpleAerodynamics : public virtual Aerodynamics
+class AerodynamicsBasicCoef : public virtual Aerodynamics
 {
+protected:
     static constexpr double AOA_THRESHOLD = 1e-6;
 
     double CD0;
@@ -125,21 +126,45 @@ class SimpleAerodynamics : public virtual Aerodynamics
 
 public:
 
-    SimpleAerodynamics(SingleStageRocket& r);
+    AerodynamicsBasicCoef(SingleStageRocket& r);
 
     void set_coef(double* coef);
 };
 
-template <unsigned NUMBER_FINS>
-struct FinControlAero
+struct Fin
 {
-    std::array<std::unique_ptr<Servo>, NUMBER_FINS> servos;
-    std::array<double, NUMBER_FINS> fin_span_vec_x;
-    std::array<double, NUMBER_FINS> fin_span_vec_y;
+    /**
+    * Servo associated with fin deflection
+    */
+    std::unique_ptr<Servo> servo;
+
+    /**
+    * span vector x (unit vector along span (normal to z) in body frame)
+    */
+    double span_x;
+
+    /**
+    * span vector y
+    */
+    double span_y;
 };
 
-template <unsigned NUMBER_FINS>
-class FinCoefficientAerodynamics : public SimpleAerodynamics, virtual FinControlAero<NUMBER_FINS>
+class FinControlAero
+{
+protected:
+    std::vector<Fin> fins;
+public:
+    const unsigned NUMBER_FINS;
+
+    FinControlAero(unsigned NFINS);
+
+    inline const Fin& get_fin(unsigned idx)
+    {
+        return this->fins[idx];
+    }
+};
+
+class AerodynamicsFinCoefficient : public AerodynamicsBasicCoef, public virtual FinControlAero
 {
     double z; // distance along z axis of span vectors from nose
 
@@ -159,17 +184,16 @@ class FinCoefficientAerodynamics : public SimpleAerodynamics, virtual FinControl
 
 public:
 
-    FinCoefficientAerodynamics(SingleStageRocket& r);
-    ~FinCoefficientAerodynamics();
+    AerodynamicsFinCoefficient(SingleStageRocket& r, unsigned NFINS);
+    ~AerodynamicsFinCoefficient();
 
     void set_aero_coef(double dCL, double dCD, double dCM, double fin_COP_z, double fin_COP_d);
 
 };
 
-template <unsigned NUMBER_FINS>
-class TabulatedAerodynamics : public virtual Aerodynamics, virtual FinControlAero<NUMBER_FINS>
+class AerodynamicsTabulated : public virtual Aerodynamics, virtual FinControlAero
 {
-    std::array<double, NUMBER_FINS> current_fin_deflection;
+    std::vector<double> current_fin_deflection;
 
     union aero_key
     {

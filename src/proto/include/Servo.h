@@ -16,7 +16,7 @@ protected:
 public:
 
     inline Servo() {}
-    virtual ~Servo() {}
+    virtual ~Servo();
 
     inline virtual void set_commanded_angle(double commanded_angle)
     {

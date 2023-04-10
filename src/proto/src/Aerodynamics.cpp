@@ -2,6 +2,8 @@
 
 #include "../include/SingleStageRocket.h"
 
+#include <cmath>
+
 void Aerodynamics::compute_aero_values()
 {
     Vector air_velocity = this->rocket.get_state().velocity - this->rocket.get_atmosphere().wind.wind;
@@ -36,9 +38,9 @@ void Aerodynamics::update()
     this->compute_forces();
 }
 
-SimpleAerodynamics::SimpleAerodynamics(SingleStageRocket& r) : Aerodynamics(r) {}
+AerodynamicsBasicCoef::AerodynamicsBasicCoef(SingleStageRocket& r) : Aerodynamics(r) {}
 
-void SimpleAerodynamics::set_coef(double* coef)
+void AerodynamicsBasicCoef::set_coef(double* coef)
 {
     this->CD0 = coef[0]*coef[5];
     this->CL_alpha = coef[1]*coef[5];
@@ -56,7 +58,7 @@ void SimpleAerodynamics::set_coef(double* coef)
 
 }
 
-double SimpleAerodynamics::get_parasitic_drag_from_mach(double mach)
+double AerodynamicsBasicCoef::get_parasitic_drag_from_mach(double mach)
 {
     if (this->aero_values.mach < 0.5)
     {
@@ -75,16 +77,16 @@ double SimpleAerodynamics::get_parasitic_drag_from_mach(double mach)
     }
 }
 
-double SimpleAerodynamics::get_angle_of_attack()
+double AerodynamicsBasicCoef::get_angle_of_attack()
 {
     double proj = std::min(1.0, rocket.get_state().CS.axis.z.dot(this->aero_values.unit_v_air));
 
     return (proj > 0.9) ? sqrt(2.0 - 2*proj) : acos(proj);
 }
 
-SimpleAerodynamics::aero_coef SimpleAerodynamics::get_aero_coef(double sAoA)
+AerodynamicsBasicCoef::aero_coef AerodynamicsBasicCoef::get_aero_coef(double sAoA)
 {
-    SimpleAerodynamics::aero_coef output;
+    AerodynamicsBasicCoef::aero_coef output;
 
     output.CD = this->get_parasitic_drag_from_mach(this->aero_values.mach);
 
@@ -118,7 +120,7 @@ SimpleAerodynamics::aero_coef SimpleAerodynamics::get_aero_coef(double sAoA)
     return output;
 }
 
-void SimpleAerodynamics::compute_forces()
+void AerodynamicsBasicCoef::compute_forces()
 {
     // if airspeed too low don't compute, (has divide by zero consequences anyway)
     if(this->aero_values.airspeed < 1e-2)
@@ -158,8 +160,22 @@ void SimpleAerodynamics::compute_forces()
     this->force += lift;
 }
 
-template<unsigned NUMBER_FINS>
-void FinCoefficientAerodynamics<NUMBER_FINS>::set_aero_coef(double dCL, double dCD, double dCM, double fin_COP_z, double fin_COP_d){
+FinControlAero::FinControlAero(unsigned NFINS) : fins(NFINS), NUMBER_FINS(NFINS)
+{
+    double angle = 0;
+    double dAngle = 6.283185307179586476925286766559/NFINS;
+    for(Fin& fin : this->fins)
+    {
+        fin.span_x = cos(angle);
+        fin.span_y = sin(angle);
+        fin.servo = std::make_unique<Servo>();
+        angle += dAngle;
+    }
+}
+
+AerodynamicsFinCoefficient::~AerodynamicsFinCoefficient(){}
+
+void AerodynamicsFinCoefficient::set_aero_coef(double dCL, double dCD, double dCM, double fin_COP_z, double fin_COP_d){
     this->dCLdTheta = dCL; // remember that these already have fin area "built in"
     this->dCDdTheta = dCD;
     this->dCMdTheta = dCM;
@@ -169,31 +185,32 @@ void FinCoefficientAerodynamics<NUMBER_FINS>::set_aero_coef(double dCL, double d
     this->const_axial_term_drag = dCD*fin_COP_d;
 }
 
-template<unsigned NUMBER_FINS>
-void FinCoefficientAerodynamics<NUMBER_FINS>::compute_forces() {
-    SimpleAerodynamics::compute_forces();
+void AerodynamicsFinCoefficient::compute_forces()
+{
+    AerodynamicsBasicCoef::compute_forces();
 
     Vector dForce((char)0);
     Vector dMoment((char)0);
 
-    double planar_term = this->dCMdTheta - (this->z - this->rocket.inertia.COG)*this->dCLdTheta;
+    double planar_term = this->dCMdTheta - (this->z - this->rocket.get_inertia().COG)*this->dCLdTheta;
 
-    for(unsigned i = 0; i < NUMBER_FINS;i++) {
-        double deflection = this->servos[i].get_angle();
+    for(Fin& fin : this->fins)
+    {
+        double deflection = fin.servo->get_angle();
 
-        dMoment.data[0] += (this->fin_span_vec_x[i]*planar_term - this->fin_span_vec_y[i]*this->const_axial_term_drag)*deflection;
-        dMoment.data[1] += (this->fin_span_vec_y[i]*planar_term + this->fin_span_vec_x[i]*this->const_axial_term_drag)*deflection;
+        dMoment.data[0] += (fin.span_x*planar_term - fin.span_y*this->const_axial_term_drag)*deflection;
+        dMoment.data[1] += (fin.span_y*planar_term + fin.span_x*this->const_axial_term_drag)*deflection;
         dMoment.data[2] += this->const_axial_term_lift*deflection;
 
         double tmp = this->dCLdTheta*deflection;
 
-        dForce.data[0] -= this->fin_span_vec_y[i]*tmp;
-        dForce.data[1] += this->fin_span_vec_x[i]*tmp;
+        dForce.data[0] -= fin.span_y*tmp;
+        dForce.data[1] += fin.span_x*tmp;
         dForce.data[2] -= this->dCDdTheta*deflection; // simply linear approximation for small angles
     }
-    dMoment *= this->rocket.aerodynamics->aero_values.dynamic_pressure;
-    dForce *= this->rocket.aerodynamics->aero_values.dynamic_pressure;
+    dMoment *= this->rocket.get_aerodynamics().aero_values.dynamic_pressure;
+    dForce *= this->rocket.get_aerodynamics().aero_values.dynamic_pressure;
     // remember currently in body frame, need to convert to inertial frame
-    this->moment += this->rocket.state.CS.transpose_mult(this->dMoment);
-    this->force += this->rocket.state.CS.transpose_mult(this->dForce);
+    this->moment += this->rocket.get_state().CS.transpose_mult(dMoment);
+    this->force += this->rocket.get_state().CS.transpose_mult(dForce);
 }

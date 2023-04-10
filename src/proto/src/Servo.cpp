@@ -2,6 +2,8 @@
 
 #include <cmath>
 
+Servo::~Servo() {}
+
 SimpleServo::SimpleServo() {}
 
 SimpleServo::~SimpleServo() {}

@@ -2,7 +2,10 @@
 
 #include "../include/Parachute.h"
 
-Guidance::Guidance(){}
+Guidance::Guidance(){
+    this->commands.z_axis.zero();
+    this->commands.z_axis.data[2] = 1.0;
+}
 
 Guidance::~Guidance(){}
 
@@ -11,13 +14,11 @@ const Commands& Guidance::get_commands(const KinematicState& estimated_state, do
     return this->commands;
 }
 
-SimpleAscent::SimpleAscent()
+GuidanceSimpleAscent::GuidanceSimpleAscent() : Guidance()
 {
-    this->commands.z_axis.zero();
-    this->commands.z_axis.data[2] = 1.0;
 }
 
-const Commands& SimpleAscent::get_commands(const KinematicState& estimated_state, double time)
+const Commands& GuidanceSimpleAscent::get_commands(const KinematicState& estimated_state, double time)
 {
     if(this->chute->is_deployed())
     {
@@ -33,7 +34,9 @@ const Commands& SimpleAscent::get_commands(const KinematicState& estimated_state
     return this->commands;
 }
 
-const Commands& VerticalAscent::get_commands(const KinematicState& estimated_state, double time)
+GuidanceVerticalAscent::GuidanceVerticalAscent(){}
+
+const Commands& GuidanceVerticalAscent::get_commands(const KinematicState& estimated_state, double time)
 {
     if(this->chute->is_deployed())
     {

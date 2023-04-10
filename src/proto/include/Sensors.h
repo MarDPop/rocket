@@ -82,7 +82,7 @@ class Sensors
 public:
 
     Sensors();
-    ~Sensors();
+    virtual ~Sensors();
 
     inline double get_measured_dynamic_pressure() const
     {

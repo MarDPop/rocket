@@ -55,6 +55,11 @@ public:
         this->inertia_empty = inertia_empty;
     }
 
+    inline const Inertia& get_inertia() const
+    {
+        return this->inertia;
+    }
+
     inline const Atmosphere& get_atmosphere() const
     {
         return *this->_atmosphere;

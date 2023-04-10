@@ -2,13 +2,20 @@
 
 #include "../include/Aerodynamics.h"
 
+Control::Control() {}
+
+Control::~Control() {}
+
 void Control::get_outputs(const Commands& commands, const KinematicState& estimated_state, double time) {}
 
-template<unsigned NUMBER_FINS>
-FinControlSimple<NUMBER_FINS>::FinControlSimple(const FinControlAero<NUMBER_FINS>& _aero) : aero(_aero) {}
+ControlFinSimple::ControlFinSimple(FinControlAero& _aero) : aero(_aero)
+{
 
-template<unsigned NUMBER_FINS>
-Vector FinControlSimple<NUMBER_FINS>::get_desired_arm_magnitude_body(const Commands& commands, const KinematicState& estimated_state)
+}
+
+ControlFinSimple::~ControlFinSimple(){}
+
+Vector ControlFinSimple::get_desired_arm_magnitude_body(const Commands& commands, const KinematicState& estimated_state)
 {
     Vector angle_diff_inertial = commands.z_axis.cross(estimated_state.CS.axis.z);
 
@@ -17,15 +24,15 @@ Vector FinControlSimple<NUMBER_FINS>::get_desired_arm_magnitude_body(const Comma
     return estimated_state.CS * arm_inertial; // should have zero z component
 }
 
-template<unsigned NUMBER_FINS>
-void FinControlSimple<NUMBER_FINS>::get_outputs(const Commands& commands, const KinematicState& estimated_state, double time)
+void ControlFinSimple::get_outputs(const Commands& commands, const KinematicState& estimated_state, double time)
 {
-    auto arm = this->get_desired_arm_magnitude(commands, estimated_state);
+    auto arm = this->get_desired_arm_magnitude_body(commands, estimated_state);
 
-    for(unsigned fin_idx = 0; fin_idx < NUMBER_FINS; fin_idx++)
+    for(unsigned fin_idx = 0; fin_idx < aero.NUMBER_FINS; fin_idx++)
     {
-        double angle = this->fin_gain*(arm.data[0]*aero.fin_span_vec_x[fin_idx] + arm.data[1]*aero.fin_span_vec_y[fin_idx]);
-        this->aero.servos[fin_idx].set_commanded_angle(angle);
-        this->aero.servos[fin_idx].update(time);
+        const Fin& fin = aero.get_fin(fin_idx);
+        double angle = this->fin_gain*(arm.data[0]*fin.span_x + arm.data[1]*fin.span_y);
+        fin.servo->set_commanded_angle(angle);
+        fin.servo->update(time);
     }
 }

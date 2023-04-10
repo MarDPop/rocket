@@ -8,6 +8,7 @@ class SingleStageRocket;
 
 using namespace Cartesian;
 
+//TODO: rename to "Recovery"
 class Parachute
 {
 protected:

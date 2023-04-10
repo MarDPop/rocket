@@ -22,7 +22,7 @@ public:
     }
 };
 
-class FilterNone: public virtual Filter
+class FilterSimpleIntegrate: public virtual Filter
 {
 
     double t_old;

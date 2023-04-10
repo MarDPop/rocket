@@ -2,7 +2,7 @@
 
 #include "../include/Sensors.h"
 
-void FilterNone::update(const Sensors& sensors, double t)
+void FilterSimpleIntegrate::update(const Sensors& sensors, double t)
 {
     auto dt = t - t_old;
     this->t_old = t;

@@ -32,19 +32,19 @@ public:
     virtual const Commands& get_commands(const KinematicState& estimated_state, double time);
 };
 
-class SimpleAscent : public virtual Guidance
+class GuidanceSimpleAscent : public virtual Guidance
 {
 
 public:
 
     Parachute* chute = nullptr;
 
-    SimpleAscent();
+    GuidanceSimpleAscent();
 
     const Commands& get_commands(const KinematicState& estimated_state, double time) override;
 };
 
-class VerticalAscent : public virtual Guidance
+class GuidanceVerticalAscent : public virtual Guidance
 {
     double proportional = 1.0;
 
@@ -54,7 +54,7 @@ public:
 
     Parachute* chute = nullptr;
 
-    VerticalAscent();
+    GuidanceVerticalAscent();
 
     inline void setProportionalConstants(double P, double D)
     {

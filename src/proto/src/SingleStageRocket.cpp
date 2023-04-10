@@ -76,13 +76,15 @@ void SingleStageRocket::step(double& time, double dt)
 
     // Rotations are non linear -> rotate CS
     double angle = angle_axis.norm();
-    if(angle > 1e-6) {
+    if(angle > 1e-6)
+    {
         angle_axis *= (1.0/angle);
         this->state.CS = Axis(angle,angle_axis)*state0.CS;
     }
 
     // Compute mass changes, no need to recompute at next step
-    if(this->thruster->is_active()) {
+    if(this->thruster->is_active())
+    {
         this->inertia.mass -= this->thruster->get_mass_rate()*dt;
         this->update_inertia();
     }
@@ -111,23 +113,123 @@ SingleStageRocket::SingleStageRocket(Atmosphere* atmosphere) : gnc(*this), _atmo
 
 SingleStageRocket::~SingleStageRocket(){}
 
-Inertia loadInerta(tinyxml2::XMLElement* inertiaElement)
+Inertia loadInertia(tinyxml2::XMLElement* inertiaElement)
 {
+    Inertia inertia;
+    auto* el = inertiaElement->FirstChildElement("Mass");
+    if(!el)
+    {
+        throw std::invalid_argument("Mass required.");
+    }
+    inertia.mass = el->DoubleText();
 
+    inertia.Ixx = 0;
+    inertia.Izz = 0;
+    inertia.COG = 0;
+
+    el = inertiaElement->FirstChildElement("Ixx");
+    if(el)
+    {
+        inertia.Ixx = el->DoubleText();
+    }
+
+    el = inertiaElement->FirstChildElement("Izz");
+    if(el)
+    {
+        inertia.Izz = el->DoubleText();
+    }
+
+    el = inertiaElement->FirstChildElement("COG");
+    if(el)
+    {
+        inertia.COG = el->DoubleText();
+    }
+
+    return inertia;
+}
+
+Thruster* loadThruster(tinyxml2::XMLElement* thrusterElement)
+{
+    const char* type = thrusterElement->Attribute("Type");
+    const char* fn = thrusterElement->FirstChildElement("File")->Value();
+    Thruster* thruster = nullptr;
+    if(!type)
+    {
+        if(fn)
+        {
+            thruster = new Thruster();
+            thruster->load(fn);
+        }
+        else
+        {
+            auto* inertiaEl = thrusterElement->FirstChildElement("Inertia");
+            double thrust = thrusterElement->FirstChildElement("Thrust")->DoubleText();
+            double ISP = thrusterElement->FirstChildElement("ISP")->DoubleText();
+            thruster = new Thruster(thrust,ISP);
+            thruster->set_fuel_inertia(loadInertia(inertiaEl));
+        }
+    }
+    else
+    {
+        if(strcmp(type,"PressureThruster") == 0)
+        {
+            if(fn)
+            {
+                thruster = new PressureThruster();
+                thruster->load(fn);
+            }
+            else
+            {
+                PressureThruster* pthruster = new PressureThruster();
+                auto* inertiaEl = thrusterElement->FirstChildElement("Inertia");
+                pthruster->set_fuel_inertia(loadInertia(inertiaEl));
+                auto* pressureTable = thrusterElement->FirstChildElement("Table");
+                if(!pressureTable)
+                {
+                    throw new std::invalid_argument("No table for pressure thruster.");
+                }
+                auto* row = pressureTable->FirstChildElement();
+                while(row)
+                {
+                    double pressure = std::stod(row->Attribute("Pressure"));
+                    double thrust = std::stod(row->Attribute("Thrust"));
+                    double mass_rate = std::stod(row->Attribute("MassRate"));
+                    pthruster->add_thrust_point(pressure,thrust,mass_rate);
+                    row = row->NextSiblingElement();
+                }
+                thruster = pthruster;
+            }
+        }
+        else if(strcmp(type,"ComputedThruster") == 0)
+        {
+            thruster = new ComputedThruster();
+            thruster->load(fn);
+        }
+    }
+    return thruster;
 }
 
 Aerodynamics* loadSimpleAerodynamics(tinyxml2::XMLElement* aeroElement, SingleStageRocket& rocket)
 {
-    SimpleAerodynamics* aero = nullptr;
-
+    AerodynamicsBasicCoef* aero = new AerodynamicsBasicCoef(rocket);
+    double coef[8];
+    coef[0] = aeroElement->FirstChildElement("CD0")->DoubleText();
+    coef[1] = aeroElement->FirstChildElement("CL_alpha")->DoubleText();
+    coef[2] = aeroElement->FirstChildElement("CM_alpha")->DoubleText();
+    coef[3] = aeroElement->FirstChildElement("CM_alpha_dot")->DoubleText();
+    coef[4] = aeroElement->FirstChildElement("InducedLiftK")->DoubleText();
+    coef[5] = aeroElement->FirstChildElement("RefArea")->DoubleText();
+    coef[6] = aeroElement->FirstChildElement("RefLength")->DoubleText();
+    coef[7] = aeroElement->FirstChildElement("StallAngle")->DoubleText();
+    aero->set_coef(coef);
     return aero;
 }
 
 Aerodynamics* loadAerodynamics(tinyxml2::XMLElement* aeroElement, SingleStageRocket& rocket)
 {
-    const char* aeroType = aeroElement->Attribute("Type");
+    const char* type = aeroElement->Attribute("Type");
     Aerodynamics* aero;
-    if(aeroType =="SimpleAerodynamics")
+    if(strcmp(type,"SimpleAerodynamics") == 0)
     {
         aero = loadSimpleAerodynamics(aeroElement,rocket);
     }
@@ -136,6 +238,84 @@ Aerodynamics* loadAerodynamics(tinyxml2::XMLElement* aeroElement, SingleStageRoc
         aero = new Aerodynamics(rocket);
     }
     return aero;
+}
+
+Parachute* loadParachute(tinyxml2::XMLElement* chuteElement, SingleStageRocket& rocket)
+{
+    const char* type = chuteElement->Attribute("Type");
+    Parachute* chute;
+    double CDA = 0;
+    if(!type)
+    {
+        auto* CDAEl = chuteElement->FirstChildElement("CDA");
+        if(CDAEl)
+        {
+            CDA = CDAEl->DoubleText();
+        }
+        chute = new Parachute(rocket,CDA);
+    }
+    else
+    {
+        chute = new Parachute(rocket,CDA);
+    }
+    return chute;
+}
+
+void loadGNC(GNC& gnc, tinyxml2::XMLElement* gncElement, Parachute* parachute, Aerodynamics* aero)
+{
+    auto* guidanceElement = gncElement->FirstChildElement("Guidance");
+    auto* navigationElement = gncElement->FirstChildElement("Navigation");
+    auto* controlElement = gncElement->FirstChildElement("Control");
+    if(guidanceElement)
+    {
+        const char* type = guidanceElement->Attribute("Type");
+        if(strcmp(type,"VerticalAscent") == 0)
+        {
+            double P = guidanceElement->FirstChildElement("Proportional")->DoubleText();
+            double D = guidanceElement->FirstChildElement("Damping")->DoubleText();
+            GuidanceVerticalAscent* guidance = new GuidanceVerticalAscent();
+            guidance->setProportionalConstants(P,D);
+            gnc.guidance.reset(guidance);
+        }
+    }
+    else
+    {
+        gnc.guidance = std::make_unique<Guidance>();
+    }
+
+    gnc.navigation = std::make_unique<Navigation>();
+    if(navigationElement)
+    {
+        auto* filterElement = navigationElement->FirstChildElement("Filter");
+        if(filterElement)
+        {
+            // const char* type = navigationElement->Attribute("Type");
+        }
+    }
+
+    if(controlElement)
+    {
+        const char* type = controlElement->Attribute("Type");
+        if(strcmp(type,"FinControl") == 0)
+        {
+            auto* finAero = dynamic_cast<FinControlAero*>(aero);
+            if(!finAero)
+            {
+                throw std::invalid_argument("Fin control requires fin aero.");
+            }
+            double P = controlElement->FirstChildElement("Proportional")->DoubleText();
+            double D = controlElement->FirstChildElement("Damping")->DoubleText();
+            double F = controlElement->FirstChildElement("FinGain")->DoubleText();
+            ControlFinSimple* finControl = new ControlFinSimple(*finAero); // double check this!
+            finControl->set_fin_gain(F);
+            finControl->set_controller_values(P,D);
+            gnc.control.reset(finControl);
+        }
+    }
+    else
+    {
+        gnc.control = std::make_unique<Control>();
+    }
 }
 
 void SingleStageRocket::load(const char* fn)
@@ -150,14 +330,16 @@ void SingleStageRocket::load(const char* fn)
     auto* InertiaElement = root->FirstChildElement("Inertia");
     if(!InertiaElement) { throw std::invalid_argument("No mass properties"); }
 
+    this->inertia = loadInertia(InertiaElement);
+
     auto* ThrusterElement = root->FirstChildElement("Thruster");
     if(!ThrusterElement) { throw std::invalid_argument("No thruster"); }
+
+    this->thruster.reset(loadThruster(ThrusterElement));
 
     auto* AerodynamicsElement = root->FirstChildElement("Aerodynamics");
     auto* ParachuteElement = root->FirstChildElement("Parachute");
     auto* GNCElement = root->FirstChildElement("GNC");
-
-    this->inertia = loadInerta(InertiaElement);
 
     if(!AerodynamicsElement)
     {
@@ -168,10 +350,24 @@ void SingleStageRocket::load(const char* fn)
         this->aerodynamics.reset(loadAerodynamics(AerodynamicsElement,*this));
     }
 
-    if(!GNCElement) {
+    if(!ParachuteElement)
+    {
+        this->parachute = std::make_unique<Parachute>(*this);
+    }
+    else
+    {
+        this->parachute.reset(loadParachute(ParachuteElement,*this));
+    }
 
-    } else {
-
+    if(!GNCElement)
+    {
+        this->gnc.guidance = std::make_unique<Guidance>();
+        this->gnc.control = std::make_unique<Control>();
+        this->gnc.navigation = std::make_unique<Navigation>();
+    }
+    else
+    {
+        loadGNC(this->gnc, GNCElement, this->parachute.get(), this->aerodynamics.get());
     }
 
 
@@ -179,7 +375,11 @@ void SingleStageRocket::load(const char* fn)
 
 void SingleStageRocket::init(double launch_angle, double launch_heading)
 {
-    memset(&this->state,0,sizeof(KinematicState));
+    this->state.position.zero();
+    this->state.velocity.zero();
+    this->state.acceleration.zero();
+    this->state.angular_velocity.zero();
+    this->state.angular_acceleration.zero();
 
     double cphi = cos(launch_heading);
     double sphi = sin(launch_heading);
@@ -191,7 +391,7 @@ void SingleStageRocket::init(double launch_angle, double launch_heading)
     // y axis points north at zero heading
     this->state.CS.axis.y.x = sphi;
     this->state.CS.axis.y.y = cphi;
-    this->state.CS.axis.y.z = 0;
+    this->state.CS.axis.y.z = 0.0;
     this->state.CS.axis.z.x = ctheta*cphi;
     this->state.CS.axis.z.y = ctheta*-sphi;
     this->state.CS.axis.z.z = stheta;

@@ -16,9 +16,10 @@ public:
 
 };
 
-template <unsigned NUMBER_FINS>
-class FinControlSimple : public virtual Control
+class ControlFinSimple : public virtual Control
 {
+    FinControlAero& aero; // can I make constant?
+
     double fin_gain = 1.0;
 
     double proportional = 1.0;
@@ -27,12 +28,10 @@ class FinControlSimple : public virtual Control
 
     Vector get_desired_arm_magnitude_body(const Commands& commands, const KinematicState& estimated_state);
 
-    FinControlAero<NUMBER_FINS>& aero;
-
 public:
 
-    FinControlSimple(const FinControlAero<NUMBER_FINS>& _aero);
-    virtual ~FinControlSimple();
+    ControlFinSimple(FinControlAero& _aero);
+    virtual ~ControlFinSimple();
 
     inline void set_fin_gain(double fin_gain)
     {

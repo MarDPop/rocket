@@ -1,5 +1,9 @@
 #include "../include/Navigation.h"
 
+Navigation::Navigation() : filter(new FilterSimpleIntegrate()), sensors(new Sensors()) {}
+
+Navigation::~Navigation() {}
+
 const KinematicState& Navigation::get_estimated_state(const SingleStageRocket& rocket, double time)
 {
     this->sensors->update(rocket, time);
