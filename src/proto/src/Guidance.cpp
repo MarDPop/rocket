@@ -2,6 +2,10 @@
 
 #include "../include/Parachute.h"
 
+Guidance::Guidance(){}
+
+Guidance::~Guidance(){}
+
 const Commands& Guidance::get_commands(const KinematicState& estimated_state, double time)
 {
     return this->commands;

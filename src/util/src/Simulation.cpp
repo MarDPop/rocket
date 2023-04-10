@@ -3,6 +3,7 @@
 #include <fstream>
 #include <stdexcept>
 #include <ctime>
+#include "../../common/include/Time.h"
 
 SingleSimulation::SingleSimulation() {
 }

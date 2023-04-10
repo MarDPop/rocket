@@ -12,6 +12,8 @@ class Parachute
 {
 protected:
 
+    SingleStageRocket& rocket;
+
     /**
     * drag coefficient multiplied by area
     */
@@ -23,8 +25,6 @@ protected:
 
     bool deployed = false;
 
-    SingleStageRocket& rocket;
-
 public:
 
     Vector tether_force;
@@ -33,7 +33,7 @@ public:
     Parachute(SingleStageRocket& _rocket, double _CDA);
     ~Parachute();
 
-    inline bool reset()
+    inline void reset()
     {
         this->deployed = false;
     }

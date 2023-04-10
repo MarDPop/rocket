@@ -11,7 +11,7 @@ void computed_quatities::set(const measured_quantities& measured, const altitude
 
     this->mach_squared = 5*(pow(pressure_ratio, 2/7) - 1.0);
 
-    this->airspeed = sqrt(this->mach_squared/(AltitudeTable::AIR_CONST*measured.temperature));
+    this->airspeed = sqrt(this->mach_squared/(Atmosphere::AIR_CONST*measured.temperature));
 
     pressure_ratio = measured.static_pressure * cal.inverse_ref_pressure;
 
@@ -44,8 +44,9 @@ void Sensors::set_sensor_variances(double sigma_pressure, double sigma_temperatu
 
 void Sensors::measure_quantities(const SingleStageRocket& rocket) {
     // add delay
-    this->measured.angular_velocity = rocket.state.angular_velocity;
-    this->measured.acceleration = rocket.state.acceleration;
+    const auto& rocket_state = rocket.get_state();
+    this->measured.angular_velocity = rocket_state.angular_velocity;
+    this->measured.acceleration = rocket_state.acceleration;
 
     for(int i = 0; i < 3; i++)
     {
@@ -53,9 +54,9 @@ void Sensors::measure_quantities(const SingleStageRocket& rocket) {
         this->measured.acceleration.data[i] += this->accelerometer_variance(this->generator);
     }
 
-    this->measured.total_pressure = rocket.altitude_table.values->pressure + rocket.aerodynamics.aero_values.dynamic_pressure + this->barometer_variance(this->generator);
-    this->measured.static_pressure = rocket.altitude_table.values->pressure + this->barometer_variance(this->generator);
-    this->measured.temperature = rocket.altitude_table.values->temperature + this->thermometer_variance(this->generator);
+    this->measured.total_pressure = rocket.get_atmosphere().values.pressure + rocket.get_aerodynamics().aero_values.dynamic_pressure + this->barometer_variance(this->generator);
+    this->measured.static_pressure = rocket.get_atmosphere().values.pressure + this->barometer_variance(this->generator);
+    this->measured.temperature = rocket.get_atmosphere().values.temperature + this->thermometer_variance(this->generator);
 }
 
 void Sensors::update(const SingleStageRocket& rocket, double time) {

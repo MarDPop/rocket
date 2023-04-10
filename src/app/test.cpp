@@ -3,8 +3,6 @@
 #include "../common/include/util.h"
 #include "../common/include/RocketShape.h"
 #include "../common/include/Cartesian.h"
-#include "../6DOF/include/Vehicle.h"
-#include "../6DOF/include/Stage.h"
 #include "../util/include/Simulation.h"
 #include <memory>
 #include <cmath>

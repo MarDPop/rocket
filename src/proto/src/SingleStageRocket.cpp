@@ -5,6 +5,7 @@
 #include <fstream>
 #include <numeric>
 #include <iostream>
+#include <exception>
 
 void SingleStageRocket::update_inertia()
 {
@@ -20,7 +21,7 @@ void SingleStageRocket::update_inertia()
 
 void SingleStageRocket::compute_acceleration(double time)
 {
-    this->atmosphere->set(this->state.position.z, time);
+    this->_atmosphere->set(this->state.position.z, time);
 
     this->gnc.update(time);
 
@@ -31,7 +32,7 @@ void SingleStageRocket::compute_acceleration(double time)
 
     if(this->thruster->is_active())
     {
-        this->thruster->set(this->atmosphere->values.pressure, time);
+        this->thruster->set(this->_atmosphere->values.pressure, time);
         total_force += this->state.CS.axis.z * this->thruster->get_thrust();
     }
 
@@ -43,7 +44,7 @@ void SingleStageRocket::compute_acceleration(double time)
     }
 
     this->state.acceleration = total_force * (1.0/this->inertia.mass);
-    this->state.acceleration.z -= this->atmosphere->values.gravity;
+    this->state.acceleration.z -= this->_atmosphere->values.gravity;
 
     Axis I_inertial = this->state.CS.get_transpose(); // rotate Inertia to inertial frame
     int i = 0;
@@ -106,7 +107,7 @@ void SingleStageRocket::step(double& time, double dt)
         this->state.CS = Axis(angle,angle_axis)*state0.CS;
     }
 }
-SingleStageRocket::SingleStageRocket() : gnc(*this) {}
+SingleStageRocket::SingleStageRocket(Atmosphere* atmosphere) : gnc(*this), _atmosphere(atmosphere) {}
 
 SingleStageRocket::~SingleStageRocket(){}
 
@@ -115,23 +116,24 @@ Inertia loadInerta(tinyxml2::XMLElement* inertiaElement)
 
 }
 
-Aerodynamics* loadSimpleAerodynamics(tinyxml2::XMLElement* aeroElement, SingleStageRocket rocket&)
+Aerodynamics* loadSimpleAerodynamics(tinyxml2::XMLElement* aeroElement, SingleStageRocket& rocket)
 {
-    SimpleAerodynamics
-    for
+    SimpleAerodynamics* aero = nullptr;
+
+    return aero;
 }
 
-Aerodynamics* loadAerodynamics(tinyxml2::XMLElement* aeroElement, SingleStageRocket rocket&)
+Aerodynamics* loadAerodynamics(tinyxml2::XMLElement* aeroElement, SingleStageRocket& rocket)
 {
-    const char* aeroType = AerodynamicsElement->attribute("Type");
+    const char* aeroType = aeroElement->Attribute("Type");
     Aerodynamics* aero;
-    switch (aeroType) {
-    case "SimpleAerodynamics":
+    if(aeroType =="SimpleAerodynamics")
+    {
         aero = loadSimpleAerodynamics(aeroElement,rocket);
-        break;
-    default:
+    }
+    else
+    {
         aero = new Aerodynamics(rocket);
-        break;
     }
     return aero;
 }
@@ -140,30 +142,30 @@ void SingleStageRocket::load(const char* fn)
 {
     tinyxml2::XMLDocument simDocument;
     auto err = simDocument.LoadFile(fn);
-    if(err != tinyxml2::XML_SUCCESS) { throw new std::exception("Couldn't load file"); }
+    if(err != tinyxml2::XML_SUCCESS) { throw std::invalid_argument("Couldn't load file"); }
 
     auto* root = simDocument.RootElement();
-    if(!root) { throw new std::exception("Couldn't find root element"); }
+    if(!root) { throw std::invalid_argument("Couldn't find root element"); }
 
     auto* InertiaElement = root->FirstChildElement("Inertia");
-    if(!InertiaElement) { throw new std::exception("No mass properties"); }
+    if(!InertiaElement) { throw std::invalid_argument("No mass properties"); }
 
     auto* ThrusterElement = root->FirstChildElement("Thruster");
-    if(!ThrusterElement) { throw new std::exception("No thruster"); }
+    if(!ThrusterElement) { throw std::invalid_argument("No thruster"); }
 
     auto* AerodynamicsElement = root->FirstChildElement("Aerodynamics");
     auto* ParachuteElement = root->FirstChildElement("Parachute");
     auto* GNCElement = root->FirstChildElement("GNC");
 
-    this.inertia = loadInerta(InertiaElement);
+    this->inertia = loadInerta(InertiaElement);
 
     if(!AerodynamicsElement)
     {
-        this->aerodynamics.reset( new Aerodynamics(rocket));
+        this->aerodynamics.reset( new Aerodynamics(*this));
     }
     else
     {
-        this->aerodynamics.reset(loadAerodynamics(AerodynamicsElement,rocket));
+        this->aerodynamics.reset(loadAerodynamics(AerodynamicsElement,*this));
     }
 
     if(!GNCElement) {

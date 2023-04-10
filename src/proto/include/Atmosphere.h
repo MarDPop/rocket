@@ -84,15 +84,13 @@ class AtmosphereTable : public virtual Atmosphere
 
 public:
 
-    AtmosphereTable();
-    ~AtmosphereTable();
-
-    void set_ground(double ground_altitude,
-                    double ground_pressure,
-                    double ground_temperature,
-                    double lapse_rate,
+    AtmosphereTable(double _ground_altitude,
+                    double _ground_pressure,
+                    double _ground_temperature,
+                    double _lapse_rate,
                     double g0 = 9.806,
                     double R0 = 6371000.0);
+    virtual ~AtmosphereTable();
 
     void set(double alt, double time) override;
 };

@@ -18,7 +18,7 @@ class GroundReferenceGravity : public virtual Gravity
 
 public:
     GroundReferenceGravity(double _g0 = 9.806, double _R0 = 6371000.0);
-    ~GroundReferenceGravity();
+    virtual ~GroundReferenceGravity();
 
     double get_acceleration(double altitude) override;
 };

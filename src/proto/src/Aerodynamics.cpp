@@ -4,7 +4,7 @@
 
 void Aerodynamics::compute_aero_values()
 {
-    Vector air_velocity = this->rocket.state.velocity - this->rocket.atmosphere->wind.wind;
+    Vector air_velocity = this->rocket.get_state().velocity - this->rocket.get_atmosphere().wind.wind;
 
     this->aero_values.airspeed = air_velocity.norm();
 
@@ -13,15 +13,17 @@ void Aerodynamics::compute_aero_values()
         this->aero_values.unit_v_air = air_velocity * (1.0/this->aero_values.airspeed);
     }
 
-    this->aero_values.mach = this->aero_values.airspeed * this->rocket.atmosphere->values.inv_sound_speed;
+    this->aero_values.mach = this->aero_values.airspeed * this->rocket.get_atmosphere().values.inv_sound_speed;
 
     double tmp = 1.0 + 0.2*this->aero_values.mach*this->aero_values.mach;
-    this->aero_values.dynamic_pressure = this->rocket.atmosphere->values.pressure*(tmp*tmp*tmp*sqrt(tmp) - 1.0);
+    this->aero_values.dynamic_pressure = this->rocket.get_atmosphere().values.pressure*(tmp*tmp*tmp*sqrt(tmp) - 1.0);
 }
 
 void Aerodynamics::compute_forces() {}
 
 Aerodynamics::Aerodynamics(SingleStageRocket& r) : rocket(r) {}
+
+Aerodynamics::~Aerodynamics(){}
 
 void Aerodynamics::update()
 {
@@ -75,7 +77,7 @@ double SimpleAerodynamics::get_parasitic_drag_from_mach(double mach)
 
 double SimpleAerodynamics::get_angle_of_attack()
 {
-    double proj = std::min(1.0, rocket.state.CS.axis.z.dot(this->aero_values.unit_v_air));
+    double proj = std::min(1.0, rocket.get_state().CS.axis.z.dot(this->aero_values.unit_v_air));
 
     return (proj > 0.9) ? sqrt(2.0 - 2*proj) : acos(proj);
 }
@@ -125,10 +127,10 @@ void SimpleAerodynamics::compute_forces()
     }
 
     // already compute damping moment
-    this->moment += rocket.state.angular_velocity*(this->CM_alpha_dot*this->rocket.atmosphere->values.density);
+    this->moment += rocket.get_state().angular_velocity*(this->CM_alpha_dot*this->rocket.get_atmosphere().values.density);
 
     // arm is the moment arm formed from the freestream, length of the arm is sin of angle between
-    Vector arm = this->aero_values.unit_v_air.cross(rocket.state.CS.axis.z);
+    Vector arm = this->aero_values.unit_v_air.cross(rocket.get_state().CS.axis.z);
 
     // sin of the angle of attack
     double sAoA = arm.norm();

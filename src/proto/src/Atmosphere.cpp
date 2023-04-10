@@ -11,23 +11,21 @@ void Atmosphere::set(double alt, double time)
 {
 }
 
-AtmosphereTable::AtmosphereTable() {}
-
-AtmosphereTable::~AtmosphereTable() {}
-
-void AtmosphereTable::set_ground(double ground_altitude,
-                               double ground_pressure,
-                               double ground_temperature,
-                               double lapse_rate,
+AtmosphereTable::AtmosphereTable(double _ground_altitude,
+                               double _ground_pressure,
+                               double _ground_temperature,
+                               double _lapse_rate,
                                double g0,
-                               double R0) {
-    this->ground_altitude = ground_altitude;
-    this->ground_pressure = ground_pressure;
-    this->ground_temperature = ground_temperature;
-    this->lapse_rate = lapse_rate;
-
+                               double R0) :
+                                ground_altitude(_ground_altitude),
+                                ground_pressure(_ground_pressure),
+                                ground_temperature(_ground_temperature),
+                                lapse_rate(_lapse_rate)
+{
     this->compute_atmosphere(30000,1,g0,R0);
 }
+
+AtmosphereTable::~AtmosphereTable() {}
 
 void AtmosphereTable::compute_atmosphere(double maxAlt, double dH, double g0, double R0)
 {

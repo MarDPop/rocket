@@ -52,7 +52,7 @@ struct Launch_Parameters
 
 class SingleStageSimulation
 {
-    SingleStageRocket rocket;
+    std::unique_ptr<SingleStageRocket> rocket;
 
     std::unique_ptr<Atmosphere> atmosphere;
 

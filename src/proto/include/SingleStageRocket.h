@@ -21,6 +21,8 @@ class SingleStageRocket
 {
 friend class SingleStageSimulation;
 
+    KinematicState state;
+
     Inertia inertia_empty;
 
     Inertia inertia;
@@ -33,7 +35,7 @@ friend class SingleStageSimulation;
 
     std::unique_ptr<Parachute> parachute;
 
-    Atmosphere* atmosphere;
+    Atmosphere* const _atmosphere;
 
     void compute_acceleration(double time);
 
@@ -43,9 +45,7 @@ friend class SingleStageSimulation;
 
 public:
 
-    KinematicState state;
-
-    SingleStageRocket();
+    SingleStageRocket(Atmosphere* atmosphere);
     ~SingleStageRocket();
 
     void load(const char* fn);
@@ -55,9 +55,24 @@ public:
         this->inertia_empty = inertia_empty;
     }
 
-    inline void set_atmosphere(Atmosphere* atmosphere)
+    inline const Atmosphere& get_atmosphere() const
     {
-        this->atmosphere = atmosphere;
+        return *this->_atmosphere;
+    }
+
+    inline const KinematicState& get_state() const
+    {
+        return this->state;
+    }
+
+    inline const Aerodynamics& get_aerodynamics() const
+    {
+        return *this->aerodynamics;
+    }
+
+    inline const Thruster& get_thruster() const
+    {
+        return *this->thruster;
     }
 
     void init(double launch_angle, double launch_heading);

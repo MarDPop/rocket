@@ -10,5 +10,6 @@ Parachute::~Parachute() {}
 
 void Parachute::update(double time)
 {
-    this->tether_force = this->rocket.aerodynamics->aero_values.unit_v_air * (this->CDA*this->rocket.aerodynamics->aero_values.dynamic_pressure);
+    const auto& air_values = this->rocket.get_aerodynamics().aero_values;
+    this->tether_force = air_values.unit_v_air * (this->CDA*air_values.dynamic_pressure);
 }

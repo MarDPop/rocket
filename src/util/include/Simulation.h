@@ -3,11 +3,10 @@
 #include "../../common/include/Geodesy.h"
 #include <string>
 #include <memory>
-#include "../../6DOF/include/Vehicle.h"
 
 class SingleSimulation {
 
-    std::unique_ptr<Vehicle> vehicle;
+    //std::unique_ptr<Vehicle> vehicle;
 
     /* starting */
     double JD2000;
