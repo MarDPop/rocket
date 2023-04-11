@@ -1,39 +1,44 @@
 <Rocket>
 	<Inertia unit="SI"> 
-		<Mass></Mass>
-		<Ixx></Ixx>
-		<Izz></Izz>
-		<COG></COG>
+		<Mass>1.0</Mass>
+		<Ixx>0.6</Ixx>
+		<Izz>0.1</Izz>
+		<COG>0.6</COG>
 	</Inertia>
 	
 	<Aerodynamics Type="SimpleAerodynamics" unit="SI">
-		<CD0></CD0>
-		<CL_alpha></CL_alpha>
-		<CM_alpha></CM_alpha>
-		<CM_alpha_dot></CM_alpha_dot>
-		<InducedLiftK></InducedLiftK>
-		<RefArea></RefArea>
-		<RefLength></RefLength>
-		<StallAngle></StallAngle>
+		<CD0>0.7</CD0>
+		<CL_alpha>1.0</CL_alpha>
+		<CM_alpha>-0.01</CM_alpha>
+		<CM_alpha_dot>-0.0001</CM_alpha_dot>
+		<InducedLiftK>0.6</InducedLiftK>
+		<RefArea>0.06</RefArea>
+		<RefLength>1.0</RefLength>
+		<StallAngle>0.2</StallAngle>
 	</Aerodynamics>
 	
-	<Thruster Type="Thruster" unit="SI">
+	<Thruster Type="PressureThruster" unit="SI">
 		<Inertia unit="SI"> 
-			<Mass></Mass>
-			<Ixx></Ixx>
-			<Izz></Izz>
-			<COG></COG>
+			<Mass>1.0</Mass>
+			<Ixx>0.5</Ixx>
+			<Izz>0.1</Izz>
+			<COG>0.4</COG>
 		</Inertia>
-		<Thrust></Thrust>
-		<ISP></ISP>
+		<Table>
+			<Row Pressure="100000" Thrust="200" ISP="112" />
+			<Row Pressure="10000" Thrust="205" ISP="118" />
+			<Row Pressure="1" Thrust="206" ISP="120" />
+		</Table>
 	</Thruster>
 	
 	<Parachute>
-		
+		<CDA>1.5</CDA>
 	</Parachute>
 	
 	<GNC>
-		<Guidance>
+		<Guidance Type="VerticalAscent">
+			<Proportional>1.0</Proportional>
+			<Damping>1.0</Damping>
 		</Guidance>
 		<Control>
 		</Control>

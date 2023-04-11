@@ -26,11 +26,12 @@ public:
 
     Vector wind;
 
+    WindHistory();
+    ~WindHistory();
+
     void reset();
 
     void set(double time);
-
-    WindHistory();
 
     void load(std::string fn);
 

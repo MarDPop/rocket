@@ -155,12 +155,12 @@ namespace Cartesian {
 
         inline void zero()
         {
-            memset(data,0,sizeof(data));
+            memset(this->data,0,sizeof(this->data));
         }
 
         inline double& operator[](uint_fast8_t idx)
         {
-            return data[idx];
+            return this->data[idx];
         }
 
         inline double operator[](uint_fast8_t idx) const

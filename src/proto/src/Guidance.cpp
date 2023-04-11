@@ -56,7 +56,17 @@ const Commands& GuidanceVerticalAscent::get_commands(const KinematicState& estim
 
     Vector rescaled_anti_vector(x_scaled,y_scaled,estimated_state.velocity.z);
 
-    this->commands.z_axis = rescaled_anti_vector * (1.0/rescaled_anti_vector.norm());
+    double scale = rescaled_anti_vector.norm();
+
+    if(scale > 1e-4)
+    {
+        this->commands.z_axis = rescaled_anti_vector * (1.0/rescaled_anti_vector.norm());
+    }
+    else
+    {
+        this->commands.z_axis.zero();
+        this->commands.z_axis.data[2] = 1.0;
+    }
 
     return this->commands;
 }

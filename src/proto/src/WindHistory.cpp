@@ -9,6 +9,8 @@ WindHistory::WindHistory() {
     this->wind.zero();
 }
 
+WindHistory::~WindHistory() {}
+
 void WindHistory::load(std::string fn) {
 
     std::ifstream file(fn);

@@ -11,12 +11,15 @@ void SingleStageRocket::update_inertia()
 {
     const auto& fuel_inertia = this->thruster->get_inertia();
 
-    double cog_arm = fuel_inertia.COG - this->inertia.COG;
-
     this->inertia.mass = this->inertia_empty.mass + fuel_inertia.mass;
-    this->inertia.Ixx = this->inertia_empty.Ixx + fuel_inertia.Ixx;
-    this->inertia.Izz = this->inertia_empty.Izz + fuel_inertia.Izz + fuel_inertia.mass*cog_arm*cog_arm;
+    this->inertia.Izz = this->inertia_empty.Izz + fuel_inertia.Izz;
+
     this->inertia.COG = (this->inertia_empty.COG*this->inertia_empty.mass + fuel_inertia.COG*fuel_inertia.mass) / this->inertia.mass;
+
+    double cog_arm_fuel = fuel_inertia.COG - this->inertia.COG;
+    double cog_arm_structure = this->inertia_empty.COG - this->inertia.COG;
+    this->inertia.Ixx = this->inertia_empty.Ixx + fuel_inertia.Ixx;
+    this->inertia.Ixx += fuel_inertia.mass*cog_arm_fuel*cog_arm_fuel + this->inertia_empty.mass*cog_arm_structure*cog_arm_structure;
 }
 
 void SingleStageRocket::compute_acceleration(double time)
@@ -151,7 +154,7 @@ Inertia loadInertia(tinyxml2::XMLElement* inertiaElement)
 Thruster* loadThruster(tinyxml2::XMLElement* thrusterElement)
 {
     const char* type = thrusterElement->Attribute("Type");
-    const char* fn = thrusterElement->FirstChildElement("File")->Value();
+    const char* fn = thrusterElement->Attribute("File");
     Thruster* thruster = nullptr;
     if(!type)
     {
@@ -193,8 +196,8 @@ Thruster* loadThruster(tinyxml2::XMLElement* thrusterElement)
                 {
                     double pressure = std::stod(row->Attribute("Pressure"));
                     double thrust = std::stod(row->Attribute("Thrust"));
-                    double mass_rate = std::stod(row->Attribute("MassRate"));
-                    pthruster->add_thrust_point(pressure,thrust,mass_rate);
+                    double ISP = std::stod(row->Attribute("ISP"));
+                    pthruster->add_thrust_point(pressure,thrust,thrust/(ISP*9.806));
                     row = row->NextSiblingElement();
                 }
                 thruster = pthruster;
@@ -266,21 +269,23 @@ void loadGNC(GNC& gnc, tinyxml2::XMLElement* gncElement, Parachute* parachute, A
     auto* guidanceElement = gncElement->FirstChildElement("Guidance");
     auto* navigationElement = gncElement->FirstChildElement("Navigation");
     auto* controlElement = gncElement->FirstChildElement("Control");
+
+    gnc.guidance = std::make_unique<Guidance>();
     if(guidanceElement)
     {
         const char* type = guidanceElement->Attribute("Type");
-        if(strcmp(type,"VerticalAscent") == 0)
+        if(type)
         {
-            double P = guidanceElement->FirstChildElement("Proportional")->DoubleText();
-            double D = guidanceElement->FirstChildElement("Damping")->DoubleText();
-            GuidanceVerticalAscent* guidance = new GuidanceVerticalAscent();
-            guidance->setProportionalConstants(P,D);
-            gnc.guidance.reset(guidance);
+            if(strcmp(type,"VerticalAscent") == 0)
+            {
+                double P = guidanceElement->FirstChildElement("Proportional")->DoubleText();
+                double D = guidanceElement->FirstChildElement("Damping")->DoubleText();
+                GuidanceVerticalAscent* guidance = new GuidanceVerticalAscent();
+                guidance->setProportionalConstants(P,D);
+                guidance->chute = parachute;
+                gnc.guidance.reset(guidance);
+            }
         }
-    }
-    else
-    {
-        gnc.guidance = std::make_unique<Guidance>();
     }
 
     gnc.navigation = std::make_unique<Navigation>();
@@ -296,25 +301,25 @@ void loadGNC(GNC& gnc, tinyxml2::XMLElement* gncElement, Parachute* parachute, A
     if(controlElement)
     {
         const char* type = controlElement->Attribute("Type");
-        if(strcmp(type,"FinControl") == 0)
-        {
-            auto* finAero = dynamic_cast<FinControlAero*>(aero);
-            if(!finAero)
-            {
-                throw std::invalid_argument("Fin control requires fin aero.");
-            }
-            double P = controlElement->FirstChildElement("Proportional")->DoubleText();
-            double D = controlElement->FirstChildElement("Damping")->DoubleText();
-            double F = controlElement->FirstChildElement("FinGain")->DoubleText();
-            ControlFinSimple* finControl = new ControlFinSimple(*finAero); // double check this!
-            finControl->set_fin_gain(F);
-            finControl->set_controller_values(P,D);
-            gnc.control.reset(finControl);
-        }
-    }
-    else
-    {
         gnc.control = std::make_unique<Control>();
+        if(type)
+        {
+            if(strcmp(type,"FinControl") == 0)
+            {
+                auto* finAero = dynamic_cast<FinControlAero*>(aero);
+                if(!finAero)
+                {
+                    throw std::invalid_argument("Fin control requires fin aero.");
+                }
+                double P = controlElement->FirstChildElement("Proportional")->DoubleText();
+                double D = controlElement->FirstChildElement("Damping")->DoubleText();
+                double F = controlElement->FirstChildElement("FinGain")->DoubleText();
+                ControlFinSimple* finControl = new ControlFinSimple(*finAero); // double check this!
+                finControl->set_fin_gain(F);
+                finControl->set_controller_values(P,D);
+                gnc.control.reset(finControl);
+            }
+        }
     }
 }
 

@@ -1,5 +1,5 @@
 <Simulation>
-	<Rocket File="rocket.rxml" />
+	<Rocket File="test/rocket.rxml" />
 	<Atmosphere Type="AtmosphereTable">
 		<Altitude Unit="meters">1550</Altitude>
 		<Pressure>92000</Pressure>

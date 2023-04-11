@@ -17,7 +17,7 @@ void SingleStageSimulation::load(std::string fn)
     auto err = simDocument.LoadFile(fn.c_str());
     if(err != tinyxml2::XML_SUCCESS) {
         //Could not load file. Handle appropriately.
-        return;
+        throw std::invalid_argument("Could not load file.");
     }
 
     auto* root = simDocument.RootElement();
@@ -26,7 +26,7 @@ void SingleStageSimulation::load(std::string fn)
     auto* RocketFileElement = root->FirstChildElement("Rocket");
     const char* rocket_fn = RocketFileElement->Attribute("File");
 
-    if(!rocket_fn){ return;}
+    if(!rocket_fn){ throw std::invalid_argument("No Rocket File."); }
 
     auto* AtmosphereElement = root->FirstChildElement("Atmosphere");
     if(AtmosphereElement)

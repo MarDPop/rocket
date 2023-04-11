@@ -3,7 +3,6 @@
 #include "../common/include/util.h"
 #include "../common/include/RocketShape.h"
 #include "../common/include/Cartesian.h"
-#include "../util/include/Simulation.h"
 #include <memory>
 #include <cmath>
 

@@ -8,16 +8,18 @@
 
 class Thruster
 {
-
 protected:
-
-    bool active = true;
+    double time_old = 0.0;
 
     double thrust;
 
     double mass_rate;
 
     Inertia inertia_fuel;
+
+    bool active = true;
+
+    virtual void update_inertia(double time);
 
 public:
 
@@ -43,18 +45,6 @@ public:
     inline const Inertia& get_inertia()
     {
         return this->inertia_fuel;
-    }
-
-    inline void set_fuel_COG(double COG)
-    {
-        this->inertia_fuel.COG = COG;
-    }
-
-    inline void set_fuel_mass_properties(double mass, double Ixx, double Izz)
-    {
-        this->inertia_fuel.mass = mass;
-        this->inertia_fuel.Ixx = Ixx;
-        this->inertia_fuel.Izz = Izz;
     }
 
     inline void set_fuel_inertia(const Inertia& inertia_fuel)

@@ -13,7 +13,21 @@ Thruster::Thruster() : thrust(0), mass_rate(0) {}
 Thruster::Thruster(double t, double isp) : thrust(t), mass_rate(t/(isp*9.806)) {}
 Thruster::~Thruster(){}
 
-void Thruster::set(double pressure, double time) {}
+void Thruster::update_inertia(double time)
+{
+    double dT = time - this->time_old;
+    double dM = dT*mass_rate;
+    double frac = (1 - dM/this->inertia_fuel.mass);
+    this->inertia_fuel.mass -= dM;
+    this->inertia_fuel.Ixx *= frac;
+    this->inertia_fuel.Izz *= frac;
+    this->time_old = time;
+}
+
+void Thruster::set(double pressure, double time)
+{
+    this->update_inertia(time);
+}
 
 void Thruster::load(std::string fn)
 {
@@ -75,6 +89,7 @@ void PressureThruster::set(double pressure, double time)
     double delta = pressure - this->pressures[this->idx];
     this->thrust = this->thrusts[this->idx] + this->dT*delta;
     this->mass_rate = this->mass_rates[this->idx] + this->dM*delta;
+    this->update_inertia(time);
 };
 
 void PressureThruster::load(std::string fn)
