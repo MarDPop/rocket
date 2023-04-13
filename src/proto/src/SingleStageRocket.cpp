@@ -2,6 +2,7 @@
 
 #include "../../common/include/util.h"
 #include "../../../lib/tinyxml/tinyxml2.h"
+#include "../include/Action.h"
 #include <fstream>
 #include <numeric>
 #include <iostream>
@@ -28,10 +29,7 @@ void SingleStageRocket::compute_acceleration(double time)
 
     this->gnc.update(time);
 
-    this->aerodynamics->update();
-
-    Vector total_force(this->aerodynamics->force);
-    Vector total_moment(this->aerodynamics->moment);
+    Action action = this->aerodynamics->update();
 
     if(this->thruster->is_active())
     {

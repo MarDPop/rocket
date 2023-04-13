@@ -11,7 +11,7 @@
 				<Option object_output="obj/Debug/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
-				<Option parameters="test/test_rocket.srocket test/out.txt" />
+				<Option parameters="test/sim.sxml test/out.txt" />
 				<Compiler>
 					<Add option="-std=c++17" />
 					<Add option="-g" />
@@ -414,31 +414,8 @@
 		<Unit filename="lib/tinyxml/tinyxml2.cpp" />
 		<Unit filename="lib/tinyxml/tinyxml2.h" />
 		<Unit filename="resources/reactions/reactions.json" />
-		<Unit filename="src/6DOF/include/Action.h" />
-		<Unit filename="src/6DOF/include/Aerodynamics.h" />
-		<Unit filename="src/6DOF/include/Atmosphere.h" />
-		<Unit filename="src/6DOF/include/Body.h" />
-		<Unit filename="src/6DOF/include/Component.h" />
-		<Unit filename="src/6DOF/include/Control.h" />
-		<Unit filename="src/6DOF/include/GNC.h" />
-		<Unit filename="src/6DOF/include/Gravity.h" />
-		<Unit filename="src/6DOF/include/Resource.h" />
-		<Unit filename="src/6DOF/include/Stage.h" />
-		<Unit filename="src/6DOF/include/StageDynamics.h" />
-		<Unit filename="src/6DOF/include/Thruster.h" />
-		<Unit filename="src/6DOF/include/Vehicle.h" />
-		<Unit filename="src/6DOF/src/Aerodynamics.cpp" />
-		<Unit filename="src/6DOF/src/Atmosphere.cpp" />
-		<Unit filename="src/6DOF/src/Body.cpp" />
-		<Unit filename="src/6DOF/src/Component.cpp" />
-		<Unit filename="src/6DOF/src/Stage.cpp" />
-		<Unit filename="src/6DOF/src/StageDynamics.cpp" />
-		<Unit filename="src/6DOF/src/Thruster.cpp" />
-		<Unit filename="src/6DOF/src/Vehicle.cpp" />
-		<Unit filename="src/app/main.cpp" />
 		<Unit filename="src/app/proto.cpp" />
 		<Unit filename="src/app/test.cpp" />
-		<Unit filename="src/app/tests.h" />
 		<Unit filename="src/common/include/Cartesian.h" />
 		<Unit filename="src/common/include/CircularArray.h" />
 		<Unit filename="src/common/include/Constants.h" />
@@ -460,6 +437,7 @@
 		<Unit filename="src/common/include/util.h" />
 		<Unit filename="src/common/src/Geodesy.cpp" />
 		<Unit filename="src/common/src/Planet.cpp" />
+		<Unit filename="src/proto/include/Action.h" />
 		<Unit filename="src/proto/include/Aerodynamics.h" />
 		<Unit filename="src/proto/include/Atmosphere.h" />
 		<Unit filename="src/proto/include/Control" />
@@ -493,8 +471,6 @@
 		<Unit filename="src/proto/src/Thruster.cpp" />
 		<Unit filename="src/proto/src/WindHistory.cpp" />
 		<Unit filename="src/proto/src/thruster1D.cpp" />
-		<Unit filename="src/util/include/Simulation.h" />
-		<Unit filename="src/util/src/Simulation.cpp" />
 		<Extensions />
 	</Project>
 </CodeBlocks_project_file>

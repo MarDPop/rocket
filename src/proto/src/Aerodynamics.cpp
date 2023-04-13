@@ -12,7 +12,7 @@ void Aerodynamics::compute_aero_values()
 
     if(this->aero_values.airspeed > 1e-3)
     {
-        this->aero_values.unit_v_air = air_velocity * (1.0/this->aero_values.airspeed);
+        this->aero_values.unit_v_air_body = (this->rocket.get_state().CS*air_velocity) * (1.0/this->aero_values.airspeed);
     }
 
     this->aero_values.mach = this->aero_values.airspeed * this->rocket.get_atmosphere().values.inv_sound_speed;
@@ -27,15 +27,17 @@ Aerodynamics::Aerodynamics(SingleStageRocket& r) : rocket(r) {}
 
 Aerodynamics::~Aerodynamics(){}
 
-void Aerodynamics::update()
+Action Aerodynamics::update()
 {
     // Get aerodynamic quantities needed for computation
     this->compute_aero_values();
 
-    this->force.zero();
-    this->moment.zero();
+    this->action.force.zero();
+    this->action.moment.zero();
 
     this->compute_forces();
+
+    return this->action;
 }
 
 AerodynamicsBasicCoef::AerodynamicsBasicCoef(SingleStageRocket& r) : Aerodynamics(r) {}
@@ -129,7 +131,7 @@ void AerodynamicsBasicCoef::compute_forces()
     }
 
     // already compute damping moment
-    this->moment += rocket.get_state().angular_velocity*(this->CM_alpha_dot*this->rocket.get_atmosphere().values.density);
+    this->action.moment += rocket.get_state().angular_velocity*(this->CM_alpha_dot*this->rocket.get_atmosphere().values.density);
 
     // arm is the moment arm formed from the freestream, length of the arm is sin of angle between
     Vector arm = this->aero_values.unit_v_air.cross(rocket.get_state().CS.axis.z);
@@ -141,7 +143,7 @@ void AerodynamicsBasicCoef::compute_forces()
 
     Vector drag = this->aero_values.unit_v_air*(coef.CD*this->aero_values.dynamic_pressure);
 
-    this->force -= drag;
+    this->action.force -= drag;
 
     if(sAoA < AOA_THRESHOLD)
     {
@@ -153,11 +155,11 @@ void AerodynamicsBasicCoef::compute_forces()
 
     Vector lift = arm.cross(this->aero_values.unit_v_air);
 
-    this->moment -= arm*(coef.CM*this->aero_values.dynamic_pressure); // TODO: check orientations
+    this->action.moment -= arm*(coef.CM*this->aero_values.dynamic_pressure); // TODO: check orientations
 
     lift *= coef.CL/lift.norm();
 
-    this->force += lift;
+    this->action.force += lift;
 }
 
 FinControlAero::FinControlAero(unsigned NFINS) : fins(NFINS), NUMBER_FINS(NFINS)
@@ -208,9 +210,9 @@ void AerodynamicsFinCoefficient::compute_forces()
         dForce.data[1] += fin.span_x*tmp;
         dForce.data[2] -= this->dCDdTheta*deflection; // simply linear approximation for small angles
     }
-    dMoment *= this->rocket.get_aerodynamics().aero_values.dynamic_pressure;
-    dForce *= this->rocket.get_aerodynamics().aero_values.dynamic_pressure;
+    dMoment *= this->rocket.get_aerodynamics().get_aero_values().dynamic_pressure;
+    dForce *= this->rocket.get_aerodynamics().get_aero_values().dynamic_pressure;
     // remember currently in body frame, need to convert to inertial frame
-    this->moment += this->rocket.get_state().CS.transpose_mult(dMoment);
-    this->force += this->rocket.get_state().CS.transpose_mult(dForce);
+    this->action.moment += this->rocket.get_state().CS.transpose_mult(dMoment);
+    this->action.force += this->rocket.get_state().CS.transpose_mult(dForce);
 }

@@ -4,6 +4,7 @@
 
 #include "../../common/include/Cartesian.h"
 #include "../../common/include/Table.h"
+#include "Action.h"
 #include "Servo.h"
 
 #include <memory>
@@ -19,9 +20,9 @@ struct AeroValues {
     double airspeed;
 
     /**
-    * current velocity with respect unit vector
+    * current air velocity unit vector in body frame
     */
-    Vector unit_v_air;
+    Vector unit_v_air_body;
 
     /**
     * current mach
@@ -44,6 +45,16 @@ protected:
     SingleStageRocket& rocket;
 
     /**
+    * Force and moment in body frame
+    */
+    Action action;
+
+    /**
+    * available aero values such as mach
+    */
+    AeroValues aero_values;
+
+    /**
     * computes aero values from rocket reference (mach, dynamic pressure, etc)
     */
     void compute_aero_values();
@@ -55,27 +66,18 @@ protected:
 
 public:
 
-    /**
-    * Force in inertial frame
-    */
-    Vector force;
-
-    /**
-    * Moment in inertial frame
-    */
-    Vector moment;
-
-    /**
-    * publically available aero values such as mach
-    */
-    AeroValues aero_values;
-
+    inline const AeroValues& get_aero_values() const
+    {
+        return this->aero_values;
+    }
 
     Aerodynamics(SingleStageRocket& r);
     virtual ~Aerodynamics();
 
-
-    void update();
+    /**
+    * Returns an Action in inertial space
+    */
+    Action update();
 };
 
 class AerodynamicsBasicCoef : public virtual Aerodynamics

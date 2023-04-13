@@ -5,6 +5,7 @@
 #include <array>
 
 #include <string>
+#include "Action.h"
 
 class Thruster
 {
@@ -16,6 +17,8 @@ protected:
     double mass_rate;
 
     Inertia inertia_fuel;
+
+    Action action;
 
     bool active = true;
 

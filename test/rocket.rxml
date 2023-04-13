@@ -7,6 +7,7 @@
 	</Inertia>
 	
 	<Aerodynamics Type="SimpleAerodynamics" unit="SI">
+		<COP>0.6</COP>
 		<CD0>0.7</CD0>
 		<CL_alpha>1.0</CL_alpha>
 		<CM_alpha>-0.01</CM_alpha>
