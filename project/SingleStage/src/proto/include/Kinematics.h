@@ -37,7 +37,7 @@ struct KinematicState
     Vector angular_acceleration;
 };
 
-struct Inertia
+struct Inertia_Basic
 {
     /**
     * current mass  (kg)
@@ -57,5 +57,49 @@ struct Inertia
     /**
     * current center of mass location from nose (m) [should be negative]
     */
-    double COG;
+    double CoM_axial;
+};
+
+struct Inertia
+{
+    /**
+    * current mass  (kg)
+    */
+    double mass;
+
+    /**
+    * current principal moment of inertia  (kg m2)
+    */
+    union
+    {
+        double I[6];
+        struct {
+            double Ixx;
+            double Iyy;
+            double Izz;
+            double Ixy;
+            double Ixz;
+            double Izy;
+        };
+    } MOI;
+
+    /**
+    * current center of mass location from nose (m) [should be negative]
+    */
+    Vector CoM;
+
+    inline Axis get_inertia_matrix()
+    {
+        Axis inertia;
+        inertia.data[0] = this->Ixx;
+        inertia.data[1] = -this->Ixy;
+        inertia.data[2] = -this->Ixz;
+        inertia.data[3] = -this->Ixy;
+        inertia.data[4] = this->Iyy;
+        inertia.data[5] = -this->Iyz;
+        inertia.data[6] = -this->Ixz;
+        inertia.data[7] = -this->Iyz;
+        inertia.data[8] = this->Izz;
+        return inertia;
+    }
 };

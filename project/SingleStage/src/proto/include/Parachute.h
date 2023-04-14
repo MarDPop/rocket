@@ -52,7 +52,7 @@ public:
         this->time_deployed = time;
     }
 
-    virtual BodyAction update(double time);
+    virtual const BodyAction& update(double time);
 
 };
 

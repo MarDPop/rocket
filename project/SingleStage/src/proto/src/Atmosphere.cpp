@@ -9,6 +9,7 @@ Atmosphere::~Atmosphere(){}
 
 void Atmosphere::set(double alt, double time)
 {
+
 }
 
 AtmosphereTable::AtmosphereTable(double _ground_altitude,

@@ -9,8 +9,12 @@
 
 #include <iostream>
 
-Thruster::Thruster() : thrust(0), mass_rate(0) {}
-Thruster::Thruster(double t, double isp) : thrust(t), mass_rate(t/(isp*9.806)) {}
+Thruster::Thruster(const Atmosphere& atmosphere) : pressure(atmosphere.values.pressure)
+{
+    this->action.zero();
+    this->thrust_vector.zero();
+}
+
 Thruster::~Thruster(){}
 
 void Thruster::update_inertia(double time)
@@ -24,7 +28,14 @@ void Thruster::update_inertia(double time)
     this->time_old = time;
 }
 
-void Thruster::update_thrust_and_massrate(double pressure, double time) {} // NO OP
+void Thruster::update_thrust_vector(double time) {} // NO OP
+
+void Thruster::update_thrust_and_massrate(double time) {} // NO OP
+
+void Thruster::update_action()
+{
+    this->action.force = this->thrust_vector*this->thrust;
+}
 
 void Thruster::load(std::string fn)
 {
@@ -39,6 +50,21 @@ void Thruster::load(std::string fn)
         myfile.close();
     }
 }
+
+const BodyAction& Thruster::update(double time)
+{
+    this->update_thrust_and_massrate(time);
+
+    this->update_inertia(time);
+
+    this->update_thrust_vector(time);
+
+    this->update_action();
+
+    return this->action;
+}
+
+PressureThruster::PressureThruster(const Atmosphere& atmosphere) : Thruster(atmosphere) {}
 
 void PressureThruster::add_thrust_point(double pressure, double thrust, double mass_rate) {
 
@@ -72,7 +98,7 @@ void PressureThruster::reset() {
     this->idx = 0;
 };
 
-void PressureThruster::update_thrust_and_massrate(double pressure, double time)
+void PressureThruster::update_thrust_and_massrate(double time)
 {
     while(this->idx < this->idx_final && pressure < this->pressures[this->idx + 1])
     {
@@ -111,7 +137,7 @@ void PressureThruster::load(std::string fn)
     }
 }
 
-ComputedThruster::ComputedThruster(){}
+ComputedThruster::ComputedThruster(const Atmosphere& atmosphere) : Thruster(atmosphere) {}
 
 void ComputedThruster::load(std::string fn)
 {
@@ -417,7 +443,7 @@ void ComputedThruster::generate(const generate_args& args, const double P_AMBIEN
 
 ComputedThruster::~ComputedThruster(){}
 
-void ComputedThruster::update_thrust_and_massrate(double pressure, double time)
+void ComputedThruster::update_thrust_and_massrate(double time)
 {
     while(time > _times[_tidx])
     {

@@ -24,27 +24,28 @@ struct BodyAction
     /**
     * Force Vector reference point in body
     */
-    Vector arm;
+    Vector location;
 
     inline void zero()
     {
         this->force.zero();
         this->moment.zero();
-        this->arm.zero();
+        this->location.zero();
     }
 
-    inline Vector get_torque()
+    inline Vector get_torque(const Vector& location) const
     {
-        return this->moment + this->arm.cross(this->force);
+        Vector arm = this->location - location;
+        return this->moment + arm.cross(this->force);
     }
 
-    inline BodyAction operator+(const BodyAction& otherAction)
+    inline BodyAction operator+(const BodyAction& otherAction) const
     {
         BodyAction output;
-        output.arm.zero();
+        output.location.zero();
 
-        Vector thisTorque = this->arm.cross(this->force);
-        Vector otherTorque = otherAction.arm.cross(otherAction.force);
+        Vector thisTorque = this->location.cross(this->force);
+        Vector otherTorque = otherAction.location.cross(otherAction.force);
 
         for(int i = 0; i < 3; i++)
         {
@@ -61,7 +62,7 @@ struct BodyAction
     inline void operator+=(const BodyAction& otherAction)
     {
         this->force += otherAction.force;
-        this->moment += otherAction.get_torque();
+        this->moment += otherAction.get_torque(this->location);
     }
 };
 
@@ -110,14 +111,14 @@ struct GeneralAction
         this->arm.zero();
     }
 
-    inline Vector get_torque()
+    inline Vector get_torque() const
     {
         return this->moment + this->arm.cross(this->force);
     }
 
-    inline Action operator+(const Action& otherAction)
+    inline GeneralAction operator+(const GeneralAction& otherAction) const
     {
-        Action inertialAction;
+        GeneralAction inertialAction;
         inertialAction.arm.zero();
         if(this->reference_frame)
         {
@@ -131,20 +132,20 @@ struct GeneralAction
         }
         if(otherAction.reference_frame)
         {
-            inertialAction.force += otherAction.reference_frame->orientation.transpose_mult(otherAction->force);
-            inertialAction.moment += otherAction.reference_frame->orientation.transpose_mult(otherAction->get_torque());
+            inertialAction.force += otherAction.reference_frame->orientation.transpose_mult(otherAction.force);
+            inertialAction.moment += otherAction.reference_frame->orientation.transpose_mult(otherAction.get_torque());
         }
         else
         {
-            inertialAction.force += otherAction->force;
-            inertialAction.moment += otherAction->get_torque();
+            inertialAction.force += otherAction.force;
+            inertialAction.moment += otherAction.get_torque();
         }
         return inertialAction;
     }
 
-    inline void operator+=(const Action& otherAction)
+    inline void operator+=(const GeneralAction& otherAction)
     {
-        if(otherAction->reference_frame == this->reference_frame)
+        if(otherAction.reference_frame == this->reference_frame)
         {
             this->force += otherAction.force;
             this->moment += otherAction.get_torque();
@@ -153,16 +154,16 @@ struct GeneralAction
         {
             if(!this->reference_frame)
             {
-                this->force += otherAction->frame->transpose_mult(otherAction->force);
-                this->moment += otherAction->frame->transpose_mult(otherAction->get_torque());
+                this->force += otherAction.reference_frame->orientation.transpose_mult(otherAction.force);
+                this->moment += otherAction.reference_frame->orientation.transpose_mult(otherAction.get_torque());
             }
             else
             {
                 // Don't do this... lol
                 // Also find a better way to do this
-                Vector forceInertial = otherAction.reference_frame->orientation.transpose_mult(otherAction->force);
-                Vector momentInertial = otherAction.reference_frame->orientation.transpose_mult(otherAction->get_torque());
-                Vector armInertial = otherAction.reference_frame->orientation.transpose_mult(otherAction->get_torque());
+                Vector forceInertial = otherAction.reference_frame->orientation.transpose_mult(otherAction.force);
+                Vector momentInertial = otherAction.reference_frame->orientation.transpose_mult(otherAction.get_torque());
+                Vector armInertial = otherAction.reference_frame->orientation.transpose_mult(otherAction.get_torque());
             }
         }
     }

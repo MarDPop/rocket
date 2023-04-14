@@ -14,6 +14,12 @@ void Aerodynamics::compute_aero_values()
     {
         this->aero_values.unit_v_air_body = (this->rocket.get_state().CS*air_velocity) * (1.0/this->aero_values.airspeed);
     }
+    else
+    {
+        this->aero_values.unit_v_air_body.data[0] = 0.0;
+        this->aero_values.unit_v_air_body.data[1] = 0.0;
+        this->aero_values.unit_v_air_body.data[2] = -1.0;
+    }
 
     this->aero_values.mach = this->aero_values.airspeed * this->rocket.get_atmosphere().values.inv_sound_speed;
 
@@ -81,9 +87,9 @@ double AerodynamicsBasicCoef::get_parasitic_drag_from_mach(double mach)
 
 double AerodynamicsBasicCoef::get_angle_of_attack()
 {
-    double proj = std::min(1.0, rocket.get_state().CS.axis.z.dot(this->aero_values.unit_v_air));
+    const double& proj = this->aero_values.unit_v_air_body.data[2];
 
-    return (proj > 0.9) ? sqrt(2.0 - 2*proj) : acos(proj);
+    return (proj > 0.9) ? sqrt(2.0*std::max(1.0 - proj,0.0)) : acos(proj);
 }
 
 AerodynamicsBasicCoef::aero_coef AerodynamicsBasicCoef::get_aero_coef(double sAoA)
@@ -134,14 +140,14 @@ void AerodynamicsBasicCoef::compute_forces()
     this->action.moment += rocket.get_state().angular_velocity*(this->CM_alpha_dot*this->rocket.get_atmosphere().values.density);
 
     // arm is the moment arm formed from the freestream, length of the arm is sin of angle between
-    Vector arm = this->aero_values.unit_v_air.cross(rocket.get_state().CS.axis.z);
+    Vector arm(this->aero_values.unit_v_air_body.data[1],-this->aero_values.unit_v_air_body.data[0],0.0);
 
     // sin of the angle of attack
-    double sAoA = arm.norm();
+    double sAoA = sqrt(arm.data[0]*arm.data[0] + arm.data[1]*arm.data[1]);
 
     auto coef = this->get_aero_coef(sAoA);
 
-    Vector drag = this->aero_values.unit_v_air*(coef.CD*this->aero_values.dynamic_pressure);
+    Vector drag = this->aero_values.unit_v_air_body*(coef.CD*this->aero_values.dynamic_pressure);
 
     this->action.force -= drag;
 
@@ -153,7 +159,7 @@ void AerodynamicsBasicCoef::compute_forces()
     // normalize arm
     arm *= (1.0/sAoA);
 
-    Vector lift = arm.cross(this->aero_values.unit_v_air);
+    Vector lift = arm.cross(this->aero_values.unit_v_air_body);
 
     this->action.moment -= arm*(coef.CM*this->aero_values.dynamic_pressure); // TODO: check orientations
 

@@ -6,21 +6,29 @@
 
 #include <string>
 #include "Action.h"
+#include "Atmosphere.h"
 
 class Thruster
 {
 protected:
+
     double time_old = 0.0;
 
-    double thrust;
+    /**
+    * thrust value in N
+    */
+    double thrust = 0.0;
 
-    double mass_rate;
+    /**
+    * mass rate in kg/s
+    */
+    double mass_rate = 0.0;
 
-    Inertia inertia_fuel;
+    const double& pressure;
+
+    InertiaBasic inertia_fuel;
 
     Vector thrust_vector;
-
-    Vector thrust_location;
 
     BodyAction action;
 
@@ -28,15 +36,22 @@ protected:
 
     virtual void update_inertia(double time);
 
-    virtual void update_thrust_and_massrate(double pressure, double time);
+    virtual void update_thrust_and_massrate(double time);
+
+    virtual void update_thrust_vector(double time);
 
     void update_action();
 
 public:
 
-    Thruster();
-    Thruster(double t, double isp);
+    Thruster(const Atmosphere& atmosphere);
     ~Thruster();
+
+    inline void set_performance(double thrust, double isp)
+    {
+        this->thrust = thrust;
+        this->mass_rate = thrust/(isp*9.806);
+    }
 
     inline bool is_active()
     {
@@ -63,16 +78,17 @@ public:
         this->inertia_fuel = inertia_fuel;
     }
 
-    inline const BodyAction& update(double pressure, double time)
+    inline void set_thrust_location_in_body(const Vector& location)
     {
-        this->update_thrust_and_massrate(pressure, time);
-
-        this->update_inertia(time);
-
-        this->update_action();
-
-        return this->action;
+        this->action.arm = location;
     }
+
+    inline void set_thrust_vector(const Vector& thrust_vector)
+    {
+        this->thrust_vector = thrust_vector;
+    }
+
+    const BodyAction& update(double time);
 
     virtual void load(std::string fn);
 };
@@ -96,13 +112,15 @@ class PressureThruster : public virtual Thruster {
 
     double time_old;
 
+    void update_thrust_and_massrate(double time) override;
+
 public:
+
+    PressureThruster(const Atmosphere& atmosphere);
 
     void add_thrust_point(double pressure, double thrust, double mass_rate);
 
     void reset();
-
-    const BodyAction& update(double pressure, double time) override;
 
     void load(std::string fn) override;
 
@@ -161,6 +179,8 @@ class ComputedThruster : public virtual Thruster
 
     void load_parameter_set(const std::vector<std::string>& lines);
 
+    void update_thrust_and_massrate(double time) override;
+
 public:
 
     struct generate_args
@@ -185,12 +205,10 @@ public:
         int n_segments;
     };
 
-    ComputedThruster();
+    ComputedThruster(const Atmosphere& atmosphere);
     ~ComputedThruster();
 
     void load(std::string fn) override;
-
-    const BodyAction& update(double pressure, double time) override;
 
     inline void reset_tidx()
     {

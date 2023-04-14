@@ -54,7 +54,7 @@ void Sensors::measure_quantities(const SingleStageRocket& rocket) {
         this->measured.acceleration.data[i] += this->accelerometer_variance(this->generator);
     }
 
-    this->measured.total_pressure = rocket.get_atmosphere().values.pressure + rocket.get_aerodynamics().aero_values.dynamic_pressure + this->barometer_variance(this->generator);
+    this->measured.total_pressure = rocket.get_atmosphere().values.pressure + rocket.get_aerodynamics().get_aero_values().dynamic_pressure + this->barometer_variance(this->generator);
     this->measured.static_pressure = rocket.get_atmosphere().values.pressure + this->barometer_variance(this->generator);
     this->measured.temperature = rocket.get_atmosphere().values.temperature + this->thermometer_variance(this->generator);
 }

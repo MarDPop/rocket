@@ -10,17 +10,34 @@
 
 void SingleStageRocket::update_inertia()
 {
-    const auto& fuel_inertia = this->thruster->get_inertia();
+    const Inertia_Basic& fuel_inertia = this->thruster->get_inertia();
 
+    // Get mass first
     this->inertia.mass = this->inertia_empty.mass + fuel_inertia.mass;
+
+    // Compute center of mass
+    this->inertia.CoM = this->inertia_empty.CoM*this->inertia_empty.mass;
+    // Fuel inertial can be assumed to be in axial
+    this->inertia.CoM.z += fuel_inertia.CoM_axial*fuel_inertia.mass;
+    this->inertia.CoM *= (1.0/this->inertia.mass);
+
+    // ASSUMPTION: offset CoM contributes negligibly to inertia
+
+    // Off axial terms are just from the structure
+    // no parallel axis theory for now, should be neglible
+    this->inertia.Ixy = this->inertia_empty.Ixy;
+    this->inertia.Ixz = this->inertia_empty.Ixz;
+    this->inertia.Iyz = this->inertia_empty.Iyz;
+
+    // Axial terms can be added directly
     this->inertia.Izz = this->inertia_empty.Izz + fuel_inertia.Izz;
 
-    this->inertia.COG = (this->inertia_empty.COG*this->inertia_empty.mass + fuel_inertia.COG*fuel_inertia.mass) / this->inertia.mass;
+    double CoM_z_fuel = fuel_inertia.CoM_axial - this->inertia.CoM.z;
+    double CoM_z_struct = this->inertia_empty.CoM.z - this->inertia.CoM.z;
+    double parallel_axis_Z = fuel_inertia.mass*CoM_z_fuel*CoM_z_fuel + this->inertia_empty.mass*CoM_z_struct*CoM_z_struct;
 
-    double cog_arm_fuel = fuel_inertia.COG - this->inertia.COG;
-    double cog_arm_structure = this->inertia_empty.COG - this->inertia.COG;
-    this->inertia.Ixx = this->inertia_empty.Ixx + fuel_inertia.Ixx;
-    this->inertia.Ixx += fuel_inertia.mass*cog_arm_fuel*cog_arm_fuel + this->inertia_empty.mass*cog_arm_structure*cog_arm_structure;
+    this->inertia.Ixx = this->inertia_empty.Ixx + fuel_inertia.Ixx + parallel_axis_Z;
+    this->inertia.Iyy = this->inertia_empty.Iyy + fuel_inertia.Ixx + parallel_axis_Z;
 }
 
 void SingleStageRocket::compute_acceleration(double time)
@@ -30,12 +47,13 @@ void SingleStageRocket::compute_acceleration(double time)
     this->gnc.update(time);
 
     BodyAction allActions;
+    allActions.location = this->CoM;
 
     allActions += this->aerodynamics->update();
 
     if(this->thruster->is_active())
     {
-        allActions += this->thruster->set(this->_atmosphere->values.pressure, time);
+        allActions += this->thruster->update(time);
     }
 
     if(this->parachute->is_deployed())
@@ -43,9 +61,12 @@ void SingleStageRocket::compute_acceleration(double time)
         allActions += this->parachute->update(time);
     }
 
+    Vector total_force = this->state.CS.transpose_mult(allActions.force);
+
     this->state.acceleration = total_force * (1.0/this->inertia.mass);
     this->state.acceleration.z -= this->_atmosphere->values.gravity;
 
+    // TODO: explore doing in body frame
     Axis I_inertial = this->state.CS.get_transpose(); // rotate Inertia to inertial frame
     int i = 0;
     for(; i < 6;i++)
@@ -56,6 +77,7 @@ void SingleStageRocket::compute_acceleration(double time)
     {
         I_inertial.data[i] *= this->inertia.Izz;
     }
+    Vector total_moment = this->state.CS.transpose_mult(allActions.moment);
     this->state.angular_acceleration = I_inertial.get_inverse() * total_moment;
 }
 
@@ -148,7 +170,7 @@ Inertia loadInertia(tinyxml2::XMLElement* inertiaElement)
     return inertia;
 }
 
-Thruster* loadThruster(tinyxml2::XMLElement* thrusterElement)
+Thruster* loadThruster(tinyxml2::XMLElement* thrusterElement, const Atmosphere& atm)
 {
     const char* type = thrusterElement->Attribute("Type");
     const char* fn = thrusterElement->Attribute("File");
@@ -157,7 +179,7 @@ Thruster* loadThruster(tinyxml2::XMLElement* thrusterElement)
     {
         if(fn)
         {
-            thruster = new Thruster();
+            thruster = new Thruster(atm);
             thruster->load(fn);
         }
         else
@@ -165,7 +187,8 @@ Thruster* loadThruster(tinyxml2::XMLElement* thrusterElement)
             auto* inertiaEl = thrusterElement->FirstChildElement("Inertia");
             double thrust = thrusterElement->FirstChildElement("Thrust")->DoubleText();
             double ISP = thrusterElement->FirstChildElement("ISP")->DoubleText();
-            thruster = new Thruster(thrust,ISP);
+            thruster = new Thruster(atm);
+            thruster->set_performance(thrust,ISP);
             thruster->set_fuel_inertia(loadInertia(inertiaEl));
         }
     }
@@ -175,12 +198,12 @@ Thruster* loadThruster(tinyxml2::XMLElement* thrusterElement)
         {
             if(fn)
             {
-                thruster = new PressureThruster();
+                thruster = new PressureThruster(atm);
                 thruster->load(fn);
             }
             else
             {
-                PressureThruster* pthruster = new PressureThruster();
+                PressureThruster* pthruster = new PressureThruster(atm);
                 auto* inertiaEl = thrusterElement->FirstChildElement("Inertia");
                 pthruster->set_fuel_inertia(loadInertia(inertiaEl));
                 auto* pressureTable = thrusterElement->FirstChildElement("Table");
@@ -202,7 +225,7 @@ Thruster* loadThruster(tinyxml2::XMLElement* thrusterElement)
         }
         else if(strcmp(type,"ComputedThruster") == 0)
         {
-            thruster = new ComputedThruster();
+            thruster = new ComputedThruster(atm);
             thruster->load(fn);
         }
     }
@@ -337,7 +360,7 @@ void SingleStageRocket::load(const char* fn)
     auto* ThrusterElement = root->FirstChildElement("Thruster");
     if(!ThrusterElement) { throw std::invalid_argument("No thruster"); }
 
-    this->thruster.reset(loadThruster(ThrusterElement));
+    this->thruster.reset(loadThruster(ThrusterElement, *this->_atmosphere));
 
     auto* AerodynamicsElement = root->FirstChildElement("Aerodynamics");
     auto* ParachuteElement = root->FirstChildElement("Parachute");
