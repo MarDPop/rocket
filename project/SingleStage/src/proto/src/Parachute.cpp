@@ -18,4 +18,5 @@ const BodyAction& Parachute::update(double time)
 {
     const auto& air_values = this->rocket.get_aerodynamics().get_aero_values();
     this->action.force = air_values.unit_v_air_body * (this->CDA*air_values.dynamic_pressure);
+    return this->action;
 }

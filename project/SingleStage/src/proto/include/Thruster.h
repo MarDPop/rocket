@@ -26,7 +26,7 @@ protected:
 
     const double& pressure;
 
-    InertiaBasic inertia_fuel;
+    Inertia_Basic inertia_fuel;
 
     Vector thrust_vector;
 
@@ -68,19 +68,19 @@ public:
         return this->mass_rate;
     }
 
-    inline const Inertia& get_inertia()
+    inline const Inertia_Basic& get_inertia()
     {
         return this->inertia_fuel;
     }
 
-    inline void set_fuel_inertia(const Inertia& inertia_fuel)
+    inline void set_fuel_inertia(const Inertia_Basic& inertia_fuel)
     {
         this->inertia_fuel = inertia_fuel;
     }
 
     inline void set_thrust_location_in_body(const Vector& location)
     {
-        this->action.arm = location;
+        this->action.location = location;
     }
 
     inline void set_thrust_vector(const Vector& thrust_vector)

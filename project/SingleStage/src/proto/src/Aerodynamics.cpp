@@ -183,10 +183,10 @@ FinControlAero::FinControlAero(unsigned NFINS) : fins(NFINS), NUMBER_FINS(NFINS)
 
 AerodynamicsFinCoefficient::~AerodynamicsFinCoefficient(){}
 
-void AerodynamicsFinCoefficient::set_aero_coef(double dCL, double dCD, double dCM, double fin_COP_z, double fin_COP_d){
-    this->dCLdTheta = dCL; // remember that these already have fin area "built in"
-    this->dCDdTheta = dCD;
-    this->dCMdTheta = dCM;
+void AerodynamicsFinCoefficient::set_aero_coef(double dCL, double dCD, double dCM, double Area_Ref, double fin_COP_z, double fin_COP_d){
+    this->dCLdTheta = dCL*Area_Ref;
+    this->dCDdTheta = dCD*Area_Ref;
+    this->dCMdTheta = dCM*Area_Ref;
     this->z = fin_COP_z;
     this->d = fin_COP_d;
     this->const_axial_term_lift = dCL*fin_COP_d;
@@ -200,7 +200,7 @@ void AerodynamicsFinCoefficient::compute_forces()
     Vector dForce((char)0);
     Vector dMoment((char)0);
 
-    double planar_term = this->dCMdTheta - (this->z - this->rocket.get_inertia().COG)*this->dCLdTheta;
+    double planar_term = this->dCMdTheta - (this->z - this->rocket.get_inertia().CoM.z)*this->dCLdTheta;
 
     for(Fin& fin : this->fins)
     {

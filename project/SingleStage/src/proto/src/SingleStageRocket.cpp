@@ -47,7 +47,7 @@ void SingleStageRocket::compute_acceleration(double time)
     this->gnc.update(time);
 
     BodyAction allActions;
-    allActions.location = this->CoM;
+    allActions.location = this->inertia.CoM;
 
     allActions += this->aerodynamics->update();
 
@@ -67,16 +67,9 @@ void SingleStageRocket::compute_acceleration(double time)
     this->state.acceleration.z -= this->_atmosphere->values.gravity;
 
     // TODO: explore doing in body frame
-    Axis I_inertial = this->state.CS.get_transpose(); // rotate Inertia to inertial frame
-    int i = 0;
-    for(; i < 6;i++)
-    {
-        I_inertial.data[i] *= this->inertia.Ixx;
-    }
-    for(; i < 9;i++)
-    {
-        I_inertial.data[i] *= this->inertia.Izz;
-    }
+    // rotate Inertia to inertial frame
+    Axis I_inertial = this->state.CS.get_transpose()*this->inertia.get_inertia_matrix();
+    // rotate moment to inertial frame
     Vector total_moment = this->state.CS.transpose_mult(allActions.moment);
     this->state.angular_acceleration = I_inertial.get_inverse() * total_moment;
 }
@@ -135,9 +128,9 @@ SingleStageRocket::SingleStageRocket(Atmosphere* atmosphere) : gnc(*this), _atmo
 
 SingleStageRocket::~SingleStageRocket(){}
 
-Inertia loadInertia(tinyxml2::XMLElement* inertiaElement)
+Inertia_Basic loadBasicInertia(tinyxml2::XMLElement* inertiaElement)
 {
-    Inertia inertia;
+    Inertia_Basic inertia;
     auto* el = inertiaElement->FirstChildElement("Mass");
     if(!el)
     {
@@ -145,9 +138,9 @@ Inertia loadInertia(tinyxml2::XMLElement* inertiaElement)
     }
     inertia.mass = el->DoubleText();
 
-    inertia.Ixx = 0;
-    inertia.Izz = 0;
-    inertia.COG = 0;
+    inertia.Ixx = 0.0;
+    inertia.Izz = 0.0;
+    inertia.CoM_axial = 0.0;
 
     el = inertiaElement->FirstChildElement("Ixx");
     if(el)
@@ -164,7 +157,7 @@ Inertia loadInertia(tinyxml2::XMLElement* inertiaElement)
     el = inertiaElement->FirstChildElement("COG");
     if(el)
     {
-        inertia.COG = el->DoubleText();
+        inertia.CoM_axial = el->DoubleText();
     }
 
     return inertia;
@@ -189,7 +182,7 @@ Thruster* loadThruster(tinyxml2::XMLElement* thrusterElement, const Atmosphere& 
             double ISP = thrusterElement->FirstChildElement("ISP")->DoubleText();
             thruster = new Thruster(atm);
             thruster->set_performance(thrust,ISP);
-            thruster->set_fuel_inertia(loadInertia(inertiaEl));
+            thruster->set_fuel_inertia(loadBasicInertia(inertiaEl));
         }
     }
     else
@@ -205,7 +198,7 @@ Thruster* loadThruster(tinyxml2::XMLElement* thrusterElement, const Atmosphere& 
             {
                 PressureThruster* pthruster = new PressureThruster(atm);
                 auto* inertiaEl = thrusterElement->FirstChildElement("Inertia");
-                pthruster->set_fuel_inertia(loadInertia(inertiaEl));
+                pthruster->set_fuel_inertia(loadBasicInertia(inertiaEl));
                 auto* pressureTable = thrusterElement->FirstChildElement("Table");
                 if(!pressureTable)
                 {
@@ -253,6 +246,10 @@ Aerodynamics* loadAerodynamics(tinyxml2::XMLElement* aeroElement, SingleStageRoc
     const char* type = aeroElement->Attribute("Type");
     Aerodynamics* aero;
     if(strcmp(type,"SimpleAerodynamics") == 0)
+    {
+        aero = loadSimpleAerodynamics(aeroElement,rocket);
+    }
+    else if(strcmp(type,"FinAerodynamics") == 0)
     {
         aero = loadSimpleAerodynamics(aeroElement,rocket);
     }
@@ -355,7 +352,8 @@ void SingleStageRocket::load(const char* fn)
     auto* InertiaElement = root->FirstChildElement("Inertia");
     if(!InertiaElement) { throw std::invalid_argument("No mass properties"); }
 
-    this->inertia = loadInertia(InertiaElement);
+    Inertia_Basic inertia = loadBasicInertia(InertiaElement);
+    this->inertia.set_from_basic(inertia);
 
     auto* ThrusterElement = root->FirstChildElement("Thruster");
     if(!ThrusterElement) { throw std::invalid_argument("No thruster"); }

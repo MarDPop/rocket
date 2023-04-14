@@ -2,6 +2,8 @@
 
 #include "../../common/include/Cartesian.h"
 
+#include "string.h"
+
 using namespace Cartesian;
 
 struct KinematicState
@@ -79,9 +81,9 @@ struct Inertia
             double Izz;
             double Ixy;
             double Ixz;
-            double Izy;
+            double Iyz;
         };
-    } MOI;
+    };
 
     /**
     * current center of mass location from nose (m) [should be negative]
@@ -101,5 +103,19 @@ struct Inertia
         inertia.data[7] = -this->Iyz;
         inertia.data[8] = this->Izz;
         return inertia;
+    }
+
+    inline void set_from_basic(const Inertia_Basic& basic)
+    {
+        memset(I,0,6*sizeof(double));
+        this->CoM.zero();
+
+        this->mass = basic.mass;
+
+        this->Ixx = basic.Ixx;
+        this->Iyy = basic.Ixx;
+        this->Izz = basic.Izz;
+
+        this->CoM.z = basic.CoM_axial;
     }
 };

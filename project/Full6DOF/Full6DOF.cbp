@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="Full6DOF" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/Debug/Full6DOF" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+				</Compiler>
+			</Target>
+			<Target title="Release">
+				<Option output="bin/Release/Full6DOF" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+		</Compiler>
+		<Unit filename="include/Action.h" />
+		<Unit filename="include/Aerodynamics.h" />
+		<Unit filename="include/Atmosphere.h" />
+		<Unit filename="include/Body.h" />
+		<Unit filename="include/Component.h" />
+		<Unit filename="include/Control.h" />
+		<Unit filename="include/GNC.h" />
+		<Unit filename="include/Gravity.h" />
+		<Unit filename="include/Resource.h" />
+		<Unit filename="include/Stage.h" />
+		<Unit filename="include/StageDynamics.h" />
+		<Unit filename="include/Thruster.h" />
+		<Unit filename="include/Vehicle.h" />
+		<Unit filename="src/Aerodynamics.cpp" />
+		<Unit filename="src/Atmosphere.cpp" />
+		<Unit filename="src/Body.cpp" />
+		<Unit filename="src/Component.cpp" />
+		<Unit filename="src/Stage.cpp" />
+		<Unit filename="src/StageDynamics.cpp" />
+		<Unit filename="src/Thruster.cpp" />
+		<Unit filename="src/Vehicle.cpp" />
+		<Unit filename="util/include/Simulation.h" />
+		<Unit filename="util/src/Simulation.cpp" />
+		<Extensions>
+			<lib_finder disable_auto="1" />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

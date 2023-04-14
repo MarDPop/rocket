@@ -189,7 +189,7 @@ public:
     AerodynamicsFinCoefficient(SingleStageRocket& r, unsigned NFINS);
     ~AerodynamicsFinCoefficient();
 
-    void set_aero_coef(double dCL, double dCD, double dCM, double fin_COP_z, double fin_COP_d);
+    void set_aero_coef(double dCL, double dCD, double dCM, double Area_Ref, double fin_COP_z, double fin_COP_d);
 
 };
 
