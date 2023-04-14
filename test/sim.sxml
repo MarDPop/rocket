@@ -1,9 +1,0 @@
-<Simulation>
-	<Rocket File="test/rocket.rxml" />
-	<Atmosphere Type="AtmosphereTable">
-		<Altitude Unit="meters">1550</Altitude>
-		<Pressure>92000</Pressure>
-		<Temperature>300</Temperature>
-		<LapseRate>0.0</LapseRate>
-	</Atmosphere>
-</Simulation>

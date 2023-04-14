@@ -29,3 +29,7 @@ More on physics
 - center of mass and moment of inertia updates with thruster burn
 - huen step integration currently used but, rk23, rk4 available. 
 
+## Directories
+
+src/ - source files for the single stage rocket 6DOF model.
+
