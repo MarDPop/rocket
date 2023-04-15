@@ -2081,7 +2081,7 @@
 	"string.h"
 	<stdint.h>
 
-1681048128 c:\users\mariu\onedrive\documents\repos\rocket\rocket\project\singlestage\src\proto\include\singlestagesimulation.h
+1681527494 c:\users\mariu\onedrive\documents\repos\rocket\rocket\project\singlestage\src\proto\include\singlestagesimulation.h
 	"SingleStageRocket.h"
 	"Atmosphere.h"
 	<string>
@@ -2102,11 +2102,11 @@
 	"Atmosphere.h"
 	"Parachute.h"
 
-1681495216 c:\users\mariu\onedrive\documents\repos\rocket\rocket\project\singlestage\src\proto\include\kinematics.h
+1681497152 c:\users\mariu\onedrive\documents\repos\rocket\rocket\project\singlestage\src\proto\include\kinematics.h
 	"../../common/include/Cartesian.h"
 	"string.h"
 
-1681495467 c:\users\mariu\onedrive\documents\repos\rocket\rocket\project\singlestage\src\proto\include\aerodynamics.h
+1681526971 c:\users\mariu\onedrive\documents\repos\rocket\rocket\project\singlestage\src\proto\include\aerodynamics.h
 	"Atmosphere.h"
 	"../../common/include/Cartesian.h"
 	"../../common/include/Table.h"
@@ -2172,7 +2172,7 @@
 	"Kinematics.h"
 	"Sensors.h"
 
-1681494378 c:\users\mariu\onedrive\documents\repos\rocket\rocket\project\singlestage\src\proto\include\thruster.h
+1681528398 c:\users\mariu\onedrive\documents\repos\rocket\rocket\project\singlestage\src\proto\include\thruster.h
 	"Kinematics.h"
 	<vector>
 	<array>
@@ -3387,7 +3387,7 @@
 	"../include/Servo.h"
 	<cmath>
 
-1681158606 source:c:\users\mariu\onedrive\documents\repos\rocket\rocket\project\singlestage\src\proto\src\singlestagesimulation.cpp
+1681502227 source:c:\users\mariu\onedrive\documents\repos\rocket\rocket\project\singlestage\src\proto\src\singlestagesimulation.cpp
 	"../include/SingleStageSimulation.h"
 	"../../common/include/util.h"
 	<exception>
@@ -3426,7 +3426,7 @@
 	<string>
 	"../../common/include/util.h"
 
-1681489456 source:c:\users\mariu\onedrive\documents\repos\rocket\rocket\project\singlestage\src\proto\src\thruster.cpp
+1681528418 source:c:\users\mariu\onedrive\documents\repos\rocket\rocket\project\singlestage\src\proto\src\thruster.cpp
 	"../include/Thruster.h"
 	<fstream>
 	<cmath>
@@ -3434,16 +3434,17 @@
 	"../../common/include/fluid.h"
 	<iostream>
 
-1681494390 source:c:\users\mariu\onedrive\documents\repos\rocket\rocket\project\singlestage\src\proto\src\aerodynamics.cpp
+1681526934 source:c:\users\mariu\onedrive\documents\repos\rocket\rocket\project\singlestage\src\proto\src\aerodynamics.cpp
 	"../include/Aerodynamics.h"
 	"../include/SingleStageRocket.h"
 	<cmath>
+	<string>
 
 1681495381 source:c:\users\mariu\onedrive\documents\repos\rocket\rocket\project\singlestage\src\proto\src\parachute.cpp
 	"../include/Parachute.h"
 	"../include/SingleStageRocket.h"
 
-1681495204 source:c:\users\mariu\onedrive\documents\repos\rocket\rocket\project\singlestage\src\proto\src\singlestagerocket.cpp
+1681528503 source:c:\users\mariu\onedrive\documents\repos\rocket\rocket\project\singlestage\src\proto\src\singlestagerocket.cpp
 	"../include/SingleStageRocket.h"
 	"../../common/include/util.h"
 	"../../../lib/tinyxml/tinyxml2.h"

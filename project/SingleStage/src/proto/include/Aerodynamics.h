@@ -47,12 +47,12 @@ protected:
     /**
     * Force and moment in body frame
     */
-    BodyAction action;
+    BodyAction _action;
 
     /**
     * available aero values such as mach
     */
-    AeroValues aero_values;
+    AeroValues _aero_values;
 
     /**
     * computes aero values from rocket reference (mach, dynamic pressure, etc)
@@ -68,7 +68,7 @@ public:
 
     inline const AeroValues& get_aero_values() const
     {
-        return this->aero_values;
+        return this->_aero_values;
     }
 
     Aerodynamics(SingleStageRocket& r);
@@ -80,7 +80,7 @@ public:
     const BodyAction& update();
 };
 
-class AerodynamicsBasicCoef : public virtual Aerodynamics
+class AerodynamicsBasicCoefficient : public virtual Aerodynamics
 {
 protected:
     static constexpr double AOA_THRESHOLD = 1e-6;
@@ -128,9 +128,10 @@ protected:
 
 public:
 
-    AerodynamicsBasicCoef(SingleStageRocket& r);
+    AerodynamicsBasicCoefficient(SingleStageRocket& r);
+    virtual ~AerodynamicsBasicCoefficient();
 
-    void set_coef(double* coef);
+    void set_coef(const std::array<double,9>& coef);
 };
 
 struct Fin
@@ -166,7 +167,7 @@ public:
     }
 };
 
-class AerodynamicsFinCoefficient : public AerodynamicsBasicCoef, public virtual FinControlAero
+class AerodynamicsFinCoefficient : public virtual AerodynamicsBasicCoefficient, public virtual FinControlAero
 {
     double z; // distance along z axis of span vectors from nose
 
@@ -189,7 +190,7 @@ public:
     AerodynamicsFinCoefficient(SingleStageRocket& r, unsigned NFINS);
     ~AerodynamicsFinCoefficient();
 
-    void set_aero_coef(double dCL, double dCD, double dCM, double Area_Ref, double fin_COP_z, double fin_COP_d);
+    void set_fin_coef(const std::array<double,6>& coef);
 
 };
 

@@ -53,7 +53,7 @@ void SingleStageRocket::compute_acceleration(double time)
 
     if(this->thruster->is_active())
     {
-        allActions += this->thruster->update(time);
+        allActions += this->thruster->get_action();
     }
 
     if(this->parachute->is_deployed())
@@ -100,7 +100,7 @@ void SingleStageRocket::step(double& time, double dt)
     // Compute mass changes, no need to recompute at next step
     if(this->thruster->is_active())
     {
-        this->inertia.mass -= this->thruster->get_mass_rate()*dt;
+        this->thruster->set_time(time);
         this->update_inertia();
     }
 
@@ -163,7 +163,7 @@ Inertia_Basic loadBasicInertia(tinyxml2::XMLElement* inertiaElement)
     return inertia;
 }
 
-Thruster* loadThruster(tinyxml2::XMLElement* thrusterElement, const Atmosphere& atm)
+Thruster* loadThruster(tinyxml2::XMLElement* thrusterElement, Atmosphere* atm)
 {
     const char* type = thrusterElement->Attribute("Type");
     const char* fn = thrusterElement->Attribute("File");
@@ -172,7 +172,7 @@ Thruster* loadThruster(tinyxml2::XMLElement* thrusterElement, const Atmosphere& 
     {
         if(fn)
         {
-            thruster = new Thruster(atm);
+            thruster = new Thruster(*atm);
             thruster->load(fn);
         }
         else
@@ -180,7 +180,7 @@ Thruster* loadThruster(tinyxml2::XMLElement* thrusterElement, const Atmosphere& 
             auto* inertiaEl = thrusterElement->FirstChildElement("Inertia");
             double thrust = thrusterElement->FirstChildElement("Thrust")->DoubleText();
             double ISP = thrusterElement->FirstChildElement("ISP")->DoubleText();
-            thruster = new Thruster(atm);
+            thruster = new Thruster(*atm);
             thruster->set_performance(thrust,ISP);
             thruster->set_fuel_inertia(loadBasicInertia(inertiaEl));
         }
@@ -191,12 +191,12 @@ Thruster* loadThruster(tinyxml2::XMLElement* thrusterElement, const Atmosphere& 
         {
             if(fn)
             {
-                thruster = new PressureThruster(atm);
+                thruster = new PressureThruster(*atm);
                 thruster->load(fn);
             }
             else
             {
-                PressureThruster* pthruster = new PressureThruster(atm);
+                PressureThruster* pthruster = new PressureThruster(*atm);
                 auto* inertiaEl = thrusterElement->FirstChildElement("Inertia");
                 pthruster->set_fuel_inertia(loadBasicInertia(inertiaEl));
                 auto* pressureTable = thrusterElement->FirstChildElement("Table");
@@ -218,17 +218,16 @@ Thruster* loadThruster(tinyxml2::XMLElement* thrusterElement, const Atmosphere& 
         }
         else if(strcmp(type,"ComputedThruster") == 0)
         {
-            thruster = new ComputedThruster(atm);
+            thruster = new ComputedThruster(*atm);
             thruster->load(fn);
         }
     }
     return thruster;
 }
 
-Aerodynamics* loadSimpleAerodynamics(tinyxml2::XMLElement* aeroElement, SingleStageRocket& rocket)
+std::array<double,9> loadSimpleAerodynamicsCoef(tinyxml2::XMLElement* aeroElement)
 {
-    AerodynamicsBasicCoef* aero = new AerodynamicsBasicCoef(rocket);
-    double coef[8];
+    std::array<double,9> coef;
     coef[0] = aeroElement->FirstChildElement("CD0")->DoubleText();
     coef[1] = aeroElement->FirstChildElement("CL_alpha")->DoubleText();
     coef[2] = aeroElement->FirstChildElement("CM_alpha")->DoubleText();
@@ -237,8 +236,20 @@ Aerodynamics* loadSimpleAerodynamics(tinyxml2::XMLElement* aeroElement, SingleSt
     coef[5] = aeroElement->FirstChildElement("RefArea")->DoubleText();
     coef[6] = aeroElement->FirstChildElement("RefLength")->DoubleText();
     coef[7] = aeroElement->FirstChildElement("StallAngle")->DoubleText();
-    aero->set_coef(coef);
-    return aero;
+    coef[8] = aeroElement->FirstChildElement("COP")->DoubleText();
+    return coef;
+}
+
+std::array<double,6> loadFinCoef(tinyxml2::XMLElement* aeroElement)
+{
+    std::array<double,6> coef;
+    coef[0] = aeroElement->FirstChildElement("dCLdTheta")->DoubleText();
+    coef[1] = aeroElement->FirstChildElement("dCDdTheta")->DoubleText();
+    coef[2] = aeroElement->FirstChildElement("dCMdTheta")->DoubleText();
+    coef[3] = aeroElement->FirstChildElement("AreaRef")->DoubleText();
+    coef[4] = aeroElement->FirstChildElement("FinZCenter")->DoubleText();
+    coef[5] = aeroElement->FirstChildElement("FinSpanCenter")->DoubleText();
+    return coef;
 }
 
 Aerodynamics* loadAerodynamics(tinyxml2::XMLElement* aeroElement, SingleStageRocket& rocket)
@@ -247,11 +258,27 @@ Aerodynamics* loadAerodynamics(tinyxml2::XMLElement* aeroElement, SingleStageRoc
     Aerodynamics* aero;
     if(strcmp(type,"SimpleAerodynamics") == 0)
     {
-        aero = loadSimpleAerodynamics(aeroElement,rocket);
+        AerodynamicsBasicCoefficient* basic_aero = new AerodynamicsBasicCoefficient(rocket);
+        auto coef = loadSimpleAerodynamicsCoef(aeroElement);
+        basic_aero->set_coef(coef);
+        aero = basic_aero;
     }
     else if(strcmp(type,"FinAerodynamics") == 0)
     {
-        aero = loadSimpleAerodynamics(aeroElement,rocket);
+        const char* nFinsStr = aeroElement->Attribute("NumberFins");
+        if(!nFinsStr)
+        {
+            throw std::invalid_argument("need to specify number fins");
+        }
+        unsigned nFins = std::stoi(nFinsStr);
+
+        AerodynamicsFinCoefficient* fin_aero = new AerodynamicsFinCoefficient(rocket,nFins);
+
+        auto coef = loadSimpleAerodynamicsCoef(aeroElement);
+        fin_aero->set_coef(coef);
+        auto coef_fins = loadFinCoef(aeroElement);
+        fin_aero->set_fin_coef(coef_fins);
+        aero = fin_aero;
     }
     else
     {
@@ -353,12 +380,12 @@ void SingleStageRocket::load(const char* fn)
     if(!InertiaElement) { throw std::invalid_argument("No mass properties"); }
 
     Inertia_Basic inertia = loadBasicInertia(InertiaElement);
-    this->inertia.set_from_basic(inertia);
+    this->inertia_empty.set_from_basic(inertia);
 
     auto* ThrusterElement = root->FirstChildElement("Thruster");
     if(!ThrusterElement) { throw std::invalid_argument("No thruster"); }
 
-    this->thruster.reset(loadThruster(ThrusterElement, *this->_atmosphere));
+    this->thruster.reset(loadThruster(ThrusterElement, this->_atmosphere));
 
     auto* AerodynamicsElement = root->FirstChildElement("Aerodynamics");
     auto* ParachuteElement = root->FirstChildElement("Parachute");
@@ -419,5 +446,8 @@ void SingleStageRocket::init(double launch_angle, double launch_heading)
     this->state.CS.axis.z.y = ctheta*-sphi;
     this->state.CS.axis.z.z = stheta;
     Vector::cross(this->state.CS.axis.y,this->state.CS.axis.z,this->state.CS.axis.x);
+
+    this->thruster->set_time(0.0);
+    this->update_inertia();
 }
 

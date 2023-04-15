@@ -46,8 +46,8 @@ struct Launch_Parameters
     double latitude = 39.94426809919236;
     double longitude = -104.94474985717818;
     double altitude = 1606.0;
-    double heading = 0;
-    double pitch_angle = 0.05;
+    double heading = 0.0;
+    double pitch_angle = 0.0;
 };
 
 class SingleStageSimulation

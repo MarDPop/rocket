@@ -107,7 +107,7 @@ struct Inertia
 
     inline void set_from_basic(const Inertia_Basic& basic)
     {
-        memset(I,0,6*sizeof(double));
+        std::fill_n(this->I,6,0.0);
         this->CoM.zero();
 
         this->mass = basic.mass;

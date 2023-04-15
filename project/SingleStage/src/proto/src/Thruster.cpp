@@ -13,6 +13,7 @@ Thruster::Thruster(const Atmosphere& atmosphere) : pressure(atmosphere.values.pr
 {
     this->action.zero();
     this->thrust_vector.zero();
+    this->thrust_vector.z = 1.0;
 }
 
 Thruster::~Thruster(){}
@@ -21,11 +22,20 @@ void Thruster::update_inertia(double time)
 {
     double dT = time - this->time_old;
     double dM = dT*mass_rate;
-    double frac = (1 - dM/this->inertia_fuel.mass);
+
     this->inertia_fuel.mass -= dM;
-    this->inertia_fuel.Ixx *= frac;
-    this->inertia_fuel.Izz *= frac;
-    this->time_old = time;
+
+    if(this->inertia_fuel.mass > 0)
+    {
+        double frac = (1 - dM/this->inertia_fuel.mass);
+        this->inertia_fuel.Ixx *= frac;
+        this->inertia_fuel.Izz *= frac;
+        this->time_old = time;
+    }
+    else
+    {
+        this->active = false;
+    }
 }
 
 void Thruster::update_thrust_vector(double time) {} // NO OP
@@ -51,7 +61,7 @@ void Thruster::load(std::string fn)
     }
 }
 
-const BodyAction& Thruster::update(double time)
+void Thruster::set_time(double time)
 {
     this->update_thrust_and_massrate(time);
 
@@ -60,8 +70,6 @@ const BodyAction& Thruster::update(double time)
     this->update_thrust_vector(time);
 
     this->update_action();
-
-    return this->action;
 }
 
 PressureThruster::PressureThruster(const Atmosphere& atmosphere) : Thruster(atmosphere) {}

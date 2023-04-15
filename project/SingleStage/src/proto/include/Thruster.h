@@ -8,6 +8,7 @@
 #include "Action.h"
 #include "Atmosphere.h"
 
+//TODO: rename to propulsion
 class Thruster
 {
 protected:
@@ -88,7 +89,12 @@ public:
         this->thrust_vector = thrust_vector;
     }
 
-    const BodyAction& update(double time);
+    void set_time(double time);
+
+    inline const BodyAction& get_action()
+    {
+        return this->action;
+    }
 
     virtual void load(std::string fn);
 };
