@@ -44,6 +44,16 @@
 		<Control>
 		</Control>
 		<Navigation>
+			<Sensor>
+				<Variances>
+					<Barometer>1</Barometer>
+					<Thermometer>0.2</Thermometer>
+					<Accelerometer>0.01</Accelerometer>
+					<Gyro>0.0001</Gyro>
+				</Variances>
+			</Sensor>
+			<Filter Type="">
+			</Filter>
 		</Navigation>
 	</GNC>
 </Rocket>

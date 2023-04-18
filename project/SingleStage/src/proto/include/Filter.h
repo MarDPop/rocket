@@ -15,7 +15,9 @@ protected:
 
 public:
 
-    virtual void update(const Sensors& sensors, double t) = 0;
+    virtual void init(const KinematicState& calibrated_state, double time);
+
+    virtual void update(const Sensors& sensors, double time) = 0;
 
     inline const KinematicState& get_computed_state() const {
         return this->computed_state;
@@ -59,8 +61,18 @@ public:
 
 };
 
+class FilterKalman : public virtual Filter
+{
+    std::array<double,6> state_predicted;
 
-class FilterMarius : public virtual Filter {
+public:
+
+    void update(const Sensors& sensors, double t) override;
+
+};
+
+class FilterMarius : public virtual Filter
+{
 
     std::array<Vector,5> last_accel_measurements;
 

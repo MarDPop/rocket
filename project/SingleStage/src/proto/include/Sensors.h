@@ -99,11 +99,15 @@ public:
         this->delay = delay;
     }
 
-    inline void calibrate(const altitude_cal& cal)
+    inline void calibrate(double altitude, double g, double temperature, double pressure)
     {
-        this->cal = cal;
-        this->cal.exp_const = -Atmosphere::R_AIR / cal.g;
-        this->cal.inverse_ref_pressure = 1.0/cal.pressure;
+        this->cal.altitude = altitude;
+        this->cal.g = g;
+        this->cal.temperature = temperature;
+        this->cal.pressure = pressure;
+        this->cal.accelerometer_cog_distance = 0.0;
+        this->cal.exp_const = -Atmosphere::R_AIR / g;
+        this->cal.inverse_ref_pressure = 1.0/pressure;
     }
 
     void set_sensor_variances(double sigma_pressure, double sigma_temperature, double sigma_accelerometer, double sigma_gyro);

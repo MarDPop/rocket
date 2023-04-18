@@ -450,5 +450,11 @@ void SingleStageRocket::init(double launch_angle, double launch_heading)
 
     this->thruster->set_time(0.0);
     this->update_inertia();
+
+    this->_atmosphere->set(0.0,0.0);
+    this->gnc.navigation->sensors->calibrate(0.0,this->_atmosphere->values.gravity,this->_atmosphere->values.temperature,this->_atmosphere->values.pressure);
+
+    this->gnc.navigation->filter->init(this->state,0.0);
+
 }
 
