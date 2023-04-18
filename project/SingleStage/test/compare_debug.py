@@ -42,5 +42,8 @@ plt.plot(filterTimes,err)
 plt.plot(filterTimes,realHeight)
 plt.plot(filterTimes,filteredHeight)
 plt.legend(['err','real','filtered'])
+plt.xlim([0,30])
+plt.ylim([-5,1500])
+
 plt.show()
     
