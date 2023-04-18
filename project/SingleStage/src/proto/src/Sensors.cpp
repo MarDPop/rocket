@@ -46,8 +46,9 @@ void Sensors::set_sensor_variances(double sigma_pressure, double sigma_temperatu
 void Sensors::measure_quantities(const SingleStageRocket& rocket) {
     // add delay
     const auto& rocket_state = rocket.get_state();
-    this->measured.angular_velocity = rocket_state.CS*rocket_state.angular_velocity;
-    this->measured.acceleration = rocket_state.CS*rocket_state.acceleration;
+    this->measured.angular_velocity = rocket_state.CS * rocket_state.angular_velocity;
+    this->measured.acceleration = rocket_state.CS * rocket_state.acceleration;
+    this->measured.acceleration.z += rocket.get_atmosphere().values.gravity;
 
     for(int i = 0; i < 3; i++)
     {

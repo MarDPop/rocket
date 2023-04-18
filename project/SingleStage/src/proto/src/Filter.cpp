@@ -22,7 +22,7 @@ void FilterSimpleIntegrate::update(const Sensors& sensors, double time)
     const auto& measured = sensors.get_measured_quantities();
     Axis body2inertial = this->computed_state.CS.get_transpose();
     Vector acceleration_inertial = body2inertial*measured.acceleration;
-    acceleration_inertial.z += 9.806;
+    acceleration_inertial.z -= 9.806;
 
     this->computed_state.position += this->computed_state.velocity * dt;
     this->computed_state.velocity += acceleration_inertial * dt;

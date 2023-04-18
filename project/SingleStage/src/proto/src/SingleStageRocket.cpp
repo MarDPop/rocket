@@ -74,11 +74,11 @@ void SingleStageRocket::compute_acceleration(double time)
 
 void SingleStageRocket::step(double& time, double dt)
 {
-    // only update GNC at beginning of time step
-    this->gnc.update(time);
-
     // Get initial state
     this->compute_acceleration(time);
+
+    // only update GNC at beginning of time step
+    this->gnc.update(time); // TODO: Investigate why this breaks things when put at start of step
 
     KinematicState state0 = this->state;
 
