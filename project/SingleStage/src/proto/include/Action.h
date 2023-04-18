@@ -35,7 +35,7 @@ struct BodyAction
 
     inline Vector get_torque(const Vector& location) const
     {
-        Vector arm = this->location - location;
+        Vector arm = location - this->location;
         return this->moment + arm.cross(this->force);
     }
 

@@ -42,6 +42,20 @@ void SingleStageSimulation::load(std::string fn)
         this->atmosphere = std::make_unique<Atmosphere>();
     }
 
+    auto* launchElement = root->FirstChildElement("Launch");
+    if(launchElement)
+    {
+        this->launch.latitude = launchElement->FirstChildElement("Latitude")->DoubleText();
+        this->launch.longitude = launchElement->FirstChildElement("Longitude")->DoubleText();
+        this->launch.altitude = launchElement->FirstChildElement("Altitude")->DoubleText();
+        this->launch.pitch_angle = launchElement->FirstChildElement("Pitch")->DoubleText();
+        this->launch.heading = launchElement->FirstChildElement("Heading")->DoubleText();
+    }
+    else
+    {
+
+    }
+
     this->rocket.reset(new SingleStageRocket(this->atmosphere.get()));
 
     this->rocket->load(rocket_fn);

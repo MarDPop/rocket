@@ -170,9 +170,10 @@ void AerodynamicsBasicCoefficient::compute_forces()
 
     this->_action.moment -= arm*(coef.CM*this->_aero_values.dynamic_pressure); // TODO: check orientations
 
-    lift *= coef.CL/lift.norm();
+    lift *= coef.CL*this->_aero_values.dynamic_pressure/lift.norm();
 
     this->_action.force += lift;
+
 }
 
 FinControlAero::FinControlAero(unsigned NFINS) : fins(NFINS), NUMBER_FINS(NFINS)

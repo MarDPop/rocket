@@ -67,10 +67,11 @@ void SingleStageRocket::compute_acceleration(double time)
     this->state.acceleration.z -= this->_atmosphere->values.gravity;
 
     // TODO: explore doing in body frame
+    Axis body2inertial = this->state.CS.get_transpose();
     // rotate Inertia to inertial frame
-    Axis I_inertial = this->state.CS.get_transpose()*this->inertia.get_inertia_matrix();
+    Axis I_inertial = body2inertial * this->inertia.get_inertia_matrix();
     // rotate moment to inertial frame
-    Vector total_moment = this->state.CS.transpose_mult(allActions.moment);
+    Vector total_moment = body2inertial * allActions.moment;
     this->state.angular_acceleration = I_inertial.get_inverse() * total_moment;
 }
 

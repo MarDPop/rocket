@@ -4,6 +4,7 @@
 #include <algorithm>
 #include "string.h"
 #include <stdint.h>
+#include <stdio.h>
 
 namespace Cartesian {
 
@@ -277,6 +278,14 @@ namespace Cartesian {
             c.data[2] = a.data[0]*b.data[1] - a.data[1]*b.data[0];
         }
 
+        std::string to_string() const
+        {
+            char output[100];
+            snprintf(output, 200,"[% .6e % .6e % .6e]",data[0],data[1],data[2]);
+            std::string out = output;
+            return out;
+        }
+
     };
 
     struct Axis
@@ -524,7 +533,8 @@ namespace Cartesian {
 
             double det = 1.0/(this->data[0]*Inv.data[0] + this->data[1]*Inv.data[3] + this->data[2]*Inv.data[6]);
 
-            for(int i = 0; i < 9; i++) {
+            for(int i = 0; i < 9; i++)
+            {
                 Inv.data[i] *= det;
             }
 
@@ -538,6 +548,14 @@ namespace Cartesian {
             this->axis.x.normalize();
             this->axis.y -= this->axis.z*( this->axis.y.dot(this->axis.z) ) - this->axis.x*( this->axis.y.dot(this->axis.x) );
             this->axis.y.normalize();
+        }
+
+        std::string to_string() const
+        {
+            char output[200];
+            snprintf(output,200,"[% .6e % .6e % .6e\n% .6e % .6e % .6e\n% .6e % .6e % .6e]",data[0],data[1],data[2],data[3],data[4],data[5],data[6],data[7],data[8]);
+            std::string out = output;
+            return out;
         }
 
     };

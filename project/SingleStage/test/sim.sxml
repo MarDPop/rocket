@@ -10,7 +10,7 @@
 		<Latitude>39.94426809919236</Latitude>
 		<Longitude>-104.94474985717818</Longitude>
 		<Altitude>1606.0</Altitude>
-		<Pitch>0.0</Pitch>
+		<Pitch>0.01</Pitch>
 		<Heading>0.0</Heading>
 	</Launch>
 </Simulation>
