@@ -7,6 +7,10 @@ void Filter::init(const KinematicState& calibrated_state, double time)
     this->computed_state = calibrated_state;
 }
 
+
+void Filter::update(const Sensors& sensors, double time) {}
+
+
 void FilterSimpleIntegrate::update(const Sensors& sensors, double time)
 {
     auto dt = time - t_old;
@@ -16,15 +20,20 @@ void FilterSimpleIntegrate::update(const Sensors& sensors, double time)
     }
     this->t_old = time;
     const auto& measured = sensors.get_measured_quantities();
-    this->computed_state.position += this->computed_state.velocity * dt;
-    this->computed_state.velocity += this->computed_state.CS.transpose_mult(measured.acceleration * dt);
+    Axis body2inertial = this->computed_state.CS.get_transpose();
+    Vector acceleration_inertial = body2inertial*measured.acceleration;
+    acceleration_inertial.z += 9.806;
 
-    Vector angle_axis = this->computed_state.CS.transpose_mult(measured.angular_velocity * dt);
+    this->computed_state.position += this->computed_state.velocity * dt;
+    this->computed_state.velocity += acceleration_inertial * dt;
+
+    Vector angle_axis = body2inertial * (measured.angular_velocity * dt);
     double angle = angle_axis.norm();
-    if(angle > 1e-6)
+    if(angle > 1e-10)
     {
-        Axis rotm(angle,angle_axis * (1.0/angle));
-        this->computed_state.CS = rotm * this->computed_state.CS; // TODO: check
+        Axis rotm(angle,angle_axis / angle);
+        this->computed_state.CS = rotm * body2inertial;
+        this->computed_state.CS.transpose();
     }
 }
 

@@ -17,7 +17,7 @@ public:
 
     virtual void init(const KinematicState& calibrated_state, double time);
 
-    virtual void update(const Sensors& sensors, double time) = 0;
+    virtual void update(const Sensors& sensors, double time);
 
     inline const KinematicState& get_computed_state() const {
         return this->computed_state;

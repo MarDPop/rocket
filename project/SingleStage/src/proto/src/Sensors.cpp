@@ -29,8 +29,9 @@ void computed_quatities::set(const measured_quantities& measured, const altitude
     this->altitude = cal.altitude + height;
 }
 
-Sensors::Sensors() : generator(std::random_device{}()) {
-    this->set_sensor_variances(0.5,0.1,0.01,0.00000001);
+Sensors::Sensors() : generator(std::random_device{}())
+{
+    this->set_sensor_variances(0.0,0.0,0.0,0.0);
 }
 
 Sensors::~Sensors() {}

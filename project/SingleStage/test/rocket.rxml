@@ -26,14 +26,14 @@
 			<COG>-0.6</COG>
 		</Inertia>
 		<Table>
-			<Row Pressure="100000" Thrust="50" ISP="110" />
-			<Row Pressure="10000" Thrust="55" ISP="115" />
-			<Row Pressure="1" Thrust="56" ISP="118" />
+			<Row Pressure="100000" Thrust="50" ISP="102" />
+			<Row Pressure="10000" Thrust="55" ISP="105" />
+			<Row Pressure="1" Thrust="56" ISP="108" />
 		</Table>
 	</Thruster>
 	
 	<Parachute>
-		<CDA>0.0</CDA>
+		<CDA>0.1</CDA>
 	</Parachute>
 	
 	<GNC>
@@ -46,17 +46,17 @@
 		<Navigation>
 			<Sensor>
 				<Variances>
-					<Barometer>1</Barometer>
-					<Thermometer>0.2</Thermometer>
+					<Barometer>0.5</Barometer>
+					<Thermometer>0.1</Thermometer>
 					<Accelerometer>0.01</Accelerometer>
-					<Gyro>0.0001</Gyro>
+					<Gyro>0.00001</Gyro>
 				</Variances>
 			</Sensor>
-			<Filter Type="">
+			<Filter Type="SimpleIntegrate">
 			</Filter>
 		</Navigation>
 	</GNC>
 </Rocket>
 <!--
-
+NOTES:
 -->

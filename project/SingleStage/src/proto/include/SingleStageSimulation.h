@@ -52,6 +52,8 @@ struct Launch_Parameters
 
 class SingleStageSimulation
 {
+friend class Loader;
+
     std::unique_ptr<SingleStageRocket> rocket;
 
     std::unique_ptr<Atmosphere> atmosphere;
@@ -64,8 +66,6 @@ public:
 
     SingleStageSimulation();
     ~SingleStageSimulation();
-
-    void load(std::string fn);
 
     void run(std::string fn, const bool debug = false);
 

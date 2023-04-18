@@ -2059,11 +2059,12 @@
 	<android/log.h>
 	<assert.h>
 
-1677110541 source:c:\users\mariu\onedrive\documents\repos\rocket\rocket\project\singlestage\src\app\proto.cpp
+1681829644 source:c:\users\mariu\onedrive\documents\repos\rocket\rocket\project\singlestage\src\app\proto.cpp
 	<iostream>
 	"../common/include/util.h"
 	"../common/include/Cartesian.h"
 	"../proto/include/SingleStageSimulation.h"
+	"../proto/include/Loader.h"
 	<string>
 	<cstdio>
 	<exception>
@@ -2075,14 +2076,14 @@
 	<vector>
 	<cmath>
 
-1681783926 c:\users\mariu\onedrive\documents\repos\rocket\rocket\project\singlestage\src\common\include\cartesian.h
+1681825471 c:\users\mariu\onedrive\documents\repos\rocket\rocket\project\singlestage\src\common\include\cartesian.h
 	<cmath>
 	<algorithm>
 	"string.h"
 	<stdint.h>
 	<stdio.h>
 
-1681527494 c:\users\mariu\onedrive\documents\repos\rocket\rocket\project\singlestage\src\proto\include\singlestagesimulation.h
+1681829602 c:\users\mariu\onedrive\documents\repos\rocket\rocket\project\singlestage\src\proto\include\singlestagesimulation.h
 	"SingleStageRocket.h"
 	"Atmosphere.h"
 	<string>
@@ -2090,7 +2091,7 @@
 	<memory>
 	"../../common/include/Cartesian.h"
 
-1681144612 c:\users\mariu\onedrive\documents\repos\rocket\rocket\project\singlestage\src\proto\include\singlestagerocket.h
+1681827758 c:\users\mariu\onedrive\documents\repos\rocket\rocket\project\singlestage\src\proto\include\singlestagerocket.h
 	<vector>
 	<array>
 	<memory>
@@ -2139,7 +2140,7 @@
 	<algorithm>
 	<array>
 
-1680224451 c:\users\mariu\onedrive\documents\repos\rocket\rocket\project\singlestage\src\proto\include\gnc.h
+1681826731 c:\users\mariu\onedrive\documents\repos\rocket\rocket\project\singlestage\src\proto\include\gnc.h
 	"Control.h"
 	"Guidance.h"
 	"Navigation.h"
@@ -2156,7 +2157,7 @@
 	<string>
 	"../../common/include/Cartesian.h"
 
-1681789921 c:\users\mariu\onedrive\documents\repos\rocket\rocket\project\singlestage\src\proto\include\navigation.h
+1681829770 c:\users\mariu\onedrive\documents\repos\rocket\rocket\project\singlestage\src\proto\include\navigation.h
 	"Sensors.h"
 	"Filter.h"
 	"Kinematics.h"
@@ -2168,7 +2169,7 @@
 	<memory>
 	"../../common/include/Cartesian.h"
 
-1681791009 c:\users\mariu\onedrive\documents\repos\rocket\rocket\project\singlestage\src\proto\include\filter.h
+1681826791 c:\users\mariu\onedrive\documents\repos\rocket\rocket\project\singlestage\src\proto\include\filter.h
 	"../../common/include/Cartesian.h"
 	"Kinematics.h"
 	"Sensors.h"
@@ -2234,7 +2235,7 @@
 	"../include/Control.h"
 	"../include/Aerodynamics.h"
 
-1681791298 source:c:\users\mariu\onedrive\documents\repos\rocket\rocket\project\singlestage\src\proto\src\filter.cpp
+1681835200 source:c:\users\mariu\onedrive\documents\repos\rocket\rocket\project\singlestage\src\proto\src\filter.cpp
 	"../include/Filter.h"
 	"../include/Sensors.h"
 
@@ -2243,14 +2244,14 @@
 
 1681100684 c:\users\mariu\onedrive\documents\repos\rocket\rocket\project\singlestage\src\proto\include\gravity.h
 
-1681178805 source:c:\users\mariu\onedrive\documents\repos\rocket\rocket\project\singlestage\src\proto\src\guidance.cpp
+1681835451 source:c:\users\mariu\onedrive\documents\repos\rocket\rocket\project\singlestage\src\proto\src\guidance.cpp
 	"../include/Guidance.h"
 	"../include/Parachute.h"
 
 1681135963 source:c:\users\mariu\onedrive\documents\repos\rocket\rocket\project\singlestage\src\proto\src\navigation.cpp
 	"../include/Navigation.h"
 
-1681791448 source:c:\users\mariu\onedrive\documents\repos\rocket\rocket\project\singlestage\src\proto\src\sensors.cpp
+1681830920 source:c:\users\mariu\onedrive\documents\repos\rocket\rocket\project\singlestage\src\proto\src\sensors.cpp
 	"../include/Sensors.h"
 	"../include/SingleStageRocket.h"
 	"../../../lib/Eigen/Dense"
@@ -3388,7 +3389,7 @@
 	"../include/Servo.h"
 	<cmath>
 
-1681787382 source:c:\users\mariu\onedrive\documents\repos\rocket\rocket\project\singlestage\src\proto\src\singlestagesimulation.cpp
+1681835592 source:c:\users\mariu\onedrive\documents\repos\rocket\rocket\project\singlestage\src\proto\src\singlestagesimulation.cpp
 	"../include/SingleStageSimulation.h"
 	"../../common/include/util.h"
 	<exception>
@@ -3445,13 +3446,20 @@
 	"../include/Parachute.h"
 	"../include/SingleStageRocket.h"
 
-1681791069 source:c:\users\mariu\onedrive\documents\repos\rocket\rocket\project\singlestage\src\proto\src\singlestagerocket.cpp
+1681830858 source:c:\users\mariu\onedrive\documents\repos\rocket\rocket\project\singlestage\src\proto\src\singlestagerocket.cpp
 	"../include/SingleStageRocket.h"
 	"../../common/include/util.h"
-	"../../../lib/tinyxml/tinyxml2.h"
 	"../include/Action.h"
 	<fstream>
 	<numeric>
 	<iostream>
 	<exception>
+
+1681828772 c:\users\mariu\onedrive\documents\repos\rocket\rocket\project\singlestage\src\proto\include\loader.h
+
+1681833309 source:c:\users\mariu\onedrive\documents\repos\rocket\rocket\project\singlestage\src\proto\src\loader.cpp
+	"../include/Loader.h"
+	"../../../lib/tinyxml/tinyxml2.h"
+	"../include/SingleStageRocket.h"
+	"../include/SingleStageSimulation.h"
 

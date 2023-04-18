@@ -16,7 +16,7 @@ public:
 
     std::unique_ptr<Guidance> guidance;
 
-    std::unique_ptr<Navigation> navigation;
+    Navigation navigation;
 
     std::unique_ptr<Control> control;
 
@@ -24,7 +24,7 @@ public:
 
     inline void update(double time)
     {
-        const auto& estimated_state = this->navigation->get_estimated_state(this->rocket, time);
+        const auto& estimated_state = this->navigation.get_estimated_state(this->rocket, time);
 
         const auto& commands = this->guidance->get_commands(estimated_state, time);
 

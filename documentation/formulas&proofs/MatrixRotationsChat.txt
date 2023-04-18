@@ -1,0 +1,138 @@
+inline Axis get_inverse() const noexcept
+        {
+            Axis Inv;
+            Inv.data[0] = this->data[4]*this->data[8] - this->data[5]*this->data[7];
+            Inv.data[1] = this->data[2]*this->data[7] - this->data[1]*this->data[8];
+            Inv.data[2] = this->data[1]*this->data[5] - this->data[2]*this->data[4];
+
+            Inv.data[3] = this->data[5]*this->data[6] - this->data[3]*this->data[8];
+            Inv.data[4] = this->data[0]*this->data[8] - this->data[2]*this->data[6];
+            Inv.data[5] = this->data[2]*this->data[3] - this->data[0]*this->data[5];
+
+            Inv.data[6] = this->data[3]*this->data[7] - this->data[4]*this->data[6];
+            Inv.data[7] = this->data[1]*this->data[6] - this->data[0]*this->data[7];
+            Inv.data[8] = this->data[0]*this->data[4] - this->data[1]*this->data[3];
+
+            double det = 1.0/(this->data[0]*Inv.data[0] + this->data[1]*Inv.data[3] + this->data[2]*Inv.data[6]);
+
+            for(int i = 0; i < 9; i++) {
+                Inv.data[i] *= det;
+            }
+
+            return Inv;
+        }
+Yes, this code correctly computes the inverse of a 3x3 matrix. The function takes no parameters and returns an Axis object, which presumably represents a 3x3 matrix.
+
+The first part of the function computes the matrix of cofactors of the input matrix, which is the transpose of its adjugate. This is done by computing the determinants of the 2x2 submatrices that result from deleting each element of the input matrix in turn, and assigning the resulting values to the corresponding elements of the output matrix.
+
+The second part of the function computes the determinant of the input matrix using the formula det(A) = a11*(a22a33 - a23a32) - a12*(a21a33 - a23a31) + a13*(a21a32 - a22a31), where aij denotes the element of the input matrix in the i-th row and j-th column.
+
+If the determinant is zero, the function will return an Axis object with uninitialized values, which could potentially cause problems if not checked for in the calling code.
+
+Finally, the function computes the inverse of the input matrix by dividing the matrix of cofactors by the determinant, and returns the resulting Axis object.
+
+
+
+
+Marius Popescu
+for the same Axis class does this constructor correctly compute the rotation matrix from a angle and axis: inline void rotation_matrix_from_angle_axis(const double angle, const Vector& axis)
+        {
+            double c = cos(angle);
+            double s = sin(angle);
+            double c1 = 1 - c;
+            double xc = axis.x*c1;
+            double yc = axis.y*c1;
+            this->data[0] = c + axis.x*xc;
+            this->data[4] = c + axis.y*yc;
+            this->data[8] = c + axis.z*axis.z*c1;
+            c = axis.x*yc;
+            c1 = axis.z*s;
+            this->data[1] = c - c1;
+            this->data[3] = c + c1;
+            c = axis.z*xc;
+            c1 = axis.y*s;
+            this->data[2] = c + c1;
+            this->data[6] = c - c1;
+            c = axis.z*yc;
+            c1 = axis.x*s;
+            this->data[5] = c - c1;
+            this->data[7] = c + c1;
+        }
+Yes, this constructor correctly computes the rotation matrix from an angle and an axis.
+
+The function takes an angle and a Vector object representing the axis of rotation, and computes the rotation matrix corresponding to a rotation of the specified angle about the specified axis.
+
+The first part of the function computes the cosine and sine of the angle, as well as the quantity 1-cos(angle), which appears in several places in the computation of the matrix elements.
+
+The second part of the function computes the individual elements of the rotation matrix using the formula for a rotation matrix about an arbitrary axis, which is given by:
+
+cos(angle) + x^2*(1-cos(angle)) xy(1-cos(angle)) - zsin(angle) xz*(1-cos(angle)) + ysin(angle)
+xy*(1-cos(angle)) + zsin(angle) cos(angle) + y^2(1-cos(angle)) yz(1-cos(angle)) - xsin(angle)
+xz*(1-cos(angle)) - ysin(angle) yz*(1-cos(angle)) + xsin(angle) cos(angle) + z^2(1-cos(angle))
+
+where (x,y,z) is the unit vector representing the axis of rotation.
+
+The code correctly uses the above formula to compute each element of the rotation matrix, and assigns the resulting values to the corresponding elements of the Axis object.
+
+Note that this code assumes that the input Vector object axis is already a unit vector. If it is not, the resulting Axis object will not be a valid rotation matrix.
+
+
+
+
+Marius Popescu
+if R is a rotation matrix and A is an arbitrary matrix then does this property hold true: R*A = (R * A^T)^T where ^T represents the transpose
+No, the property R*A = (R * A^T)^T does not hold true in general.
+
+The reason is that the transpose of a product of matrices is not equal to the product of their transposes taken in reverse order, unless the matrices involved satisfy certain conditions.
+
+In general, the transpose of the product R * A^T is given by (A^T)^T * R^T = A * R^T. Therefore, we have:
+
+R * A^T ≠ (R * A^T)^T
+
+unless A is a symmetric matrix (i.e., A = A^T) or R is an orthogonal matrix (i.e., R * R^T = R^T * R = I, where I is the identity matrix).
+
+If A is symmetric, then A^T = A, and we have:
+
+R * A = R * A^T = (R * A^T)^T
+
+If R is orthogonal, then we have:
+
+(R * A^T)^T = (A^T)^T * R^T = A * R = R^-1 * R * A = A
+
+Therefore, in the special cases where either A is symmetric or R is orthogonal, the property R*A = (R * A^T)^T holds true. However, in general, this property does not hold.
+
+
+
+
+Marius Popescu
+Are rotation matrices orthogonal?
+Yes, rotation matrices are orthogonal matrices.
+
+An orthogonal matrix is a square matrix whose columns and rows are orthonormal vectors, meaning that each column and row has unit length, and each pair of columns and rows is perpendicular to each other. Geometrically, an orthogonal matrix represents a linear transformation that preserves lengths and angles, and therefore, can be used to rotate and reflect vectors.
+
+A rotation matrix is a special type of orthogonal matrix that represents a rotation in three-dimensional space. Specifically, a rotation matrix R is an orthogonal matrix that has a determinant equal to +1, which implies that it preserves orientation (i.e., it does not reflect the coordinate system).
+
+In summary, rotation matrices are a subset of orthogonal matrices that represent rotations in three-dimensional space.
+
+
+
+
+Marius Popescu
+If R is an orthogonal matrix then does R * A = A * R^T
+Yes, if R is an orthogonal matrix, then we have the property:
+
+R * A = A * R^T
+
+This property is also known as the "orthogonality property" of orthogonal matrices. It follows from the fact that the columns of R form an orthonormal basis of three-dimensional space, which means that any vector v can be expressed as a linear combination of the columns of R, say v = r1c1 + r2c2 + r3*c3, where r1, r2, r3 are scalars and c1, c2, c3 are the columns of R. Using this expression for v, we can show that:
+
+R * v = R * (r1c1 + r2c2 + r3c3) = r1Rc1 + r2Rc2 + r3R*c3
+
+Since the columns of R are orthonormal, we have R*c_i = e_i, where e_i is the ith column of the identity matrix. Therefore,
+
+R * v = r1e1 + r2e2 + r3*e3 = [r1, r2, r3]^T
+
+Similarly, we can show that Av can also be expressed as a linear combination of its columns, say Av = a1c1 + a2c2 + a3*c3. Therefore,
+
+A * R^T * v = A * R^T * (r1e1 + r2e2 + r3*e3) = A * [r1, r2, r3] = [a1, a2, a3] * [r1, r2, r3]^T = (A * v)^T * [r1, r2, r3]^T
+
+Since this holds for any vector v, we can conclude that R * A = A * R^T.

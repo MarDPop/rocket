@@ -2,6 +2,7 @@
 #include "../common/include/util.h"
 #include "../common/include/Cartesian.h"
 #include "../proto/include/SingleStageSimulation.h"
+#include "../proto/include/Loader.h"
 #include <string>
 #include <cstdio>
 #include <exception>
@@ -31,7 +32,7 @@ int main(int argc, char *argv[])
 
     SingleStageSimulation sim;
 
-    sim.load(argv[1]);
+    Loader::loadSimulation(sim,argv[1]);
 
     sim.run(argv[2],run_debug);
 

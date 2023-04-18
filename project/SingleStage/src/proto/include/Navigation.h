@@ -6,20 +6,18 @@
 
 #include <memory>
 
-class Navigation
+struct Navigation
 {
-protected:
-
-    KinematicState estimated_state;
-
-public:
-
     std::unique_ptr<Filter> filter;
 
     std::unique_ptr<Sensors> sensors;
 
-    Navigation();
-    virtual ~Navigation();
+    inline const KinematicState& get_estimated_state(const SingleStageRocket& rocket, double time)
+    {
+        this->sensors->update(rocket, time);
 
-    const KinematicState& get_estimated_state(const SingleStageRocket& rocket, double time); // make make virtual in future
+        this->filter->update(*this->sensors, time);
+
+        return this->filter->get_computed_state();
+    }
 };

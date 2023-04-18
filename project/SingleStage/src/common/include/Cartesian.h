@@ -492,6 +492,13 @@ namespace Cartesian {
             return t;
         }
 
+        inline void transpose() noexcept
+        {
+            std::swap(this->data[1],this->data[3]);
+            std::swap(this->data[2],this->data[6]);
+            std::swap(this->data[7],this->data[5]);
+        }
+
         inline Vector transpose_mult(const Vector& v) const noexcept
         {
             Vector b;

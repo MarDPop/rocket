@@ -11,56 +11,6 @@
 SingleStageSimulation::SingleStageSimulation() {}
 SingleStageSimulation::~SingleStageSimulation() {}
 
-void SingleStageSimulation::load(std::string fn)
-{
-    tinyxml2::XMLDocument simDocument;
-    auto err = simDocument.LoadFile(fn.c_str());
-    if(err != tinyxml2::XML_SUCCESS) {
-        //Could not load file. Handle appropriately.
-        throw std::invalid_argument("Could not load file.");
-    }
-
-    auto* root = simDocument.RootElement();
-    if(!root) { return; }
-
-    auto* RocketFileElement = root->FirstChildElement("Rocket");
-    const char* rocket_fn = RocketFileElement->Attribute("File");
-
-    if(!rocket_fn){ throw std::invalid_argument("No Rocket File."); }
-
-    auto* AtmosphereElement = root->FirstChildElement("Atmosphere");
-    if(AtmosphereElement)
-    {
-        double ground_altitude = AtmosphereElement->FirstChildElement("Altitude")->DoubleText();
-        double ground_temperature = AtmosphereElement->FirstChildElement("Temperature")->DoubleText();
-        double ground_pressure = AtmosphereElement->FirstChildElement("Pressure")->DoubleText();
-        double lapse_rate = AtmosphereElement->FirstChildElement("LapseRate")->DoubleText();
-        this->atmosphere = std::make_unique<AtmosphereTable>(ground_altitude,ground_pressure,ground_temperature,lapse_rate);
-    }
-    else
-    {
-        this->atmosphere = std::make_unique<Atmosphere>();
-    }
-
-    auto* launchElement = root->FirstChildElement("Launch");
-    if(launchElement)
-    {
-        this->launch.latitude = launchElement->FirstChildElement("Latitude")->DoubleText();
-        this->launch.longitude = launchElement->FirstChildElement("Longitude")->DoubleText();
-        this->launch.altitude = launchElement->FirstChildElement("Altitude")->DoubleText();
-        this->launch.pitch_angle = launchElement->FirstChildElement("Pitch")->DoubleText();
-        this->launch.heading = launchElement->FirstChildElement("Heading")->DoubleText();
-    }
-    else
-    {
-
-    }
-
-    this->rocket.reset(new SingleStageRocket(this->atmosphere.get()));
-
-    this->rocket->load(rocket_fn);
-}
-
 void SingleStageSimulation::run(std::string fn, const bool debug)
 {
     FILE* output = fopen(fn.c_str(),"w");
@@ -113,7 +63,7 @@ void SingleStageSimulation::run(std::string fn, const bool debug)
             if(debug)
             {
                 debug_output << time << " ";
-                const auto& filtered_state = this->rocket->gnc.navigation->get_estimated_state(*this->rocket, time);
+                const auto& filtered_state = this->rocket->gnc.navigation.filter->get_computed_state();
                 char buf[150];
                 sprintf(buf,POS_FORMAT.c_str(), filtered_state.position[0],filtered_state.position[1],filtered_state.position[2]);
                 debug_output << buf;

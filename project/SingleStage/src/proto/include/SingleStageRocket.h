@@ -21,6 +21,8 @@ class SingleStageRocket
 {
 friend class SingleStageSimulation;
 
+friend class Loader;
+
     KinematicState state;
 
     Inertia inertia_empty;
@@ -47,8 +49,6 @@ public:
 
     SingleStageRocket(Atmosphere* atmosphere);
     ~SingleStageRocket();
-
-    void load(const char* fn);
 
     inline void set_inertial_properties(Inertia inertia_empty)
     {
