@@ -65,11 +65,8 @@ void AerodynamicsBasicCoefficient::set_coef(const std::array<double,9>& coef)
     this->ref_length = coef[6];
     this->stall_angle = coef[7];
     this->_action.location.data[2] = coef[8];
-    this->sin_stall_angle = sin(this->stall_angle);
-    this->sin_zero_lift_angle = 2*this->sin_stall_angle;
     this->CL_max = this->CL_alpha*this->stall_angle;
-    this->constant_term = 1.0/sin(this->stall_angle);
-    this->CM_max = this->CM_alpha*2*this->stall_angle;
+    this->CM_max = this->CM_alpha*this->stall_angle;
 }
 
 double AerodynamicsBasicCoefficient::get_parasitic_drag_from_mach(double mach)
@@ -110,27 +107,13 @@ AerodynamicsBasicCoefficient::aero_coef AerodynamicsBasicCoefficient::get_aero_c
         return output;
     }
 
-    output.CM = sAoA*this->CM_alpha;
-
-    if(sAoA > this->sin_stall_angle)
+    output.CM = std::min(this->CM_max,this->CM_alpha*sAoA);
+    output.CL = this->CL_alpha*sAoA;
+    output.CD += this->K*output.CL*output.CL;
+    if(output.CL > this->CL_max)
     {
-        output.CD += this->K*this->CL_max*this->CL_max*sAoA*this->constant_term; // norm of arm is equal to sin of angle which is approx lift curve
-        if(sAoA > this->sin_zero_lift_angle)
-        {
-            return output;
-        }
-        else
-        {
-            double frac = 1.0/(5*(sAoA - this->sin_stall_angle) + 1.0);
-            output.CL = frac*this->CL_max;
-        }
+        output.CL = this->CL_max;
     }
-    else
-    {
-        output.CL = this->CL_alpha*sAoA;
-        output.CD += this->K*output.CL*output.CL;
-    }
-
     return output;
 }
 

@@ -7,11 +7,11 @@
 	</Inertia>
 	
 	<Aerodynamics Type="SimpleAerodynamics" unit="SI">
-		<CD0>0.0</CD0>
+		<CD0>0.5</CD0>
 		<CL_alpha>0.5</CL_alpha>
-		<CM_alpha>-0.00</CM_alpha>
+		<CM_alpha>-0.0</CM_alpha>
 		<CM_alpha_dot>-0.0001</CM_alpha_dot>
-		<InducedLiftK>0.0</InducedLiftK>
+		<InducedLiftK>0.06</InducedLiftK>
 		<RefArea>0.02</RefArea>
 		<RefLength>1.0</RefLength>
 		<StallAngle>0.2</StallAngle>
