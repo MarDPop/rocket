@@ -64,7 +64,7 @@ void FilterBasic::update(const Sensors& sensors, double time)
 
     Vector angle_axis = body2inertial * (measured.angular_velocity * dt);
     double angle = angle_axis.norm();
-    if(angle > 1e-10)
+    if(angle > 1e-6)
     {
         angle_axis *= (1.0/angle);
         Axis rotm(angle,angle_axis);

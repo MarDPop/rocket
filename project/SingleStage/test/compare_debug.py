@@ -1,33 +1,43 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+def dot(u,v):
+    return u[0]*v[0] + u[1]*v[1] + u[2]*v[2]
+
 outFile = open('out.txt','r')
 outLines = outFile.readlines()
 outFile.close()
+outLines.pop(0)
 
 debugFile = open('debug.txt','r')
 debugLines = debugFile.readlines()
 debugFile.close()
 
 realTimes = []
-realStates = []
+realPosition = []
+realZAxis = []
 for line in outLines:
     data = line.split()
-    if len(data) < 5:
+    # print(data)
+    if len(data) < 13:
        continue
     realTimes.append(float(data[0]))
-    realStates.append([float(data[1]),float(data[2]),float(data[3])])
+    realPosition.append([float(data[1]),float(data[2]),float(data[3])])
+    realZAxis.append([float(data[10]),float(data[11]),float(data[12])])
 
 filterTimes = []
-filterStates = []
+filterPosition = []
+filteredZAxis = []
 for line in debugLines:
     data = line.split()
-    if len(data) < 5:
+    if len(data) < 13:
        continue
     filterTimes.append(float(data[0]))
-    filterStates.append([float(data[1]),float(data[2]),float(data[3])])
+    filterPosition.append([float(data[1]),float(data[2]),float(data[3])])
+    filteredZAxis.append([float(data[13]),float(data[14]),float(data[15])])
 
 err = []
+angleErr = []
 realHeight = []
 filteredHeight = []
 maxHeight = 0
@@ -37,9 +47,9 @@ realZ = []
 filteredX = []
 filteredY = []
 filteredZ = []
-for i in range(len(filterTimes)):
-    real = np.array(realStates[i])
-    filtered = np.array(filterStates[i])
+for i in range(len(realTimes)):
+    real = np.array(realPosition[i])
+    filtered = np.array(filterPosition[i])
     diff = real - filtered
     err.append(np.linalg.norm(diff))
     realHeight.append(real[2])
@@ -55,14 +65,25 @@ for i in range(len(filterTimes)):
     filteredX.append(filtered[0])
     filteredY.append(filtered[1])
     filteredZ.append(filtered[2])
-    
 
-plt.plot(filterTimes,err)
-plt.plot(filterTimes,realHeight)
-plt.plot(filterTimes,filteredHeight,':g')
-plt.legend(['err','real','filtered'])
-plt.xlim([0,50])
-plt.ylim([-5,maxHeight + 20])
+    proj = dot(realZAxis[i],filteredZAxis[i])
+    angleErr.append(np.arccos(proj))
+
+
+fig = plt.figure()
+ax = plt.axes()
+
+ax.plot(filterTimes,err)
+ax.plot(filterTimes,realHeight)
+ax.plot(filterTimes,filteredHeight,':g')
+ax.legend(['err','real','filtered'])
+ax.set_xlim([0,50])
+ax.set_ylim([-5,maxHeight + 20])
+
+fig = plt.figure()
+ax = plt.axes()
+
+ax.plot(filterTimes,angleErr)
 
 fig = plt.figure()
 ax = plt.axes(projection ='3d')

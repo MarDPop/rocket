@@ -69,8 +69,8 @@ void SingleStageSimulation::run(std::string fn, const bool debug)
                 debug_output << buf;
                 sprintf(buf,POS_FORMAT.c_str(), filtered_state.velocity[0],filtered_state.velocity[1],filtered_state.velocity[2]);
                 debug_output << buf;
-                // auto& CS = filtered_state.CS;
-                auto& CS = this->rocket->state.CS;
+                auto& CS = filtered_state.CS;
+                // auto& CS = this->rocket->state.CS;
                 sprintf(buf,CS_FORMAT.c_str(),CS.data[0],CS.data[1],CS.data[2],CS.data[3],CS.data[4],CS.data[5],CS.data[6],CS.data[7],CS.data[8]);
                 debug_output << buf << std::endl;
             }
