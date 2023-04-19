@@ -43,16 +43,6 @@ void WindHistory::load(std::string fn) {
     }
 }
 
-void WindHistory::load(std::vector<double> t, std::vector<Vector> s) {
-    this->times = t;
-    this->speed = s;
-    this->reset();
-    this->constant = t.size() == 1;
-    if(this->constant){
-        this->wind = this->speed[0];
-    }
-}
-
 void WindHistory::reset() {
     this->titer = times.data();
     this->siter = speed.data();
@@ -64,7 +54,7 @@ void WindHistory::reset() {
     }
 }
 
- void WindHistory::set(double time) {
+ void WindHistory::set(double altitude, double time) {
     if(this->constant){
         return;
     }

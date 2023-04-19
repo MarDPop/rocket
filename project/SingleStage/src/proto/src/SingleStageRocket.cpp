@@ -78,7 +78,7 @@ void SingleStageRocket::step(double& time, double dt)
     this->compute_acceleration(time);
 
     // only update GNC at beginning of time step
-    this->gnc.update(time); // TODO: Investigate why this breaks things when put at start of step
+    this->gnc.update(time); // TODO: Investigate why this breaks things in dynamics when put at start of step
 
     KinematicState state0 = this->state;
 
@@ -87,15 +87,16 @@ void SingleStageRocket::step(double& time, double dt)
 
     this->state.position += this->state.velocity*dt;
     this->state.velocity += this->state.acceleration*dt;
-    Vector angle_axis = this->state.angular_velocity*dt;
+
+    Vector inertial_rotation = this->state.angular_velocity*dt;
     this->state.angular_velocity += this->state.angular_acceleration*dt;
 
     // Rotations are non linear -> rotate CS
-    double angle = angle_axis.norm();
+    double angle = inertial_rotation.norm();
     if(angle > 1e-6)
     {
-        angle_axis *= (1.0/angle);
-        this->state.CS = Axis(angle,angle_axis)*state0.CS;
+        inertial_rotation *= (1.0/angle);
+        this->state.CS = Axis(angle,inertial_rotation)*state0.CS;
     }
 
     // Compute mass changes, no need to recompute at next step
@@ -118,12 +119,12 @@ void SingleStageRocket::step(double& time, double dt)
     this->state.angular_velocity = state0.angular_velocity + (state0.angular_acceleration + this->state.angular_acceleration)*dt_half;
 
     // Average angular rate
-    angle_axis = (state0.angular_velocity + this->state.angular_velocity)*dt_half;
-    angle = angle_axis.norm();
+    inertial_rotation = (state0.angular_velocity + this->state.angular_velocity)*dt_half;
+    angle = inertial_rotation.norm();
     if(angle > 1e-6)
     {
-        angle_axis *= (1.0/angle);
-        this->state.CS = Axis(angle,angle_axis)*state0.CS;  // confirmed true since rotation matrix is orthogonal
+        inertial_rotation *= (1.0/angle);
+        this->state.CS = Axis(angle,inertial_rotation)*state0.CS;  // confirmed true since rotation matrix is orthogonal
     }
 }
 SingleStageRocket::SingleStageRocket(Atmosphere* atmosphere) : gnc(*this), _atmosphere(atmosphere) {}

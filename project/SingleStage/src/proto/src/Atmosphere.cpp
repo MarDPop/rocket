@@ -102,5 +102,5 @@ void AtmosphereTable::set(double alt, double time)
     this->values.dynamic_viscosity = lo.dynamic_viscosity + delta.dynamic_viscosity*dH;
     this->values.gravity = lo.gravity + delta.gravity*dH;
 
-    this->wind.set(time);
+    this->wind.set(alt,time);
 }

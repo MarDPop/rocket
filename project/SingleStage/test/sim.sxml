@@ -5,6 +5,8 @@
 		<Pressure>92000</Pressure>
 		<Temperature>300</Temperature>
 		<LapseRate>0.0</LapseRate>
+		<Wind File="test/wind.dat">
+		</Wind>
 	</Atmosphere>
 	<Launch>
 		<Latitude>39.94426809919236</Latitude>

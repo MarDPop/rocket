@@ -94,6 +94,11 @@ public:
         return this->measured;
     }
 
+    inline const computed_quatities& get_computed_quantities() const
+    {
+        return this->computed;
+    }
+
     inline void set_delay(double delay)
     {
         this->delay = delay;

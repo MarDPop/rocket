@@ -9,6 +9,8 @@ using namespace Cartesian;
 
 class WindHistory {
 
+friend class Loader;
+
     /* Wind Table */
     std::vector<double> times;
     std::vector<Vector> speed;
@@ -31,9 +33,7 @@ public:
 
     void reset();
 
-    void set(double time);
+    void set(double altitude, double time);
 
     void load(std::string fn);
-
-    void load(std::vector<double> t, std::vector<Vector> s);
 };

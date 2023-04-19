@@ -40,6 +40,8 @@ class FilterBasic: public virtual Filter
 
     double t_old;
 
+    double alt_old;
+
     KinematicState state_old;
 
 public:
@@ -73,8 +75,9 @@ public:
 
 class FilterMarius : public virtual Filter
 {
+    double t_old;
 
-    std::array<Vector,5> last_accel_measurements;
+    std::array<Vector,3> last_accel_measurements;
 
 public:
 

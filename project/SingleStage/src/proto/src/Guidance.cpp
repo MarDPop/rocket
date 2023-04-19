@@ -42,7 +42,7 @@ const Commands& GuidanceVerticalAscent::get_commands(const KinematicState& estim
     {
         return this->commands;
     }
-    else if (estimated_state.velocity.z < -1.0)
+    else if (estimated_state.velocity.z < -10.0)
     {
         this->chute->deploy(time);
         this->commands.z_axis.zero();

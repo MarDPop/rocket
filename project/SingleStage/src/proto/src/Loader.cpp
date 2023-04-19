@@ -29,6 +29,15 @@ void Loader::loadSimulation(SingleStageSimulation& simulation, const char* fn)
         double ground_pressure = AtmosphereElement->FirstChildElement("Pressure")->DoubleText();
         double lapse_rate = AtmosphereElement->FirstChildElement("LapseRate")->DoubleText();
         simulation.atmosphere = std::make_unique<AtmosphereTable>(ground_altitude,ground_pressure,ground_temperature,lapse_rate);
+        auto* windEl = AtmosphereElement->FirstChildElement("Wind");
+        if(windEl)
+        {
+            const char* wind_fn = windEl->Attribute("File");
+            if(wind_fn)
+            {
+                simulation.atmosphere->wind.load(wind_fn);
+            }
+        }
     }
     else
     {
@@ -270,6 +279,9 @@ void loadGNC(GNC& gnc, tinyxml2::XMLElement* gncElement, Parachute* parachute, A
                 if(strcmp(type,"SimpleIntegrate") == 0)
                 {
                     gnc.navigation.filter = std::make_unique<FilterSimpleIntegrate>();
+                } else if(strcmp(type,"Basic") == 0)
+                {
+                    gnc.navigation.filter = std::make_unique<FilterBasic>();
                 }
             }
         }

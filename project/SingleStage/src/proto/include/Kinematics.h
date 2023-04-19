@@ -26,7 +26,7 @@ struct KinematicState
     /**
     * Current body frame in ENU (z axis is axial)
     */
-    Axis CS;
+    Axis CS; // TODO: make this quaternion
 
     /**
     * Current angular speed in body frame (rad/s)

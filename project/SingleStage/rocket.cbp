@@ -462,7 +462,6 @@
 		<Unit filename="src/proto/src/Filter.cpp" />
 		<Unit filename="src/proto/src/Gravity.cpp" />
 		<Unit filename="src/proto/src/Guidance.cpp" />
-		<Unit filename="src/proto/src/Navigation.cpp" />
 		<Unit filename="src/proto/src/Parachute.cpp" />
 		<Unit filename="src/proto/src/Sensors.cpp" />
 		<Unit filename="src/proto/src/Servo.cpp" />
