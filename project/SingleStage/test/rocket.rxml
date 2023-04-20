@@ -6,7 +6,7 @@
 		<COG>-0.5</COG>
 	</Inertia>
 	
-	<Aerodynamics Type="SimpleAerodynamics" unit="SI">
+	<Aerodynamics Type="FinAerodynamics" NumberFins="3" unit="SI">
 		<CD0>0.5</CD0>
 		<CL_alpha>0.8</CL_alpha>
 		<CM_alpha>-0.0</CM_alpha>
@@ -16,6 +16,12 @@
 		<RefLength>1.0</RefLength>
 		<StallAngle>0.2</StallAngle>
 		<COP>-0.6</COP>
+		<dCLdTheta>0.1</dCLdTheta>
+        <dCDdTheta>0.1</dCDdTheta>
+		<dCMdTheta>0.0</dCMdTheta>
+		<AreaRef>0.015</AreaRef>
+		<FinZCenter>-0.9</FinZCenter>
+		<FinSpanCenter>0.1</FinSpanCenter>
 	</Aerodynamics>
 	
 	<Thruster Type="PressureThruster" unit="SI">
@@ -32,8 +38,9 @@
 		</Table>
 	</Thruster>
 	
-	<Parachute>
+	<Parachute Type="Timed">
 		<CDA>0.1</CDA>
+		<DeploymentTime>3.0</DeploymentTime>
 	</Parachute>
 	
 	<GNC>
@@ -43,11 +50,18 @@
 		</Guidance>
 		<Control>
 		</Control>
+		<!--
+		<Control Type="FinControl">
+			<Proportional>2</Proportional>
+			<Damping>0.0</Damping>
+			<FinGain>0.0</FinGain>
+		</Control>
+		-->
 		<Navigation>
 			<Sensor>
 				<Variances>
 					<Barometer>100</Barometer>
-					<Thermometer>0.5</Thermometer>
+					<Thermometer>0.007</Thermometer>
 					<Accelerometer>0.1</Accelerometer>
 					<Gyro>0.01</Gyro>
 				</Variances>

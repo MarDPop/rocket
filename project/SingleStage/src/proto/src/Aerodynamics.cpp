@@ -188,7 +188,7 @@ void AerodynamicsFinCoefficient::set_fin_coef(const std::array<double,6>& coef){
 
 void AerodynamicsFinCoefficient::compute_forces()
 {
-    AerodynamicsFinCoefficient::compute_forces();
+    AerodynamicsBasicCoefficient::compute_forces();
 
     Vector dForce((char)0);
     Vector dMoment((char)0);

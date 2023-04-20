@@ -57,6 +57,13 @@ function mat2quat(a){
             q[3] = 0.25 * s;
         }
     }
+    // although not strictly necessary, this seems to trip up cesium if not close enough
+    let sq = q[0]*q[0] + q[1]*q[1] + q[2]*q[2] + q[3]*q[3];
+    let n = 1.0/Math.sqrt(sq);
+    q[0] *= n;
+    q[1] *= n;
+    q[2] *= n;
+    q[3] *= n;
     return q;
 }
 

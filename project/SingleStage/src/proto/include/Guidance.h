@@ -13,8 +13,9 @@ using namespace Cartesian;
 
 struct Commands
 {
-    Vector z_axis;
+    Vector z_axis_inertial;
     std::unordered_map<std::string, double> other_values;
+    std::unordered_map<std::string, bool> flags;
 };
 
 //guidance should control things like chute activation

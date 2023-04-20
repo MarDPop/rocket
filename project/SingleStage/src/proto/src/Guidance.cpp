@@ -3,8 +3,8 @@
 #include "../include/Parachute.h"
 
 Guidance::Guidance(){
-    this->commands.z_axis.zero();
-    this->commands.z_axis.data[2] = 1.0;
+    this->commands.z_axis_inertial.zero();
+    this->commands.z_axis_inertial.data[2] = 1.0;
 }
 
 Guidance::~Guidance(){}
@@ -27,7 +27,7 @@ const Commands& GuidanceSimpleAscent::get_commands(const KinematicState& estimat
     else if (estimated_state.velocity.z < -1.0)
     {
         this->chute->deploy(time);
-        this->commands.z_axis.zero();
+        this->commands.z_axis_inertial.zero();
         return this->commands;
     }
 
@@ -45,11 +45,9 @@ const Commands& GuidanceVerticalAscent::get_commands(const KinematicState& estim
     else if (estimated_state.velocity.z < -10.0)
     {
         this->chute->deploy(time);
-        this->commands.z_axis.zero();
+        this->commands.z_axis_inertial.zero();
         return this->commands;
     }
-
-    //Vector velocity_correction_arm(-estimated_state.velocity.y,estimated_state.velocity.x,0.0);
 
     double x_scaled = this->damping*estimated_state.acceleration.x - this->proportional*estimated_state.velocity.x;
     double y_scaled = this->damping*estimated_state.acceleration.y - this->proportional*estimated_state.velocity.y;
@@ -58,14 +56,14 @@ const Commands& GuidanceVerticalAscent::get_commands(const KinematicState& estim
 
     double scale = rescaled_anti_vector.norm();
 
-    if(scale > 1e-4)
+    if(scale > 1e-4) // REMEMBER TO PUT BACK
     {
-        this->commands.z_axis = rescaled_anti_vector * (1.0/rescaled_anti_vector.norm());
+        this->commands.z_axis_inertial = rescaled_anti_vector * (1.0/rescaled_anti_vector.norm());
     }
     else
     {
-        this->commands.z_axis.zero();
-        this->commands.z_axis.data[2] = 1.0;
+        this->commands.z_axis_inertial.zero();
+        this->commands.z_axis_inertial.data[2] = 1.0;
     }
 
     return this->commands;

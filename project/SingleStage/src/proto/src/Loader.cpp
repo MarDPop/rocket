@@ -225,22 +225,22 @@ Aerodynamics* loadAerodynamics(tinyxml2::XMLElement* aeroElement, SingleStageRoc
 Parachute* loadParachute(tinyxml2::XMLElement* chuteElement, SingleStageRocket& rocket)
 {
     const char* type = chuteElement->Attribute("Type");
-    Parachute* chute;
     double CDA = 0;
-    if(!type)
+    auto* el = chuteElement->FirstChildElement("CDA");
+    if(el)
     {
-        auto* CDAEl = chuteElement->FirstChildElement("CDA");
-        if(CDAEl)
+        CDA = el->DoubleText();
+    }
+
+    if(type)
+    {
+        if(strcmp(type,"Timed") == 0)
         {
-            CDA = CDAEl->DoubleText();
+            double tDeploy = chuteElement->FirstChildElement("DeploymentTime")->DoubleText();
+            return new ParachuteTimed(rocket,CDA,tDeploy);
         }
-        chute = new Parachute(rocket,CDA);
     }
-    else
-    {
-        chute = new Parachute(rocket,CDA);
-    }
-    return chute;
+    return new Parachute(rocket,CDA);
 }
 
 void loadGNC(GNC& gnc, tinyxml2::XMLElement* gncElement, Parachute* parachute, Aerodynamics* aero)

@@ -2,21 +2,41 @@
 
 #include "../include/SingleStageRocket.h"
 
-Parachute::Parachute(SingleStageRocket& _rocket) : rocket(_rocket)
+Parachute::Parachute(SingleStageRocket& rocket) : _rocket(rocket)
 {
-    this->action.zero();
+    this->_action.zero();
 }
 
-Parachute::Parachute(SingleStageRocket& _rocket, double _CDA) : rocket(_rocket), CDA(_CDA)
+Parachute::Parachute(SingleStageRocket& rocket, double CDA) : _rocket(rocket), _CDA(CDA)
 {
-    this->action.zero();
+    this->_action.zero();
 }
 
 Parachute::~Parachute() {}
 
 const BodyAction& Parachute::update(double time)
 {
-    const auto& air_values = this->rocket.get_aerodynamics().get_aero_values();
-    this->action.force = air_values.unit_v_air_body * (-this->CDA*air_values.dynamic_pressure);
-    return this->action;
+    const auto& air_values = this->_rocket.get_aerodynamics().get_aero_values();
+    this->_action.force = air_values.unit_v_air_body * (-this->_CDA*air_values.dynamic_pressure);
+    return this->_action;
+}
+
+ParachuteTimed::ParachuteTimed(SingleStageRocket& rocket, double CDA, double deployment_time) : Parachute(rocket,CDA),
+                                                                                                _deployment_duration(deployment_time) {}
+
+const BodyAction& ParachuteTimed::update(double time)
+{
+    double dt = time - this->_time_deployed;
+    double CDA;
+    if(dt > this->_deployment_duration)
+    {
+        CDA = -this->_CDA;
+    }
+    else
+    {
+        CDA = -this->_CDA * dt / this->_deployment_duration;
+    }
+    const auto& air_values = this->_rocket.get_aerodynamics().get_aero_values();
+    this->_action.force = air_values.unit_v_air_body * (CDA*air_values.dynamic_pressure);
+    return this->_action;
 }
