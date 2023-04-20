@@ -47,8 +47,10 @@ void Sensors::measure_quantities(const SingleStageRocket& rocket) {
     // add delay
     const auto& rocket_state = rocket.get_state();
     this->measured.angular_velocity = rocket_state.CS * rocket_state.angular_velocity;
-    this->measured.acceleration = rocket_state.CS * rocket_state.acceleration;
-    this->measured.acceleration.z += rocket.get_atmosphere().values.gravity;
+    Vector acceleration_and_gravity(rocket_state.acceleration.x,
+                                    rocket_state.acceleration.y,
+                                    rocket_state.acceleration.z + rocket.get_atmosphere().values.gravity);
+    this->measured.acceleration = rocket_state.CS * acceleration_and_gravity;
 
     for(int i = 0; i < 3; i++)
     {

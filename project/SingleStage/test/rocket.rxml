@@ -46,10 +46,10 @@
 		<Navigation>
 			<Sensor>
 				<Variances>
-					<Barometer>2</Barometer>
-					<Thermometer>0.1</Thermometer>
-					<Accelerometer>0.00</Accelerometer>
-					<Gyro>0.000</Gyro>
+					<Barometer>100</Barometer>
+					<Thermometer>0.5</Thermometer>
+					<Accelerometer>0.1</Accelerometer>
+					<Gyro>0.01</Gyro>
 				</Variances>
 			</Sensor>
 			<Filter Type="Basic">

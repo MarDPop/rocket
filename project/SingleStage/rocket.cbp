@@ -447,6 +447,7 @@
 		<Unit filename="src/proto/include/Gravity.h" />
 		<Unit filename="src/proto/include/Guidance.h" />
 		<Unit filename="src/proto/include/Kinematics.h" />
+		<Unit filename="src/proto/include/Loader.h" />
 		<Unit filename="src/proto/include/Navigation.h" />
 		<Unit filename="src/proto/include/Parachute.h" />
 		<Unit filename="src/proto/include/Sensors.h" />
@@ -462,6 +463,7 @@
 		<Unit filename="src/proto/src/Filter.cpp" />
 		<Unit filename="src/proto/src/Gravity.cpp" />
 		<Unit filename="src/proto/src/Guidance.cpp" />
+		<Unit filename="src/proto/src/Loader.cpp" />
 		<Unit filename="src/proto/src/Parachute.cpp" />
 		<Unit filename="src/proto/src/Sensors.cpp" />
 		<Unit filename="src/proto/src/Servo.cpp" />

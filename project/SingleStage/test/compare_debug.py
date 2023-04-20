@@ -38,6 +38,8 @@ for line in debugLines:
 
 err = []
 angleErr = []
+pitchReal = []
+pitchFiltered = []
 realHeight = []
 filteredHeight = []
 maxHeight = 0
@@ -69,12 +71,15 @@ for i in range(len(realTimes)):
     proj = dot(realZAxis[i],filteredZAxis[i])
     angleErr.append(np.arccos(proj))
 
+    pitchReal.append(np.arccos(realZAxis[i][2]))
+    pitchFiltered.append(np.arccos(filteredZAxis[i][2]))
+
 
 fig = plt.figure()
 ax = plt.axes()
 
-ax.plot(filterTimes,err)
-ax.plot(filterTimes,realHeight)
+ax.plot(filterTimes,err,'r')
+ax.plot(filterTimes,realHeight,'b')
 ax.plot(filterTimes,filteredHeight,':g')
 ax.legend(['err','real','filtered'])
 ax.set_xlim([0,50])
@@ -83,7 +88,10 @@ ax.set_ylim([-5,maxHeight + 20])
 fig = plt.figure()
 ax = plt.axes()
 
-ax.plot(filterTimes,angleErr)
+ax.plot(filterTimes,angleErr,'r')
+ax.plot(filterTimes,pitchReal,'b');
+ax.plot(filterTimes,pitchFiltered,':g')
+ax.legend(['err','real','filtered'])
 
 fig = plt.figure()
 ax = plt.axes(projection ='3d')

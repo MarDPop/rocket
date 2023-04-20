@@ -56,8 +56,8 @@ void FilterBasic::update(const Sensors& sensors, double time)
     Vector acceleration_inertial = body2inertial*measured.acceleration;
     acceleration_inertial.z -= 9.806;
 
-    this->computed_state.position += this->computed_state.velocity * dt;
-    this->computed_state.velocity += acceleration_inertial * dt;
+    this->computed_state.position += (this->computed_state.velocity * dt);
+    this->computed_state.velocity += (acceleration_inertial * dt);
 
     this->computed_state.position.z = (this->computed_state.position.z + computed.altitude)*0.5;
     this->computed_state.velocity.z = (this->computed_state.velocity.z + dHdt)*0.5;
