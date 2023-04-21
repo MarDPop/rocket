@@ -83,33 +83,29 @@ public:
 class AerodynamicsBasicCoefficient : public virtual Aerodynamics
 {
 protected:
+    static constexpr double AIRSPEED_THRESHOLD = 1e-2;
+
     static constexpr double AOA_THRESHOLD = 1e-6;
 
-    double CD0;
+    double _CD0;
 
-    double CL_alpha;
+    double _CL_alpha;
 
-    double CM_alpha;
+    double _CM_alpha;
 
-    double CM_alpha_dot;
+    double _CM_alpha_dot;
 
-    double K;
+    double _K;
 
-    double ref_area;
+    double _ref_area;
 
-    double ref_length;
+    double _ref_length;
 
-    double stall_angle;
+    double _stall_angle;
 
-    double sin_stall_angle;
+    double _CL_max;
 
-    double sin_zero_lift_angle;
-
-    double CL_max;
-
-    double constant_term;
-
-    double CM_max;
+    double _CM_max;
 
     double get_parasitic_drag_from_mach(double mach);
 
@@ -169,9 +165,9 @@ public:
 
 class AerodynamicsFinCoefficient : public virtual AerodynamicsBasicCoefficient, public virtual FinControlAero
 {
-    double z; // distance along z axis of span vectors from nose
+    double delta_z; // distance along z axis of span vectors from nose
 
-    double d; // distance along span vector of Center of pressure
+    double span_d; // distance along span vector of Center of pressure
 
     double dCMdTheta; // change in moment ( on span vector )
 
@@ -182,6 +178,8 @@ class AerodynamicsFinCoefficient : public virtual AerodynamicsBasicCoefficient, 
     double const_axial_term_lift;
 
     double const_axial_term_drag;
+
+    double const_axial_term_moment;
 
     void compute_forces() override;
 

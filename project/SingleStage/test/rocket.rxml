@@ -16,8 +16,8 @@
 		<RefLength>1.0</RefLength>
 		<StallAngle>0.2</StallAngle>
 		<COP>-0.6</COP>
-		<dCLdTheta>0.1</dCLdTheta>
-        <dCDdTheta>0.1</dCDdTheta>
+		<dCLdTheta>0.0</dCLdTheta>
+        <dCDdTheta>0.0</dCDdTheta>
 		<dCMdTheta>0.0</dCMdTheta>
 		<AreaRef>0.015</AreaRef>
 		<FinZCenter>-0.9</FinZCenter>
@@ -48,15 +48,16 @@
 			<Proportional>1.0</Proportional>
 			<Damping>1.0</Damping>
 		</Guidance>
+		<!--
 		<Control>
 		</Control>
-		<!--
+		-->
 		<Control Type="FinControl">
 			<Proportional>2</Proportional>
 			<Damping>0.0</Damping>
 			<FinGain>0.0</FinGain>
 		</Control>
-		-->
+
 		<Navigation>
 			<Sensor>
 				<Variances>

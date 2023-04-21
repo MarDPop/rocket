@@ -18,7 +18,7 @@ struct Recording
     /**
     * Time interval between recordings (sec)
     */
-    double t_interval = 0.25;
+    double t_interval = 1.0/8.0;
 
     /**
     * Position (m)

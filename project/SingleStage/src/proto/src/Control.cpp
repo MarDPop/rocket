@@ -31,7 +31,7 @@ void ControlFinSimple::get_outputs(const Commands& commands, const KinematicStat
     for(unsigned fin_idx = 0; fin_idx < aero.NUMBER_FINS; fin_idx++)
     {
         const Fin& fin = aero.get_fin(fin_idx);
-        double angle = this->fin_gain*(arm.data[0]*fin.span_x + arm.data[1]*fin.span_y);
+        double angle = this->fin_gain*(arm.x*fin.span_x + arm.y*fin.span_y);
         fin.servo->set_commanded_angle(angle);
         fin.servo->update(time);
     }

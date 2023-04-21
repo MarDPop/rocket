@@ -524,6 +524,14 @@ namespace Cartesian {
             return C;
         }
 
+        inline Axis det() const noexcept
+        {
+            double a1 = this->data[0]*(this->data[4]*this->data[8] - this->data[5]*this->data[7]);
+            double a2 = this->data[1]*(this->data[3]*this->data[8] - this->data[5]*this->data[6]);
+            double a3 = this->data[2]*(this->data[3]*this->data[7] - this->data[4]*this->data[6]);
+            return a1 - a2 + a3;
+        }
+
         inline Axis get_inverse() const noexcept
         {
             Axis Inv;
@@ -549,7 +557,7 @@ namespace Cartesian {
             return Inv;
         }
 
-        void gram_schmidt_orthogonalize()
+        inline void gram_schmidt_orthogonalize()
         {
             this->axis.z.normalize();
             this->axis.x -= this->axis.z*( this->axis.x.dot(this->axis.z) );

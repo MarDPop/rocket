@@ -55,7 +55,7 @@ void SingleStageRocket::compute_acceleration(double time)
 
     if(this->parachute->is_deployed())
     {
-        allActions += this->parachute->update(time);
+        //allActions += this->parachute->update(time);
     }
 
     Vector total_force = this->state.CS.transpose_mult(allActions.force);
@@ -66,7 +66,7 @@ void SingleStageRocket::compute_acceleration(double time)
     // TODO: explore doing in body frame
     Axis body2inertial = this->state.CS.get_transpose();
     // rotate Inertia to inertial frame
-    Axis I_inertial = body2inertial * this->inertia.get_inertia_matrix();
+    Axis I_inertial = body2inertial * this->inertia.get_inertia_matrix() * this->state.CS; // See InertiaTensor.pdf
     // rotate moment to inertial frame
     Vector total_moment = body2inertial * allActions.moment;
     this->state.angular_acceleration = I_inertial.get_inverse() * total_moment;
