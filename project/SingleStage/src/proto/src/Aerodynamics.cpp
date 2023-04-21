@@ -127,7 +127,8 @@ void AerodynamicsBasicCoefficient::compute_forces()
 
     // already compute damping moment
     Vector angular_velocity_body = rocket.get_state().CS * rocket.get_state().angular_velocity;
-    this->_action.moment += angular_velocity_body*(this->_CM_alpha_dot*this->rocket.get_atmosphere().values.density);
+    double angular_rate = angular_velocity_body.norm();
+    this->_action.moment += angular_velocity_body*(this->_CM_alpha_dot*this->rocket.get_atmosphere().values.density*angular_rate);
 
     // arm is the moment arm formed from the freestream, length of the arm is sin of angle between
     Vector arm(this->_aero_values.unit_v_air_body.y, -this->_aero_values.unit_v_air_body.x,0.0);
@@ -167,7 +168,7 @@ FinControlAero::FinControlAero(unsigned NFINS) : fins(NFINS), NUMBER_FINS(NFINS)
     {
         fin.span_x = cos(angle);
         fin.span_y = sin(angle);
-        fin.servo = std::make_unique<Servo>();
+        fin.servo = std::make_unique<BoundedServo>(-0.1,0.1);
         angle += dAngle;
     }
 }

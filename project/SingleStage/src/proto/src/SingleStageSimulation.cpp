@@ -51,8 +51,6 @@ void SingleStageSimulation::run(std::string fn, const bool debug)
                 break;
             }
 
-            this->rocket->state.CS.gram_schmidt_orthogonalize();
-
             const double* pos = this->rocket->state.position.data;
             const double* q = this->rocket->state.CS.data;
             fprintf(output,OUTPUT_FORMAT.c_str(),

@@ -10,13 +10,13 @@
 		<CD0>0.5</CD0>
 		<CL_alpha>0.8</CL_alpha>
 		<CM_alpha>-0.0</CM_alpha>
-		<CM_alpha_dot>-0.001</CM_alpha_dot>
+		<CM_alpha_dot>-0.01</CM_alpha_dot>
 		<InducedLiftK>0.06</InducedLiftK>
 		<RefArea>0.01</RefArea>
 		<RefLength>1.0</RefLength>
 		<StallAngle>0.2</StallAngle>
 		<COP>-0.6</COP>
-		<dCLdTheta>0.0</dCLdTheta>
+		<dCLdTheta>0.1</dCLdTheta>
         <dCDdTheta>0.0</dCDdTheta>
 		<dCMdTheta>0.0</dCMdTheta>
 		<AreaRef>0.015</AreaRef>
@@ -53,9 +53,9 @@
 		</Control>
 		-->
 		<Control Type="FinControl">
-			<Proportional>2</Proportional>
-			<Damping>0.0</Damping>
-			<FinGain>0.0</FinGain>
+			<Proportional>1.0</Proportional>
+			<Damping>0.02</Damping>
+			<FinGain>0.1</FinGain>
 		</Control>
 
 		<Navigation>

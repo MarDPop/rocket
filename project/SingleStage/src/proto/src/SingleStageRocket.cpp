@@ -55,7 +55,7 @@ void SingleStageRocket::compute_acceleration(double time)
 
     if(this->parachute->is_deployed())
     {
-        //allActions += this->parachute->update(time);
+        allActions += this->parachute->update(time);
     }
 
     Vector total_force = this->state.CS.transpose_mult(allActions.force);
@@ -125,6 +125,11 @@ void SingleStageRocket::step(double& time, double dt)
     {
         inertial_rotation *= (1.0/angle);
         this->state.CS = Axis(angle,inertial_rotation)*state0.CS;  // confirmed true since rotation matrix is orthogonal
+        this->state.CS.gram_schmidt_orthogonalize();
+    }
+    else
+    {
+        this->state.CS = state0.CS;
     }
 }
 SingleStageRocket::SingleStageRocket(Atmosphere* atmosphere) : gnc(*this), _atmosphere(atmosphere) {}

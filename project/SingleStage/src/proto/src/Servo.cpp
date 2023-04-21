@@ -4,24 +4,28 @@
 
 Servo::~Servo() {}
 
-SimpleServo::SimpleServo() {}
+BoundedServo::BoundedServo(double min_angle, double max_angle) : _min_angle(min_angle),_max_angle(max_angle){}
 
-SimpleServo::~SimpleServo() {}
+BoundedServo::~BoundedServo(){}
 
-void SimpleServo::update(double time)
+SlewingServo::SlewingServo() {}
+
+SlewingServo::~SlewingServo() {}
+
+void SlewingServo::update(double time)
 {
-    double dt = time - this->time_ref;
+    double dt = time - this->_time_ref;
 
-    this->time_ref = time;
+    this->_time_ref = time;
 
-    double angle_to_move = this->commanded_angle - this->angle;
+    double angle_to_move = this->_commanded_angle - this->_angle;
 
-    if(this->torque > this->max_torque && angle_to_move*this->angle > 0)
+    if(this->_torque > this->_max_torque && angle_to_move*this->_angle > 0)
     {
         return;
     }
 
-    double angle_movement_possible = this->slew_rate*dt;
+    double angle_movement_possible = this->_slew_rate*dt;
 
     if(angle_movement_possible > fabs(angle_to_move))
     {
@@ -32,5 +36,5 @@ void SimpleServo::update(double time)
         angle_movement_possible *= (angle_to_move > 0);
     }
 
-    this->angle += angle_movement_possible;
+    this->_angle += angle_movement_possible;
 }

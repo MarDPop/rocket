@@ -78,9 +78,9 @@ for i in range(len(realTimes)):
 fig = plt.figure()
 ax = plt.axes()
 
-ax.plot(filterTimes,err,'r')
-ax.plot(filterTimes,realHeight,'b')
-ax.plot(filterTimes,filteredHeight,':g')
+ax.plot(realTimes,err,'r')
+ax.plot(realTimes,realHeight,'g')
+ax.plot(realTimes,filteredHeight,':b')
 ax.legend(['err','real','filtered'])
 ax.set_xlim([0,50])
 ax.set_ylim([-5,maxHeight + 20])
@@ -88,16 +88,16 @@ ax.set_ylim([-5,maxHeight + 20])
 fig = plt.figure()
 ax = plt.axes()
 
-ax.plot(filterTimes,angleErr,'r')
-ax.plot(filterTimes,pitchReal,'b');
-ax.plot(filterTimes,pitchFiltered,':g')
+ax.plot(realTimes,angleErr,'r')
+ax.plot(realTimes,pitchReal,'g');
+ax.plot(realTimes,pitchFiltered,':b')
 ax.legend(['err','real','filtered'])
 
 fig = plt.figure()
 ax = plt.axes(projection ='3d')
 
 ax.plot3D(realX,realY,realZ, 'r')
-ax.plot3D(filteredX,filteredY,filteredZ, ':g')
+ax.plot3D(filteredX,filteredY,filteredZ, ':b')
 
 ax.set_xlabel("x")
 ax.set_ylabel("y")

@@ -7,11 +7,11 @@ class Servo
 {
 protected:
 
-    double commanded_angle = 0;
+    double _commanded_angle = 0;
 
-    double angle = 0;
+    double _angle = 0;
 
-    double torque = 0;
+    double _torque = 0;
 
 public:
 
@@ -20,66 +20,87 @@ public:
 
     inline virtual void set_commanded_angle(double commanded_angle)
     {
-        this->commanded_angle = commanded_angle;
+        this->_commanded_angle = commanded_angle;
     }
 
     inline virtual void set_commanded_voltage(double commanded_voltage)
     {
-        this->commanded_angle = commanded_voltage;
+        this->_commanded_angle = commanded_voltage;
     }
 
     inline double get_angle() const
     {
-        return this->angle;
+        return this->_angle;
     }
 
     inline void set_torque(double torque)
     {
-        this->torque = torque;
+        this->_torque = torque;
     }
 
     virtual void update(double time)
     {
-        this->angle = this->commanded_angle;
+        this->_angle = this->_commanded_angle;
     }
 };
 
-class SimpleServo : public virtual Servo
+class BoundedServo : public virtual Servo
 {
-    std::array<double,2> angle_range;
+    const double _min_angle;
 
-    double voltage_to_angle;
-
-    double max_torque;
-
-    double slew_rate;
-
-    double time_ref;
+    const double _max_angle;
 
 public:
 
-    SimpleServo();
-    virtual ~SimpleServo();
+    BoundedServo(double min_angle, double max_angle);
+    virtual ~BoundedServo();
 
-    inline void set_performance(std::array<double,2> angle_range,
+    inline void set_commanded_angle(double commanded_angle) override
+    {
+        this->_commanded_angle = std::clamp(commanded_angle,this->_min_angle,this->_max_angle);
+    }
+};
+
+class SlewingServo : public virtual Servo
+{
+    double _min_angle;
+
+    double _max_angle;
+
+    double _voltage_to_angle;
+
+    double _max_torque;
+
+    double _slew_rate;
+
+    double _time_ref;
+
+public:
+
+    SlewingServo();
+    virtual ~SlewingServo();
+
+    inline void set_performance(double min_angle,
+                                double max_angle,
                           double voltage_to_angle,
                           double max_torque,
                           double slew_rate)
     {
-        this->angle_range = angle_range;
-        this->voltage_to_angle = voltage_to_angle;
-        this->max_torque = max_torque;
-        this->slew_rate = slew_rate;
+        this->_min_angle = min_angle;
+        this->_max_angle = max_angle;
+        this->_voltage_to_angle = voltage_to_angle;
+        this->_max_torque = max_torque;
+        this->_slew_rate = slew_rate;
     }
 
     inline void set_commanded_angle(double commanded_angle) override
     {
-        this->commanded_angle = std::clamp(commanded_angle,this->angle_range[0],this->angle_range[1]);
+        this->_commanded_angle = std::clamp(commanded_angle,this->_min_angle,this->_max_angle);
     }
 
     inline void set_commanded_voltage(double commanded_voltage) override
     {
-        this->set_commanded_angle(commanded_voltage*this->voltage_to_angle);
+        this->set_commanded_angle(commanded_voltage*this->_voltage_to_angle);
     }
 
     void update(double time);
