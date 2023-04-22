@@ -1,18 +1,18 @@
-#include "../include/Atmosphere.h"
+#include "../include/Environment.h"
 
 #include <algorithm>
 #include <cmath>
 
-Atmosphere::Atmosphere(){}
+Environment::Environment(){}
 
-Atmosphere::~Atmosphere(){}
+Environment::~Environment(){}
 
-void Atmosphere::set(double alt, double time)
+void Environment::set(double alt, double time)
 {
 
 }
 
-AtmosphereTable::AtmosphereTable(double _ground_altitude,
+EnvironmentTable::EnvironmentTable(double _ground_altitude,
                                double _ground_pressure,
                                double _ground_temperature,
                                double _lapse_rate,
@@ -26,9 +26,9 @@ AtmosphereTable::AtmosphereTable(double _ground_altitude,
     this->compute_atmosphere(30000,1,g0,R0);
 }
 
-AtmosphereTable::~AtmosphereTable() {}
+EnvironmentTable::~EnvironmentTable() {}
 
-void AtmosphereTable::compute_atmosphere(double maxAlt, double dH, double g0, double R0)
+void EnvironmentTable::compute_atmosphere(double maxAlt, double dH, double g0, double R0)
 {
     this->inv_dH = 1.0/dH;
     this->maxAlt = maxAlt;
@@ -74,7 +74,7 @@ void AtmosphereTable::compute_atmosphere(double maxAlt, double dH, double g0, do
     }
 }
 
-void AtmosphereTable::set(double alt, double time)
+void EnvironmentTable::set(double alt, double time)
 {
     if(alt > this->altitudes.back())
     {

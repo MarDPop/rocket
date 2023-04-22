@@ -1,7 +1,7 @@
 #pragma once
 
 #include "SingleStageRocket.h"
-#include "Atmosphere.h"
+#include "Environment.h"
 #include <string>
 #include <vector>
 #include <memory>
@@ -56,7 +56,7 @@ friend class Loader;
 
     std::unique_ptr<SingleStageRocket> rocket;
 
-    std::unique_ptr<Atmosphere> atmosphere;
+    std::unique_ptr<Environment> atmosphere;
 
     Recording record;
 

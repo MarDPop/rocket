@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Atmosphere.h"
+#include "Environment.h"
 
 #include "../../common/include/Cartesian.h"
 #include "../../common/include/Table.h"

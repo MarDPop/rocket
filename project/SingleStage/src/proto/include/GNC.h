@@ -28,6 +28,6 @@ public:
 
         const auto& commands = this->guidance->get_commands(estimated_state, time);
 
-        this->control->get_outputs(commands, estimated_state, time);
+        this->control->get_outputs(commands, estimated_state, this->navigation.sensors.get(), time);
     }
 };

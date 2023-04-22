@@ -9,7 +9,7 @@
 
 #include <iostream>
 
-Thruster::Thruster(const Atmosphere& atmosphere) : pressure(atmosphere.values.pressure)
+Thruster::Thruster(const Environment& atmosphere) : pressure(atmosphere.values.pressure)
 {
     this->action.zero();
     this->thrust_vector.zero();
@@ -72,7 +72,7 @@ void Thruster::set_time(double time)
     this->update_action();
 }
 
-PressureThruster::PressureThruster(const Atmosphere& atmosphere) : Thruster(atmosphere) {}
+PressureThruster::PressureThruster(const Environment& atmosphere) : Thruster(atmosphere) {}
 
 void PressureThruster::add_thrust_point(double pressure, double thrust, double mass_rate) {
 
@@ -145,7 +145,7 @@ void PressureThruster::load(std::string fn)
     }
 }
 
-ComputedThruster::ComputedThruster(const Atmosphere& atmosphere) : Thruster(atmosphere) {}
+ComputedThruster::ComputedThruster(const Environment& atmosphere) : Thruster(atmosphere) {}
 
 void ComputedThruster::load(std::string fn)
 {

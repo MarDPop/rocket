@@ -266,7 +266,7 @@ namespace Cartesian {
 
         inline void normalize()
         {
-            double n = 1/sqrt(this->data[0]*this->data[0] + this->data[1]*this->data[1] + this->data[2]*this->data[2]);
+            double n = 1.0/sqrt(this->data[0]*this->data[0] + this->data[1]*this->data[1] + this->data[2]*this->data[2]);
             this->data[0] *= n;
             this->data[1] *= n;
             this->data[2] *= n;
@@ -374,87 +374,6 @@ namespace Cartesian {
             return Axis(IDENTITY);
         }
 
-        inline Vector& operator[](uint_fast8_t idx)
-        {
-            return row[idx];
-        }
-
-        inline void operator=(const Axis& b)
-        {
-            memcpy(this->data,b.data,sizeof(this->data));
-        }
-
-        inline Axis operator+(const Axis& b) const noexcept
-        {
-            Axis a;
-            for(int i = 0; i < 9; i++)
-            {
-                a.data[i] = this->data[i] + b.data[i];
-            }
-            return a;
-        }
-
-        inline Axis operator-(const Axis& b) const noexcept
-        {
-            Axis a;
-            for(int i = 0; i < 9; i++)
-            {
-                a.data[i] = this->data[i] - b.data[i];
-            }
-            return a;
-        }
-
-        inline void operator+=(const Axis& b) noexcept
-        {
-            for(int i = 0; i < 9; i++)
-            {
-                this->data[i] += b.data[i];
-            }
-        }
-
-        inline void operator-=(const Axis& b) noexcept
-        {
-            for(int i = 0; i < 9; i++)
-            {
-                this->data[i] -= b.data[i];
-            }
-        }
-
-        inline void operator*=(double b) noexcept
-        {
-            for(int i = 0; i < 9; i++)
-            {
-                this->data[i] *= b;
-            }
-        }
-
-        inline Vector operator*(const Vector& a) const noexcept
-        {
-            Vector b;
-            int irow = 0;
-            for(int i = 0; i < 3; i++)
-            {
-                b.data[i] = this->data[irow]*a.data[0] + this->data[irow + 1]*a.data[1] + this->data[irow + 2]*a.data[2];
-                irow += 3;
-            }
-            return b;
-        }
-
-        inline Axis operator*(const Axis& B) const noexcept
-        {
-            Axis C;
-            C.data[0] = data[0]*B.data[0] + data[1]*B.data[3] + data[2]*B.data[6];
-            C.data[1] = data[0]*B.data[1] + data[1]*B.data[4] + data[2]*B.data[7];
-            C.data[2] = data[0]*B.data[2] + data[1]*B.data[5] + data[2]*B.data[8];
-            C.data[3] = data[3]*B.data[0] + data[4]*B.data[3] + data[5]*B.data[6];
-            C.data[4] = data[3]*B.data[1] + data[4]*B.data[4] + data[5]*B.data[7];
-            C.data[5] = data[3]*B.data[2] + data[4]*B.data[5] + data[5]*B.data[8];
-            C.data[6] = data[6]*B.data[0] + data[7]*B.data[3] + data[8]*B.data[6];
-            C.data[7] = data[6]*B.data[1] + data[7]*B.data[4] + data[8]*B.data[7];
-            C.data[8] = data[6]*B.data[2] + data[7]*B.data[5] + data[8]*B.data[8];
-            return C;
-        }
-
         inline static void mult(const Axis& A, const Axis& B, Axis& C) noexcept
         {
             C.data[0] = A.data[0]*B.data[0] + A.data[1]*B.data[3] + A.data[2]*B.data[6];
@@ -470,12 +389,80 @@ namespace Cartesian {
 
         inline static void mult(const Axis& A, const Vector& b, Vector& x) noexcept
         {
-            int irow = 0;
-            for(int i = 0; i < 3; i++)
+            unsigned irow = 0;
+            for(unsigned i = 0; i < 3; i++)
             {
                 x.data[i] = A.data[irow]*b.data[0] + A.data[irow + 1]*b.data[1] + A.data[irow + 2]*b.data[2];
                 irow += 3;
             }
+        }
+
+        inline Vector& operator[](uint_fast8_t idx)
+        {
+            return row[idx];
+        }
+
+        inline void operator=(const Axis& b)
+        {
+            memcpy(this->data,b.data,sizeof(this->data));
+        }
+
+        inline Axis operator+(const Axis& b) const noexcept
+        {
+            Axis a;
+            for(unsigned i = 0; i < 9; i++)
+            {
+                a.data[i] = this->data[i] + b.data[i];
+            }
+            return a;
+        }
+
+        inline Axis operator-(const Axis& b) const noexcept
+        {
+            Axis a;
+            for(unsigned i = 0; i < 9; i++)
+            {
+                a.data[i] = this->data[i] - b.data[i];
+            }
+            return a;
+        }
+
+        inline void operator+=(const Axis& b) noexcept
+        {
+            for(unsigned i = 0; i < 9; i++)
+            {
+                this->data[i] += b.data[i];
+            }
+        }
+
+        inline void operator-=(const Axis& b) noexcept
+        {
+            for(unsigned i = 0; i < 9; i++)
+            {
+                this->data[i] -= b.data[i];
+            }
+        }
+
+        inline void operator*=(double b) noexcept
+        {
+            for(unsigned i = 0; i < 9; i++)
+            {
+                this->data[i] *= b;
+            }
+        }
+
+        inline Vector operator*(const Vector& a) const noexcept
+        {
+            Vector b;
+            Axis::mult(*this,a,b);
+            return b;
+        }
+
+        inline Axis operator*(const Axis& A) const noexcept
+        {
+            Axis B;
+            Axis::mult(*this,A,B);
+            return B;
         }
 
         inline Axis get_transpose() const noexcept
@@ -562,7 +549,7 @@ namespace Cartesian {
             this->axis.z.normalize();
             this->axis.x -= this->axis.z*( this->axis.x.dot(this->axis.z) );
             this->axis.x.normalize();
-            this->axis.y -= this->axis.z*( this->axis.y.dot(this->axis.z) ) - this->axis.x*( this->axis.y.dot(this->axis.x) );
+            this->axis.y -= (this->axis.z*( this->axis.y.dot(this->axis.z) ) + this->axis.x*( this->axis.y.dot(this->axis.x) ));
             this->axis.y.normalize();
         }
 

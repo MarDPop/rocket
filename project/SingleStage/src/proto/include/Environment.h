@@ -14,7 +14,7 @@ struct AltitudeValues
     double gravity = 9.806; // m/s2
 };
 
-class Atmosphere
+class Environment
 {
 public:
 
@@ -24,18 +24,22 @@ public:
 
     static constexpr double AIR_CONST = 287.052874*1.4;
 
+    Vector ecef_origin;
+
+    Vector earth_rotation_in_frame;
+
     AltitudeValues values;
 
     WindHistory wind;
 
-    Atmosphere();
-    virtual ~Atmosphere();
+    Environment();
+    virtual ~Environment();
 
     virtual void set(double alt, double time);
 
 };
 
-class AtmosphereTable : public virtual Atmosphere
+class EnvironmentTable : public virtual Environment
 {
 
     /**
@@ -84,13 +88,13 @@ class AtmosphereTable : public virtual Atmosphere
 
 public:
 
-    AtmosphereTable(double _ground_altitude,
+    EnvironmentTable(double _ground_altitude,
                     double _ground_pressure,
                     double _ground_temperature,
                     double _lapse_rate,
                     double g0 = 9.806,
                     double R0 = 6371000.0);
-    virtual ~AtmosphereTable();
+    virtual ~EnvironmentTable();
 
     void set(double alt, double time) override;
 };

@@ -28,7 +28,7 @@ void Loader::loadSimulation(SingleStageSimulation& simulation, const char* fn)
         double ground_temperature = AtmosphereElement->FirstChildElement("Temperature")->DoubleText();
         double ground_pressure = AtmosphereElement->FirstChildElement("Pressure")->DoubleText();
         double lapse_rate = AtmosphereElement->FirstChildElement("LapseRate")->DoubleText();
-        simulation.atmosphere = std::make_unique<AtmosphereTable>(ground_altitude,ground_pressure,ground_temperature,lapse_rate);
+        simulation.atmosphere = std::make_unique<EnvironmentTable>(ground_altitude,ground_pressure,ground_temperature,lapse_rate);
         auto* windEl = AtmosphereElement->FirstChildElement("Wind");
         if(windEl)
         {
@@ -41,7 +41,7 @@ void Loader::loadSimulation(SingleStageSimulation& simulation, const char* fn)
     }
     else
     {
-        simulation.atmosphere = std::make_unique<Atmosphere>();
+        simulation.atmosphere = std::make_unique<Environment>();
     }
 
     auto* launchElement = root->FirstChildElement("Launch");
@@ -98,7 +98,7 @@ Inertia_Basic loadBasicInertia(tinyxml2::XMLElement* inertiaElement)
     return inertia;
 }
 
-Thruster* loadThruster(tinyxml2::XMLElement* thrusterElement, Atmosphere* atm)
+Thruster* loadThruster(tinyxml2::XMLElement* thrusterElement, Environment* atm)
 {
     const char* type = thrusterElement->Attribute("Type");
     const char* fn = thrusterElement->Attribute("File");
@@ -290,8 +290,7 @@ void loadGNC(GNC& gnc, tinyxml2::XMLElement* gncElement, Parachute* parachute, A
         auto* sensorElement = navigationElement->FirstChildElement("Sensor");
         if(sensorElement)
         {
-            // const char* type = navigationElement->Attribute("Type");
-            auto* el = navigationElement->FirstChildElement("Variances");
+            auto* el = sensorElement->FirstChildElement("Variances");
             if(el)
             {
                 double barometer = el->FirstChildElement("Barometer")->DoubleText();
@@ -350,7 +349,7 @@ void Loader::loadRocket(SingleStageRocket& rocket, const char* fn)
     auto* ThrusterElement = root->FirstChildElement("Thruster");
     if(!ThrusterElement) { throw std::invalid_argument("No thruster"); }
 
-    rocket.thruster.reset(loadThruster(ThrusterElement, rocket._atmosphere));
+    rocket.thruster.reset(loadThruster(ThrusterElement, rocket._environment));
 
     auto* AerodynamicsElement = root->FirstChildElement("Aerodynamics");
     auto* ParachuteElement = root->FirstChildElement("Parachute");

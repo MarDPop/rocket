@@ -6,7 +6,7 @@ Control::Control() {}
 
 Control::~Control() {}
 
-void Control::get_outputs(const Commands& commands, const KinematicState& estimated_state, double time) {}
+void Control::get_outputs(const Commands& commands, const KinematicState& estimated_state, const Sensors* sensors, double time) {}
 
 ControlFinSimple::ControlFinSimple(FinControlAero& _aero) : aero(_aero)
 {
@@ -24,14 +24,23 @@ Vector ControlFinSimple::get_desired_arm_magnitude_body(const Commands& commands
     return estimated_state.CS * arm_inertial; // should have zero z component
 }
 
-void ControlFinSimple::get_outputs(const Commands& commands, const KinematicState& estimated_state, double time)
+void ControlFinSimple::get_outputs(const Commands& commands, const KinematicState& estimated_state, const Sensors* sensors, double time)
 {
+    double dynamic_pressure_factor = sensors->get_measured_dynamic_pressure();
+
+    if(dynamic_pressure_factor < 0.1)
+    {
+        return;
+    }
+
     auto arm = this->get_desired_arm_magnitude_body(commands, estimated_state);
+
+    double gain = this->fin_gain/dynamic_pressure_factor;
 
     for(unsigned fin_idx = 0; fin_idx < aero.NUMBER_FINS; fin_idx++)
     {
         const Fin& fin = aero.get_fin(fin_idx);
-        double angle = this->fin_gain*(arm.x*fin.span_x + arm.y*fin.span_y);
+        double angle = gain*(arm.x*fin.span_x + arm.y*fin.span_y);
         fin.servo->set_commanded_angle(angle);
         fin.servo->update(time);
     }

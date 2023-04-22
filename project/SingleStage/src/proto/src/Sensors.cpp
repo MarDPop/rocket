@@ -11,7 +11,7 @@ void computed_quatities::set(const measured_quantities& measured, const altitude
 
     this->mach_squared = 5*(pow(pressure_ratio, 2/7) - 1.0);
 
-    this->airspeed = sqrt(this->mach_squared/(Atmosphere::AIR_CONST*measured.temperature));
+    this->airspeed = sqrt(this->mach_squared/(Environment::AIR_CONST*measured.temperature));
 
     pressure_ratio = measured.static_pressure * cal.inverse_ref_pressure;
 
@@ -46,10 +46,10 @@ void Sensors::set_sensor_variances(double sigma_pressure, double sigma_temperatu
 void Sensors::measure_quantities(const SingleStageRocket& rocket) {
     // add delay
     const auto& rocket_state = rocket.get_state();
-    this->measured.angular_velocity = rocket_state.CS * rocket_state.angular_velocity;
+    this->measured.angular_velocity = rocket_state.angular_velocity;
     Vector acceleration_and_gravity(rocket_state.acceleration.x,
                                     rocket_state.acceleration.y,
-                                    rocket_state.acceleration.z + rocket.get_atmosphere().values.gravity);
+                                    rocket_state.acceleration.z + rocket.get_environment().values.gravity);
     this->measured.acceleration = rocket_state.CS * acceleration_and_gravity;
 
     for(int i = 0; i < 3; i++)
@@ -58,9 +58,9 @@ void Sensors::measure_quantities(const SingleStageRocket& rocket) {
         this->measured.acceleration.data[i] += this->accelerometer_variance(this->generator);
     }
 
-    this->measured.total_pressure = rocket.get_atmosphere().values.pressure + rocket.get_aerodynamics().get_aero_values().dynamic_pressure + this->barometer_variance(this->generator);
-    this->measured.static_pressure = rocket.get_atmosphere().values.pressure + this->barometer_variance(this->generator);
-    this->measured.temperature = rocket.get_atmosphere().values.temperature + this->thermometer_variance(this->generator);
+    this->measured.total_pressure = rocket.get_environment().values.pressure + rocket.get_aerodynamics().get_aero_values().dynamic_pressure + this->barometer_variance(this->generator);
+    this->measured.static_pressure = rocket.get_environment().values.pressure + this->barometer_variance(this->generator);
+    this->measured.temperature = rocket.get_environment().values.temperature + this->thermometer_variance(this->generator);
 }
 
 void Sensors::update(const SingleStageRocket& rocket, double time) {

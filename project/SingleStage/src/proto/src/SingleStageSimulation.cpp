@@ -4,7 +4,7 @@
 #include <exception>
 #include <iostream>
 
-#include "../include/Atmosphere.h"
+#include "../include/Environment.h"
 
 #include "../../../lib/tinyxml/tinyxml2.h"
 
@@ -50,6 +50,8 @@ void SingleStageSimulation::run(std::string fn, const bool debug)
             if(std::isnan(this->rocket->state.position.z) || this->rocket->state.position.z < -0.5) {
                 break;
             }
+
+            this->rocket->state.CS.gram_schmidt_orthogonalize();
 
             const double* pos = this->rocket->state.position.data;
             const double* q = this->rocket->state.CS.data;

@@ -6,7 +6,7 @@
 
 #include <string>
 #include "Action.h"
-#include "Atmosphere.h"
+#include "Environment.h"
 
 //TODO: rename to propulsion
 class Thruster
@@ -45,7 +45,7 @@ protected:
 
 public:
 
-    Thruster(const Atmosphere& atmosphere);
+    Thruster(const Environment& atmosphere);
     ~Thruster();
 
     inline void set_performance(double thrust, double isp)
@@ -122,7 +122,7 @@ class PressureThruster : public virtual Thruster {
 
 public:
 
-    PressureThruster(const Atmosphere& atmosphere);
+    PressureThruster(const Environment& atmosphere);
 
     void add_thrust_point(double pressure, double thrust, double mass_rate);
 
@@ -211,7 +211,7 @@ public:
         int n_segments;
     };
 
-    ComputedThruster(const Atmosphere& atmosphere);
+    ComputedThruster(const Environment& atmosphere);
     ~ComputedThruster();
 
     void load(std::string fn) override;

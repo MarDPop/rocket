@@ -7,7 +7,7 @@
 
 void Aerodynamics::compute_aero_values()
 {
-    Vector air_velocity = this->rocket.get_state().velocity - this->rocket.get_atmosphere().wind.wind;
+    Vector air_velocity = this->rocket.get_state().velocity - this->rocket.get_environment().wind.wind;
 
     this->_aero_values.airspeed = air_velocity.norm();
 
@@ -22,10 +22,10 @@ void Aerodynamics::compute_aero_values()
         this->_aero_values.unit_v_air_body.data[2] = -1.0;
     }
 
-    this->_aero_values.mach = this->_aero_values.airspeed * this->rocket.get_atmosphere().values.inv_sound_speed;
+    this->_aero_values.mach = this->_aero_values.airspeed * this->rocket.get_environment().values.inv_sound_speed;
 
     double tmp = 1.0 + 0.2*this->_aero_values.mach*this->_aero_values.mach;
-    this->_aero_values.dynamic_pressure = this->rocket.get_atmosphere().values.pressure*(tmp*tmp*tmp*sqrt(tmp) - 1.0);
+    this->_aero_values.dynamic_pressure = this->rocket.get_environment().values.pressure*(tmp*tmp*tmp*sqrt(tmp) - 1.0);
 }
 
 void Aerodynamics::compute_forces() {}
@@ -125,10 +125,8 @@ void AerodynamicsBasicCoefficient::compute_forces()
         return;
     }
 
-    // already compute damping moment
-    Vector angular_velocity_body = rocket.get_state().CS * rocket.get_state().angular_velocity;
-    double angular_rate = angular_velocity_body.norm();
-    this->_action.moment += angular_velocity_body*(this->_CM_alpha_dot*this->rocket.get_atmosphere().values.density*angular_rate);
+    double angular_rate = rocket.get_state().angular_velocity.norm();
+    this->_action.moment += rocket.get_state().angular_velocity*(this->_CM_alpha_dot*this->rocket.get_environment().values.density*angular_rate);
 
     // arm is the moment arm formed from the freestream, length of the arm is sin of angle between
     Vector arm(this->_aero_values.unit_v_air_body.y, -this->_aero_values.unit_v_air_body.x,0.0);

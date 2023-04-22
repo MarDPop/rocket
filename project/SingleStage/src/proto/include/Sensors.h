@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Atmosphere.h"
+#include "Environment.h"
 
 #include <random>
 #include <memory>
@@ -111,7 +111,7 @@ public:
         this->cal.temperature = temperature;
         this->cal.pressure = pressure;
         this->cal.accelerometer_cog_distance = 0.0;
-        this->cal.exp_const = -Atmosphere::R_AIR / g;
+        this->cal.exp_const = -Environment::R_AIR / g;
         this->cal.inverse_ref_pressure = 1.0/pressure;
     }
 

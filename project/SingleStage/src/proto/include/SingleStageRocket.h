@@ -12,7 +12,7 @@
 #include "Aerodynamics.h"
 #include "GNC.h"
 #include "Thruster.h"
-#include "Atmosphere.h"
+#include "Environment.h"
 #include "Parachute.h"
 
 using namespace Cartesian;
@@ -29,6 +29,10 @@ friend class Loader;
 
     Inertia inertia;
 
+    MOI MoI_rate_change;
+
+    Axis I_inverse;
+
     GNC gnc;
 
     std::unique_ptr<Aerodynamics> aerodynamics;
@@ -37,22 +41,30 @@ friend class Loader;
 
     std::unique_ptr<Parachute> parachute;
 
-    Atmosphere* const _atmosphere;
+    Environment* const _environment;
+
+    bool symmetric_inertia_assumption = false;
 
     void compute_acceleration(double time);
 
     void step(double& time, double dt);
 
-    void update_inertia();
+    void update_inertia(double inv_dt);
 
 public:
 
-    SingleStageRocket(Atmosphere* atmosphere);
+    SingleStageRocket(Environment* atmosphere);
     ~SingleStageRocket();
 
     inline void set_inertial_properties(Inertia inertia_empty)
     {
         this->inertia_empty = inertia_empty;
+        if( (fabs(inertia_empty.MoI.Ixy) + fabs(inertia_empty.MoI.Ixz) + fabs(inertia_empty.MoI.Ixz) < 1e-6) &&
+             (fabs(inertia_empty.CoM.x) + fabs(inertia_empty.CoM.y) < 1e-6) )
+        {
+            this->symmetric_inertia_assumption = true;
+            this->I_inverse.zero(); // ensure zero non diagonal terms
+        }
     }
 
     inline const Inertia& get_inertia() const
@@ -60,9 +72,9 @@ public:
         return this->inertia;
     }
 
-    inline const Atmosphere& get_atmosphere() const
+    inline const Environment& get_environment() const
     {
-        return *this->_atmosphere;
+        return *this->_environment;
     }
 
     inline const KinematicState& get_state() const

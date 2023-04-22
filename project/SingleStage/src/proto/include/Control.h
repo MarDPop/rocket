@@ -3,6 +3,7 @@
 #include "Kinematics.h"
 #include "Aerodynamics.h"
 #include "Guidance.h"
+#include "Sensors.h"
 
 class Control
 {
@@ -12,7 +13,7 @@ public:
     Control();
     virtual ~Control();
 
-    virtual void get_outputs(const Commands& commands, const KinematicState& estimated_state, double time);
+    virtual void get_outputs(const Commands& commands, const KinematicState& estimated_state, const Sensors* sensors, double time);
 
 };
 
@@ -44,5 +45,5 @@ public:
         this->damping = damping;
     }
 
-    void get_outputs(const Commands& commands, const KinematicState& estimated_state, double time) override;
+    void get_outputs(const Commands& commands, const KinematicState& estimated_state, const Sensors* sensors, double time) override;
 };
