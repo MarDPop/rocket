@@ -25,7 +25,7 @@ void Aerodynamics::compute_aero_values()
     this->_aero_values.mach = this->_aero_values.airspeed * this->rocket.get_environment().values.inv_sound_speed;
 
     double tmp = 1.0 + 0.2*this->_aero_values.mach*this->_aero_values.mach;
-    this->_aero_values.dynamic_pressure = this->rocket.get_environment().values.pressure*(tmp*tmp*tmp*sqrt(tmp) - 1.0);
+    this->_aero_values.dynamic_pressure = this->rocket.get_environment().values.pressure*(tmp*tmp*tmp*sqrt(tmp) - 1.0); // TODO: dynamic pressure seems high
 }
 
 void Aerodynamics::compute_forces() {}

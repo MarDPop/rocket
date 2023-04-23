@@ -49,9 +49,6 @@ void FilterBasic::update(const Sensors& sensors, double time)
     const auto& measured = sensors.get_measured_quantities();
     const auto& computed = sensors.get_computed_quantities();
 
-    double dHdt = (computed.altitude - this->alt_old)/dt;
-    this->alt_old = computed.altitude;
-
     this->computed_state.acceleration = this->computed_state.CS.transpose_mult(measured.acceleration);
     this->computed_state.acceleration.z -= 9.806;
 
@@ -59,10 +56,11 @@ void FilterBasic::update(const Sensors& sensors, double time)
     this->computed_state.velocity += (this->computed_state.acceleration * dt);
 
     this->computed_state.position.z = (this->computed_state.position.z + computed.altitude)*0.5;
-
-    double velocity_factor = fabs((dHdt - this->computed_state.velocity.z)/this->computed_state.velocity.z);
-    velocity_factor = velocity_factor/(velocity_factor + 0.2);
-    this->computed_state.velocity.z = this->computed_state.velocity.z*velocity_factor + dHdt*(1.0 - velocity_factor);
+    if(fabs(this->computed_state.velocity.z) > 10.0) {
+        double dHdt = (computed.altitude - this->alt_old)/dt;
+        this->computed_state.velocity.z = this->computed_state.velocity.z*0.8 + dHdt*0.2;
+    }
+    this->alt_old = computed.altitude;
 
     Vector angular_velocity = this->computed_state.CS.transpose_mult(measured.angular_velocity);
     double angular_rate = angular_velocity.norm();

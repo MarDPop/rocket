@@ -16,6 +16,7 @@ debugFile.close()
 realTimes = []
 realPosition = []
 realZAxis = []
+timeBurnout = -1
 for line in outLines:
     data = line.split()
     # print(data)
@@ -24,6 +25,11 @@ for line in outLines:
     realTimes.append(float(data[0]))
     realPosition.append([float(data[1]),float(data[2]),float(data[3])])
     realZAxis.append([float(data[10]),float(data[11]),float(data[12])])
+    if timeBurnout < 0 and float(data[13]) < 0.1:
+        timeBurnout = float(data[0])
+
+print('Time Burnout')
+print(timeBurnout)
 
 filterTimes = []
 filterPosition = []
@@ -74,6 +80,28 @@ for i in range(len(realTimes)):
     pitchReal.append(np.arccos(realZAxis[i][2]))
     pitchFiltered.append(np.arccos(filteredZAxis[i][2]))
 
+iLast = len(realTimes);
+realAcceleration = np.zeros(iLast)
+i = 2
+dt = 1.0/(9.806*(realTimes[1] - realTimes[0]))
+pos_prev = np.array(realPosition[0])
+pos_next = np.array(realPosition[1])
+while (i < iLast):
+    pos = pos_next
+    pos_next = np.array(realPosition[i])
+
+    acc = (pos_next - 2*pos + pos_prev)
+
+    g = np.linalg.norm(acc)*dt;
+
+    realAcceleration[i-1] = g
+
+    pos_prev = pos;
+    i += 1
+
+# fig = plt.figure()
+# ax = plt.axes()
+# ax.plot(realTimes,realAcceleration,'b')
 
 fig = plt.figure()
 ax = plt.axes()

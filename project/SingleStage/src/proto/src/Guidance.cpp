@@ -11,27 +11,37 @@ Guidance::~Guidance(){}
 
 const Commands& Guidance::get_commands(const KinematicState& estimated_state, double time)
 {
-    return this->commands;
+    return this->_commands;
 }
 
-GuidanceSimpleAscent::GuidanceSimpleAscent() : Guidance()
+GuidanceTimedParachute::GuidanceTimedParachute(double burnout, double delay) : Guidance(), _burnout(burnout), _deploy(burnout + delay) {}
+
+const Commands& GuidanceTimedParachute::get_commands(const KinematicState& estimated_state, double time)
 {
+    if(!this->chute->is_deployed() && time > _deploy )
+    {
+        this->_commands.z_axis_inertial.zero();
+        this->chute->deploy(time);
+    }
+    return this->_commands;
 }
+
+GuidanceSimpleAscent::GuidanceSimpleAscent() : Guidance() {}
 
 const Commands& GuidanceSimpleAscent::get_commands(const KinematicState& estimated_state, double time)
 {
     if(this->chute->is_deployed())
     {
-        return this->commands;
+        return this->_commands;
     }
     else if (estimated_state.velocity.z < -1.0)
     {
         this->chute->deploy(time);
-        this->commands.z_axis_inertial.zero();
-        return this->commands;
+        this->_commands.z_axis_inertial.zero();
+        return this->_commands;
     }
 
-    return this->commands;
+    return this->_commands;
 }
 
 GuidanceVerticalAscent::GuidanceVerticalAscent(){}
@@ -40,17 +50,17 @@ const Commands& GuidanceVerticalAscent::get_commands(const KinematicState& estim
 {
     if(this->chute->is_deployed())
     {
-        return this->commands;
+        return this->_commands;
     }
     else if (estimated_state.velocity.z < -30.0)
     {
         this->chute->deploy(time);
-        this->commands.z_axis_inertial.zero();
-        return this->commands;
+        this->_commands.z_axis_inertial.zero();
+        return this->_commands;
     }
 
-    double x_scaled = this->damping*estimated_state.acceleration.x - this->proportional*estimated_state.velocity.x;
-    double y_scaled = this->damping*estimated_state.acceleration.y - this->proportional*estimated_state.velocity.y;
+    double x_scaled = -this->damping*estimated_state.acceleration.x - this->proportional*estimated_state.velocity.x;
+    double y_scaled = -this->damping*estimated_state.acceleration.y - this->proportional*estimated_state.velocity.y;
 
     Vector rescaled_anti_vector(x_scaled,y_scaled,estimated_state.velocity.z);
 
@@ -58,13 +68,13 @@ const Commands& GuidanceVerticalAscent::get_commands(const KinematicState& estim
 
     if(scale > 1e-4) // REMEMBER TO PUT BACK
     {
-        this->commands.z_axis_inertial = rescaled_anti_vector * (1.0/scale);
+        this->_commands.z_axis_inertial = rescaled_anti_vector * (1.0/scale);
     }
     else
     {
-        this->commands.z_axis_inertial.zero();
-        this->commands.z_axis_inertial.data[2] = 1.0;
+        this->_commands.z_axis_inertial.zero();
+        this->_commands.z_axis_inertial.data[2] = 1.0;
     }
 
-    return this->commands;
+    return this->_commands;
 }

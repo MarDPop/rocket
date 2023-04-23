@@ -72,6 +72,63 @@ void Thruster::set_time(double time)
     this->update_action();
 }
 
+void EstesThruster::update_thrust_and_massrate(double time)
+{
+    if(time < this->_burnout_time)
+    {
+        int idx = time * this->_dT_inv;
+        this->thrust = this->_thrusts[idx];
+        this->mass_rate = this->thrust * this->_inv_avg_exit_velocity;
+    }
+    else
+    {
+        this->active = false;
+        this->thrust = 0;
+        this->mass_rate = 0;
+    }
+};
+
+void EstesThruster::load(std::string fn)
+{
+    // Loads RASP file
+    std::ifstream myfile(fn);
+
+    if(myfile.is_open())
+    {
+        _thrusts.clear();
+
+
+        std::string line;
+        getline( myfile, line );
+        for(; getline( myfile, line ); )
+        {
+            if(line[0] != ';') break;
+        }
+        auto row = util::split(line);
+        this->_propellant_mass = std::stod(row[0]);
+        this->_total_impulse = std::stod(row[1]);
+        this->_chute_delay = std::stod(row[2]);
+        double dT = std::stod(row[3]);
+        this->_dT_inv = 1.0/dT;
+        for(; getline( myfile, line ); )
+        {
+            if(line[0] == ';')
+            {
+                continue;
+            }
+            this->_thrusts.push_back(std::stod(line));
+        }
+        this->_burnout_time = dT*this->_thrusts.size();
+
+        this->_inv_avg_exit_velocity = this->_propellant_mass / this->_total_impulse;
+        myfile.close();
+    }
+    else
+    {
+        throw std::invalid_argument("could not load file for thruster");
+    }
+}
+
 PressureThruster::PressureThruster(const Environment& atmosphere) : Thruster(atmosphere) {}
 
 void PressureThruster::add_thrust_point(double pressure, double thrust, double mass_rate) {
@@ -101,10 +158,6 @@ void PressureThruster::add_thrust_point(double pressure, double thrust, double m
 
     this->idx_final = this->pressures.size()-1;
 }
-
-void PressureThruster::reset() {
-    this->idx = 0;
-};
 
 void PressureThruster::update_thrust_and_massrate(double time)
 {

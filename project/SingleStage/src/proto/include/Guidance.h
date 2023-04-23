@@ -23,9 +23,11 @@ class Guidance
 {
 protected:
 
-    Commands commands;
+    Commands _commands;
 
 public:
+
+    Parachute* chute = nullptr;
 
     Guidance();
     virtual ~Guidance();
@@ -33,12 +35,25 @@ public:
     virtual const Commands& get_commands(const KinematicState& estimated_state, double time);
 };
 
+class GuidanceTimedParachute : public virtual Guidance
+{
+protected:
+
+    const double _burnout;
+
+    const double _deploy;
+
+public:
+
+    GuidanceTimedParachute(double burnout, double delay);
+
+    const Commands& get_commands(const KinematicState& estimated_state, double time) override;
+};
+
 class GuidanceSimpleAscent : public virtual Guidance
 {
 
 public:
-
-    Parachute* chute = nullptr;
 
     GuidanceSimpleAscent();
 
@@ -52,8 +67,6 @@ class GuidanceVerticalAscent : public virtual Guidance
     double damping = 0.1;
 
 public:
-
-    Parachute* chute = nullptr;
 
     GuidanceVerticalAscent();
 

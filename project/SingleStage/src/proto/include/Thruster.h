@@ -99,6 +99,58 @@ public:
     virtual void load(std::string fn);
 };
 
+class EstesThruster : public virtual Thruster
+{
+    std::string _name;
+
+    std::vector<double> _times;
+
+    std::vector<double> _thrusts;
+
+    double _propellant_mass;
+
+    double _total_impulse;
+
+    double _chute_delay;
+
+    double _burnout_time;
+
+    int _length_mm;
+
+    int _diameter_mm;
+
+    void update_thrust_and_massrate(double time) override;
+
+public:
+
+    EstesThruster(const Environment& atmosphere);
+
+    inline void reset()
+    {
+        this->idx = 0;
+    }
+
+    inline double get_burnout_time()
+    {
+        return this->_burnout_time;
+    }
+
+    inline double get_chute_delay()
+    {
+        return this->_chute_delay
+    }
+
+    inline double get_propellant_mass()
+    {
+        return this->_propellant_mass;
+    }
+
+    void generate(char Class, int AvgThrust, int Delay);
+
+    void load(std::string fn) override;
+
+};
+
 
 class PressureThruster : public virtual Thruster {
 
@@ -126,7 +178,10 @@ public:
 
     void add_thrust_point(double pressure, double thrust, double mass_rate);
 
-    void reset();
+    inline void reset()
+    {
+        this->idx = 0;
+    }
 
     void load(std::string fn) override;
 
