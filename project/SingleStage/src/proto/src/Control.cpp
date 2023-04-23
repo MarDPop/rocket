@@ -19,9 +19,9 @@ Vector ControlFinSimple::get_desired_arm_magnitude_body(const Commands& commands
 {
     Vector angle_diff_inertial = commands.z_axis_inertial.cross(estimated_state.CS.axis.z);
 
-    Vector arm_inertial = angle_diff_inertial * this->proportional - estimated_state.angular_velocity * this->damping;
+    Vector arm_body = estimated_state.CS * angle_diff_inertial;
 
-    return estimated_state.CS * arm_inertial; // should have zero z component
+    return (arm_body * this->proportional) - (estimated_state.angular_velocity * this->damping); // should have zero z component
 }
 
 void ControlFinSimple::get_outputs(const Commands& commands, const KinematicState& estimated_state, const Sensors* sensors, double time)

@@ -42,7 +42,7 @@ const Commands& GuidanceVerticalAscent::get_commands(const KinematicState& estim
     {
         return this->commands;
     }
-    else if (estimated_state.velocity.z < -10.0)
+    else if (estimated_state.velocity.z < -30.0)
     {
         this->chute->deploy(time);
         this->commands.z_axis_inertial.zero();
@@ -58,7 +58,7 @@ const Commands& GuidanceVerticalAscent::get_commands(const KinematicState& estim
 
     if(scale > 1e-4) // REMEMBER TO PUT BACK
     {
-        this->commands.z_axis_inertial = rescaled_anti_vector * (1.0/rescaled_anti_vector.norm());
+        this->commands.z_axis_inertial = rescaled_anti_vector * (1.0/scale);
     }
     else
     {

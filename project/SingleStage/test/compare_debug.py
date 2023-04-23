@@ -98,6 +98,9 @@ ax = plt.axes(projection ='3d')
 
 ax.plot3D(realX,realY,realZ, 'r')
 ax.plot3D(filteredX,filteredY,filteredZ, ':b')
+ax.set_zlim([-5,maxHeight + 20])
+ax.set_xlim([-10 - maxHeight*0.5,maxHeight*0.5 + 10])
+ax.set_ylim([-10 - maxHeight*0.5,maxHeight*0.5 + 10])
 
 ax.set_xlabel("x")
 ax.set_ylabel("y")

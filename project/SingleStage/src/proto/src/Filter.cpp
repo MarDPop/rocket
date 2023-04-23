@@ -40,7 +40,7 @@ void FilterSimpleIntegrate::update(const Sensors& sensors, double time)
 void FilterBasic::update(const Sensors& sensors, double time)
 {
     auto dt = time - t_old;
-    if(fabs(dt) < 1e-8)
+    if(fabs(dt) < 1e-2)
     {
         return;
     }
@@ -52,14 +52,17 @@ void FilterBasic::update(const Sensors& sensors, double time)
     double dHdt = (computed.altitude - this->alt_old)/dt;
     this->alt_old = computed.altitude;
 
-    Vector acceleration_inertial = this->computed_state.CS.transpose_mult(measured.acceleration);
-    acceleration_inertial.z -= 9.806;
+    this->computed_state.acceleration = this->computed_state.CS.transpose_mult(measured.acceleration);
+    this->computed_state.acceleration.z -= 9.806;
 
     this->computed_state.position += (this->computed_state.velocity * dt);
-    this->computed_state.velocity += (acceleration_inertial * dt);
+    this->computed_state.velocity += (this->computed_state.acceleration * dt);
 
     this->computed_state.position.z = (this->computed_state.position.z + computed.altitude)*0.5;
-    this->computed_state.velocity.z = (this->computed_state.velocity.z + dHdt)*0.5;
+
+    double velocity_factor = fabs((dHdt - this->computed_state.velocity.z)/this->computed_state.velocity.z);
+    velocity_factor = velocity_factor/(velocity_factor + 0.2);
+    this->computed_state.velocity.z = this->computed_state.velocity.z*velocity_factor + dHdt*(1.0 - velocity_factor);
 
     Vector angular_velocity = this->computed_state.CS.transpose_mult(measured.angular_velocity);
     double angular_rate = angular_velocity.norm();
