@@ -125,8 +125,7 @@ void AerodynamicsBasicCoefficient::compute_forces()
         return;
     }
 
-    double angular_rate = rocket.get_state().angular_velocity.norm();
-    this->_action.moment += rocket.get_state().angular_velocity*(this->_CM_alpha_dot*this->rocket.get_environment().values.density*angular_rate);
+    this->_action.moment += rocket.get_state().angular_velocity*(this->_CM_alpha_dot*this->rocket.get_environment().values.density);
 
     // arm is the moment arm formed from the freestream, length of the arm is sin of angle between
     Vector arm(this->_aero_values.unit_v_air_body.y, -this->_aero_values.unit_v_air_body.x,0.0);

@@ -2070,7 +2070,7 @@
 	<exception>
 	<float.h>
 
-1674624550 c:\users\mariu\onedrive\documents\repos\rocket\rocket\project\singlestage\src\common\include\util.h
+1682343944 c:\users\mariu\onedrive\documents\repos\rocket\rocket\project\singlestage\src\common\include\util.h
 	<fstream>
 	<string>
 	<vector>
@@ -2126,12 +2126,13 @@
 	<string>
 	"../../common/include/Cartesian.h"
 
-1672544429 c:\users\mariu\onedrive\documents\repos\rocket\rocket\project\singlestage\src\common\include\table.h
+1682348665 c:\users\mariu\onedrive\documents\repos\rocket\rocket\project\singlestage\src\common\include\table.h
 	<vector>
 	<array>
 	<string>
 	<fstream>
 	<exception>
+	<algorithm>
 	"util.h"
 
 1681785190 c:\users\mariu\onedrive\documents\repos\rocket\rocket\project\singlestage\src\proto\include\action.h
@@ -2141,7 +2142,7 @@
 	<algorithm>
 	<array>
 
-1682217073 c:\users\mariu\onedrive\documents\repos\rocket\rocket\project\singlestage\src\proto\include\gnc.h
+1682351011 c:\users\mariu\onedrive\documents\repos\rocket\rocket\project\singlestage\src\proto\include\gnc.h
 	"Control.h"
 	"Guidance.h"
 	"Navigation.h"
@@ -2153,7 +2154,7 @@
 	"Guidance.h"
 	"Sensors.h"
 
-1681963997 c:\users\mariu\onedrive\documents\repos\rocket\rocket\project\singlestage\src\proto\include\guidance.h
+1682350669 c:\users\mariu\onedrive\documents\repos\rocket\rocket\project\singlestage\src\proto\include\guidance.h
 	"Kinematics.h"
 	<unordered_map>
 	<string>
@@ -2176,13 +2177,14 @@
 	"Kinematics.h"
 	"Sensors.h"
 
-1682097084 c:\users\mariu\onedrive\documents\repos\rocket\rocket\project\singlestage\src\proto\include\thruster.h
+1682348111 c:\users\mariu\onedrive\documents\repos\rocket\rocket\project\singlestage\src\proto\include\thruster.h
 	"Kinematics.h"
 	<vector>
 	<array>
 	<string>
 	"Action.h"
 	"Environment.h"
+	"../../common/include/Table.h"
 
 1681962156 c:\users\mariu\onedrive\documents\repos\rocket\rocket\project\singlestage\src\proto\include\parachute.h
 	"../../common/include/Cartesian.h"
@@ -2246,7 +2248,7 @@
 
 1681100684 c:\users\mariu\onedrive\documents\repos\rocket\rocket\project\singlestage\src\proto\include\gravity.h
 
-1682256149 source:c:\users\mariu\onedrive\documents\repos\rocket\rocket\project\singlestage\src\proto\src\guidance.cpp
+1682350658 source:c:\users\mariu\onedrive\documents\repos\rocket\rocket\project\singlestage\src\proto\src\guidance.cpp
 	"../include/Guidance.h"
 	"../include/Parachute.h"
 
@@ -3399,7 +3401,7 @@
 	"../include/Environment.h"
 	"../../../lib/tinyxml/tinyxml2.h"
 
-1680276200 source:c:\users\mariu\onedrive\documents\repos\rocket\rocket\project\singlestage\src\proto\src\thruster1d.cpp
+1682346995 source:c:\users\mariu\onedrive\documents\repos\rocket\rocket\project\singlestage\src\proto\src\thruster1d.cpp
 	"../include/thruster1D.h"
 	"../../common/include/fluid.h"
 	"../../common/include/util.h"
@@ -3430,7 +3432,7 @@
 	<string>
 	"../../common/include/util.h"
 
-1682097084 source:c:\users\mariu\onedrive\documents\repos\rocket\rocket\project\singlestage\src\proto\src\thruster.cpp
+1682348562 source:c:\users\mariu\onedrive\documents\repos\rocket\rocket\project\singlestage\src\proto\src\thruster.cpp
 	"../include/Thruster.h"
 	<fstream>
 	<cmath>
@@ -3438,7 +3440,7 @@
 	"../../common/include/fluid.h"
 	<iostream>
 
-1682257320 source:c:\users\mariu\onedrive\documents\repos\rocket\rocket\project\singlestage\src\proto\src\aerodynamics.cpp
+1682351925 source:c:\users\mariu\onedrive\documents\repos\rocket\rocket\project\singlestage\src\proto\src\aerodynamics.cpp
 	"../include/Aerodynamics.h"
 	"../include/SingleStageRocket.h"
 	<cmath>
@@ -3459,7 +3461,7 @@
 
 1681852230 c:\users\mariu\onedrive\documents\repos\rocket\rocket\project\singlestage\src\proto\include\loader.h
 
-1682190251 source:c:\users\mariu\onedrive\documents\repos\rocket\rocket\project\singlestage\src\proto\src\loader.cpp
+1682350401 source:c:\users\mariu\onedrive\documents\repos\rocket\rocket\project\singlestage\src\proto\src\loader.cpp
 	"../include/Loader.h"
 	"../../../lib/tinyxml/tinyxml2.h"
 	"../include/SingleStageRocket.h"

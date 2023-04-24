@@ -2,9 +2,10 @@
 
 #include "../include/Parachute.h"
 
-Guidance::Guidance(){
-    this->commands.z_axis_inertial.zero();
-    this->commands.z_axis_inertial.data[2] = 1.0;
+Guidance::Guidance()
+{
+    this->_commands.z_axis_inertial.zero();
+    this->_commands.z_axis_inertial.data[2] = 1.0;
 }
 
 Guidance::~Guidance(){}
@@ -14,11 +15,11 @@ const Commands& Guidance::get_commands(const KinematicState& estimated_state, do
     return this->_commands;
 }
 
-GuidanceTimedParachute::GuidanceTimedParachute(double burnout, double delay) : Guidance(), _burnout(burnout), _deploy(burnout + delay) {}
+GuidanceTimedParachute::GuidanceTimedParachute(double burnout, double delay) : Guidance(), _deploy(burnout + delay) {}
 
 const Commands& GuidanceTimedParachute::get_commands(const KinematicState& estimated_state, double time)
 {
-    if(!this->chute->is_deployed() && time > _deploy )
+    if( !this->chute->is_deployed() && time > _deploy )
     {
         this->_commands.z_axis_inertial.zero();
         this->chute->deploy(time);

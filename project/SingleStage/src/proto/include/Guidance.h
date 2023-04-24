@@ -39,8 +39,6 @@ class GuidanceTimedParachute : public virtual Guidance
 {
 protected:
 
-    const double _burnout;
-
     const double _deploy;
 
 public:

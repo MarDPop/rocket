@@ -1,0 +1,79 @@
+<Rocket>
+	<Inertia unit="SI"> 
+		<Mass>0.1</Mass>
+		<Ixx>0.003</Ixx>
+		<Izz>0.0002</Izz>
+		<COG>-0.2</COG>
+	</Inertia>
+	
+	<Aerodynamics Type="FinAerodynamics" NumberFins="3" unit="SI">
+		<CD0>0.5</CD0>
+		<CL_alpha>1.8</CL_alpha>
+		<CM_alpha>-0.0</CM_alpha>
+		<CM_alpha_dot>-0.001</CM_alpha_dot>
+		<InducedLiftK>0.4</InducedLiftK>
+		<RefArea>0.0029</RefArea>
+		<RefLength>0.5</RefLength>
+		<StallAngle>0.2</StallAngle>
+		<COP>-0.35</COP>
+		<dCLdTheta>0.2</dCLdTheta>
+        <dCDdTheta>0.0</dCDdTheta>
+		<dCMdTheta>0.0</dCMdTheta>
+		<AreaRef>0.002</AreaRef>
+		<FinZCenter>-0.45</FinZCenter>
+		<FinSpanCenter>0.1</FinSpanCenter>
+	</Aerodynamics>
+	
+	<Thruster Type="PressureThruster" unit="SI">
+		<Inertia unit="SI"> 
+			<Mass>0.062</Mass>
+			<Ixx>0.004</Ixx>
+			<Izz>0.0002</Izz>
+			<COG>-0.35</COG>
+		</Inertia>
+		<Table>
+			<Row Pressure="100000" Thrust="15" ISP="90" />
+			<Row Pressure="10000" Thrust="16" ISP="91" />
+			<Row Pressure="1" Thrust="16" ISP="92" />
+		</Table>
+	</Thruster>
+	
+	<Parachute Type="Timed">
+		<CDA>0.01</CDA>
+		<DeploymentTime>3.0</DeploymentTime>
+	</Parachute>
+	
+	<GNC>
+		<Guidance Type="VerticalAscent">
+			<Proportional>1.0</Proportional>
+			<Damping>0.2</Damping>
+		</Guidance>
+		<!--
+		<Control>
+		</Control>
+		-->
+		<Control Type="FinControl">
+			<Proportional>1.0</Proportional>
+			<Damping>0.1</Damping>
+			<FinGain>40000.0</FinGain> 
+		</Control>
+
+		<Navigation>
+			<Sensor>
+				<Variances>
+					<Barometer>1.4</Barometer>
+					<Thermometer>0.007</Thermometer>
+					<Accelerometer>0.1</Accelerometer>
+					<Gyro>0.004</Gyro>
+				</Variances>
+			</Sensor>
+			<Filter Type="Basic">
+			</Filter>
+		</Navigation>
+	</GNC>
+</Rocket>
+<!--
+NOTES:
+- under 125g propellant is FAA exempt
+- Fin Gain is proportional to dynamic pressure
+-->

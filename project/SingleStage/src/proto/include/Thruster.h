@@ -7,23 +7,24 @@
 #include <string>
 #include "Action.h"
 #include "Environment.h"
+#include "../../common/include/Table.h"
 
 //TODO: rename to propulsion
 class Thruster
 {
 protected:
 
-    double time_old = 0.0;
+    double _time_old = 0.0;
 
     /**
     * thrust value in N
     */
-    double thrust = 0.0;
+    double _thrust = 0.0;
 
     /**
     * mass rate in kg/s
     */
-    double mass_rate = 0.0;
+    double _mass_rate = 0.0;
 
     const double& pressure;
 
@@ -50,8 +51,8 @@ public:
 
     inline void set_performance(double thrust, double isp)
     {
-        this->thrust = thrust;
-        this->mass_rate = thrust/(isp*9.806);
+        this->_thrust = thrust;
+        this->_mass_rate = thrust/(isp*9.806);
     }
 
     inline bool is_active()
@@ -61,12 +62,12 @@ public:
 
     inline double get_thrust()
     {
-        return this->thrust;
+        return this->_thrust;
     }
 
     inline double get_mass_rate()
     {
-        return this->mass_rate;
+        return this->_mass_rate;
     }
 
     inline const Inertia_Basic& get_inertia()
@@ -77,6 +78,11 @@ public:
     inline void set_fuel_inertia(const Inertia_Basic& inertia_fuel)
     {
         this->inertia_fuel = inertia_fuel;
+    }
+
+    inline void set_center_of_mass(const double& Z)
+    {
+        this->inertia_fuel.CoM_axial = Z;
     }
 
     inline void set_thrust_location_in_body(const Vector& location)
@@ -103,11 +109,7 @@ class EstesThruster : public virtual Thruster
 {
     std::string _name;
 
-    std::vector<double> _times;
-
-    std::vector<double> _thrusts;
-
-    std::vector<double> _thrusts;
+    IncrementingTable _table;
 
     double _propellant_mass;
 
@@ -119,6 +121,8 @@ class EstesThruster : public virtual Thruster
 
     double _burnout_time;
 
+    double _inv_avg_exit_velocity;
+
     int _length_mm;
 
     int _diameter_mm;
@@ -128,11 +132,6 @@ class EstesThruster : public virtual Thruster
 public:
 
     EstesThruster(const Environment& atmosphere);
-
-    inline void reset()
-    {
-        this->_idx = 0;
-    }
 
     inline double get_burnout_time()
     {

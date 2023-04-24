@@ -60,16 +60,33 @@ namespace util {
       }
     }
 
-    inline unsigned int bisection_search(const double* x, double val, unsigned int hi){
-        unsigned int lo = 0;
-        unsigned int mid = (lo + hi) >> 1;
-        while(lo != mid){
-            if(val > x[mid]){
-                lo = mid;
-            } else {
-                hi = mid;
+    inline unsigned search(const double* x, const double key, unsigned length)
+    {
+        // perform exponential search first
+        unsigned advance = 1;
+        while(advance < length && x[advance] < key) { advance <<= 1; }
+        advance >>= 1;
+        x += advance;
+        length -= advance;
+
+        advance = 1;
+        while(advance < length && x[length - advance] > key) { advance <<= 1; }
+        advance >>= 1;
+        length -= advance;
+
+        advance = 0;
+        unsigned mid = length >> 1;
+        while(advance != mid)
+        {
+            if(key > x[mid])
+            {
+                advance = mid;
             }
-            mid = (lo + hi) >> 1;
+            else
+            {
+                length = mid;
+            }
+            mid = (advance + length) >> 1;
         }
         return mid;
     }

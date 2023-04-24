@@ -3,20 +3,20 @@
 		<Mass>0.1</Mass>
 		<Ixx>0.003</Ixx>
 		<Izz>0.0002</Izz>
-		<COG>-0.2</COG>
+		<COG>-0.25</COG>
 	</Inertia>
 	
 	<Aerodynamics Type="FinAerodynamics" NumberFins="3" unit="SI">
-		<CD0>0.5</CD0>
+		<CD0>0.7</CD0>
 		<CL_alpha>1.8</CL_alpha>
 		<CM_alpha>-0.0</CM_alpha>
-		<CM_alpha_dot>-0.001</CM_alpha_dot>
+		<CM_alpha_dot>-0.01</CM_alpha_dot>
 		<InducedLiftK>0.4</InducedLiftK>
 		<RefArea>0.0029</RefArea>
 		<RefLength>0.5</RefLength>
 		<StallAngle>0.2</StallAngle>
 		<COP>-0.35</COP>
-		<dCLdTheta>0.2</dCLdTheta>
+		<dCLdTheta>0.0</dCLdTheta>
         <dCDdTheta>0.0</dCDdTheta>
 		<dCMdTheta>0.0</dCMdTheta>
 		<AreaRef>0.002</AreaRef>
@@ -24,19 +24,7 @@
 		<FinSpanCenter>0.1</FinSpanCenter>
 	</Aerodynamics>
 	
-	<Thruster Type="PressureThruster" unit="SI">
-		<Inertia unit="SI"> 
-			<Mass>0.062</Mass>
-			<Ixx>0.004</Ixx>
-			<Izz>0.0002</Izz>
-			<COG>-0.35</COG>
-		</Inertia>
-		<Table>
-			<Row Pressure="100000" Thrust="15" ISP="90" />
-			<Row Pressure="10000" Thrust="16" ISP="91" />
-			<Row Pressure="1" Thrust="16" ISP="92" />
-		</Table>
-	</Thruster>
+	<Thruster Type="Estes" File="test/Estes_F26.eng" COM="-0.43" />
 	
 	<Parachute Type="Timed">
 		<CDA>0.01</CDA>
@@ -44,9 +32,9 @@
 	</Parachute>
 	
 	<GNC>
-		<Guidance Type="VerticalAscent">
-			<Proportional>1.0</Proportional>
-			<Damping>0.2</Damping>
+		<Guidance Type="DelayParachute">
+			<Burnout>2.6</Burnout>
+			<Delay>6</Delay>
 		</Guidance>
 		<!--
 		<Control>
@@ -55,7 +43,7 @@
 		<Control Type="FinControl">
 			<Proportional>1.0</Proportional>
 			<Damping>0.1</Damping>
-			<FinGain>40000.0</FinGain> 
+			<FinGain>00000.0</FinGain> 
 		</Control>
 
 		<Navigation>

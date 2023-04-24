@@ -20,8 +20,8 @@ Thruster::~Thruster(){}
 
 void Thruster::update_inertia(double time)
 {
-    double dT = time - this->time_old;
-    double dM = dT*mass_rate;
+    double dT = time - this->_time_old;
+    double dM = dT*this->_mass_rate;
 
     this->inertia_fuel.mass -= dM;
 
@@ -30,7 +30,7 @@ void Thruster::update_inertia(double time)
         double frac = (1 - dM/this->inertia_fuel.mass);
         this->inertia_fuel.Ixx *= frac;
         this->inertia_fuel.Izz *= frac;
-        this->time_old = time;
+        this->_time_old = time;
     }
     else
     {
@@ -44,7 +44,7 @@ void Thruster::update_thrust_and_massrate(double time) {} // NO OP
 
 void Thruster::update_action()
 {
-    this->action.force = this->thrust_vector*this->thrust;
+    this->action.force = this->thrust_vector*this->_thrust;
 }
 
 void Thruster::load(std::string fn)
@@ -55,8 +55,8 @@ void Thruster::load(std::string fn)
     {
         std::string line; getline( myfile, line );
         auto row = util::split(line);
-        this->thrust = std::stod(row[0]);
-        this->mass_rate = this->thrust/(9.806*std::stod(row[1]));
+        this->_thrust = std::stod(row[0]);
+        this->_mass_rate = this->_thrust/(9.806*std::stod(row[1]));
         myfile.close();
     }
 }
@@ -72,23 +72,20 @@ void Thruster::set_time(double time)
     this->update_action();
 }
 
+EstesThruster::EstesThruster(const Environment& atmosphere) : Thruster(atmosphere) {}
+
 void EstesThruster::update_thrust_and_massrate(double time)
 {
-    while(time > this->_times[this->_idx])
-    {
-        this->_idx++;
-    }
     if(time < this->_burnout_time)
     {
-        int idx = time * this->_dT_inv;
-        this->thrust = this->_thrusts[idx];
-        this->mass_rate = this->thrust * this->_inv_avg_exit_velocity;
+        this->_thrust = this->_table.get(time);
+        this->_mass_rate = this->_thrust*this->_inv_avg_exit_velocity;
     }
     else
     {
         this->active = false;
-        this->thrust = 0;
-        this->mass_rate = 0;
+        this->_thrust = 0;
+        this->_mass_rate = 0;
     }
 };
 
@@ -99,9 +96,6 @@ void EstesThruster::load(std::string fn)
 
     if(myfile.is_open())
     {
-        _thrusts.clear();
-
-
         std::string line;
         getline( myfile, line );
         for(; getline( myfile, line ); )
@@ -115,23 +109,33 @@ void EstesThruster::load(std::string fn)
         this->_propellant_mass = std::stod(row[4]);
         this->_total_mass = std::stod(row[5]);
 
+        this->inertia_fuel.mass = this->_propellant_mass;
+
+        double radius_m = this->_diameter_mm*0.0005;
+        double height_m = this->_length_mm*0.001;
+        this->inertia_fuel.Ixx = this->_propellant_mass/12.0*(3*radius_m*radius_m + height_m*height_m);
+        this->inertia_fuel.Izz = 0.5*this->_propellant_mass*radius_m*radius_m;
+
+        std::vector<double> times;
+        std::vector<double> thrusts;
         for(; getline( myfile, line ); )
         {
             auto row = util::split(line);
-            this->_times.push_back(std::stod(row[0]));
-            this->_thrusts.push_back(std::stod(row[1]));
+            times.push_back(std::stod(row[0]));
+            thrusts.push_back(std::stod(row[1]));
         }
+        myfile.close();
+
+        this->_burnout_time = times.back();
+        this->_table.set(times,thrusts);
 
         this->_total_impulse = 0.0;
-        for(unsigned i = 1; i < this->_times.size();i++)
+        for(unsigned i = 1; i < times.size();i++)
         {
-            this->_total_impulse += (this->_times[i] - this->_times[i-1])*(this->_thrusts[i] + this->_thrusts[i-1])*0.5;
+            this->_total_impulse += (times[i] - times[i-1])*(thrusts[i] + thrusts[i-1])*0.5;
         }
 
-        this->_burnout_time = this->_times.back();
-
-        this->_inv_avg_exit_velocity = this->_propellant_mass / this->_total_impulse;
-        myfile.close();
+        this->_inv_avg_exit_velocity = 0.98*this->_propellant_mass / this->_total_impulse;
     }
     else
     {
@@ -162,8 +166,8 @@ void PressureThruster::add_thrust_point(double pressure, double thrust, double m
         this->thrusts.push_back(thrust);
         this->mass_rates.push_back(mass_rate);
 
-        this->thrust = thrust;
-        this->mass_rate = mass_rate;
+        this->_thrust = thrust;
+        this->_mass_rate = mass_rate;
     }
 
     this->idx_final = this->pressures.size()-1;
@@ -181,8 +185,8 @@ void PressureThruster::update_thrust_and_massrate(double time)
     }
 
     double delta = pressure - this->pressures[this->idx];
-    this->thrust = this->thrusts[this->idx] + this->dT*delta;
-    this->mass_rate = this->mass_rates[this->idx] + this->dM*delta;
+    this->_thrust = this->thrusts[this->idx] + this->dT*delta;
+    this->_mass_rate = this->mass_rates[this->idx] + this->dM*delta;
 };
 
 void PressureThruster::load(std::string fn)
@@ -520,7 +524,7 @@ void ComputedThruster::update_thrust_and_massrate(double time)
     {
         if(_tidx >= _tidx_final)
         {
-            this->mass_rate = 0;
+            this->_mass_rate = 0;
             this->inertia_fuel.mass = 0;
             this->inertia_fuel.Ixx = 0;
             this->inertia_fuel.Izz = 0;
@@ -536,7 +540,7 @@ void ComputedThruster::update_thrust_and_massrate(double time)
 
     double chamber_pressure = vals.chamber_pressure + delta*dvals.chamber_pressure;
     double exit_velocity = vals.ideal_exit_velocity + delta*dvals.ideal_exit_velocity;
-    this->mass_rate = vals.mass_rate + delta*dvals.mass_rate;
+    this->_mass_rate = vals.mass_rate + delta*dvals.mass_rate;
     this->inertia_fuel.mass = vals.mass + delta*dvals.mass;
 
     this->inertia_fuel.Ixx = vals.Ixx + delta*dvals.Ixx;
@@ -553,7 +557,7 @@ void ComputedThruster::update_thrust_and_massrate(double time)
     {
         double pressure_exit = chamber_pressure*this->_pressure_ratio_ideal;
         // if(pressure_ratio > this->_pressure_ratio_ideal)
-        this->thrust = (pressure_exit - pressure)*this->_exit_area + this->_half_angle_factor*exit_velocity*mass_rate;
+        this->_thrust = (pressure_exit - pressure)*this->_exit_area + this->_half_angle_factor*exit_velocity*this->_mass_rate;
     }
     else
     {
@@ -562,7 +566,7 @@ void ComputedThruster::update_thrust_and_massrate(double time)
         double M_exit = sqrt((temperature_ratio - 1.0)*2.0/(this->_gamma - 1.0));
         double v_exit = M_exit*sqrt(this->_gamma*flow::R_GAS/_mw*chamber_temperature/temperature_ratio);
 
-        this->thrust = v_exit*this->mass_rate;
+        this->_thrust = v_exit*this->_mass_rate;
     }
 
 };

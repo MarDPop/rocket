@@ -102,6 +102,7 @@ Thruster* loadThruster(tinyxml2::XMLElement* thrusterElement, Environment* atm)
 {
     const char* type = thrusterElement->Attribute("Type");
     const char* fn = thrusterElement->Attribute("File");
+    const char* ZLocation = thrusterElement->Attribute("COM");
     Thruster* thruster = nullptr;
     if(!type)
     {
@@ -151,11 +152,21 @@ Thruster* loadThruster(tinyxml2::XMLElement* thrusterElement, Environment* atm)
                 thruster = pthruster;
             }
         }
+        else if(strcmp(type,"Estes") == 0)
+        {
+            thruster = new EstesThruster(*atm);
+            thruster->load(fn);
+        }
         else if(strcmp(type,"ComputedThruster") == 0)
         {
             thruster = new ComputedThruster(*atm);
             thruster->load(fn);
         }
+    }
+
+    if(ZLocation)
+    {
+        thruster->set_center_of_mass(std::stod(ZLocation));
     }
     return thruster;
 }
@@ -261,11 +272,17 @@ void loadGNC(GNC& gnc, tinyxml2::XMLElement* gncElement, Parachute* parachute, A
                 double D = guidanceElement->FirstChildElement("Damping")->DoubleText();
                 GuidanceVerticalAscent* guidance = new GuidanceVerticalAscent();
                 guidance->setProportionalConstants(P,D);
-                guidance->chute = parachute;
                 gnc.guidance.reset(guidance);
+            }
+            if(strcmp(type,"DelayParachute") == 0)
+            {
+                double burnout = guidanceElement->FirstChildElement("Burnout")->DoubleText();
+                double delay = guidanceElement->FirstChildElement("Delay")->DoubleText();
+                gnc.guidance.reset(new GuidanceTimedParachute(burnout,delay));
             }
         }
     }
+    gnc.guidance->chute = parachute;
 
     if(navigationElement)
     {

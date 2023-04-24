@@ -5,42 +5,114 @@
 #include <string>
 #include <fstream>
 #include <exception>
+#include <algorithm>
 
 #include "util.h"
 
-class SimpleTable
+class Table
+{
+    std::vector< double > _delta;
+
+public:
+
+    const std::vector< double > _x;
+    const std::vector< double > _v;
+
+    Table( const std::vector< double >& x, const std::vector< double >& v) : _delta(x.size()), _x(x), _v(v)
+    {
+        for(unsigned i = 1; i < _x.size(); i++)
+        {
+            this->_delta[i-1] = (this->_v[i] - this->_v[i-1])/(this->_x[i] - this->_x[i-1]);
+        }
+    }
+
+    inline double get(const double& x) const
+    {
+        if(x <= _x.front()) { return _v.front(); }
+
+        if(x >= _x.back()) { return _v.back();}
+
+        auto it = std::lower_bound(_x.begin(),_x.end(),x);
+        auto idx = std::distance(_x.begin(),it);
+        return _v[idx] + (x - *it)*_delta[idx];
+    }
+};
+
+class IncrementingTable
 {
     std::vector< double > _x;
     std::vector< double > _v;
     std::vector< double > _delta;
 
+    double* _x_ptr;
+    double* _v_ptr;
+    double* _delta_ptr;
+
 public:
 
-    LinearFixedTable( const std::vector< double >& x, const std::vector< double >& v) : _x(x), _v(v) \
+    inline void reset()
     {
-        for(unsigned int i = 1; i < _x.size(); i++) {
-            this->_delta[i-1] = (this->_v[i] - this->_v[i-1])/(this->_x[i] - this->_x[i-1]);
+        if(_x.size() > 1)
+        {
+            _x_ptr = _x.data() + 1;
+            _v_ptr = _v.data() + 1;
+            _delta_ptr = _delta.data() + 1;
+        }
+        else
+        {
+            _x_ptr = _x.data();
+            _v_ptr = _v.data();
+            _delta_ptr = _delta.data();
         }
     }
 
-    inline void get(const unsigned int& x) {
-        if(x < this->values[0]) {
-            arr = this->data[0];
-            return;
-        }
+    inline IncrementingTable() { }
 
-        if(x > this->values[N-1]) {
-            arr = this->data[N-1];
-            return;
+    inline void set(const std::vector< double >& x, const std::vector< double >& v)
+    {
+        this->_x = x;
+        this->_v = v;
+        this->_delta = std::vector<double>(x.size());
+        _delta[0] = 0.0;
+        for(unsigned i = 1; i < _x.size(); i++)
+        {
+            this->_delta[i] = (this->_v[i] - this->_v[i-1])/(this->_x[i] - this->_x[i-1]);
         }
+        this->reset();
+    }
 
-        unsigned int idx = this->lower_bound(x);
-        const double d = x - this->values[idx];
-        const std::array<double, COLS>& row = this->data[idx];
-        const std::array<double, COLS>& factor = this->delta[idx];
-        for(int i = 0; i < COLS; i++) {
-            arr[i] = row[i] + d*factor[i];
+    inline double get(const double& x)
+    {
+        if(x <= _x.front()) { return _v.front(); }
+
+        if(x >= _x.back()) { return _v.back();}
+
+        if(x > *_x_ptr)
+        {
+            _x_ptr++;
+            _v_ptr++;
+            _delta_ptr++;
+            while(x > *_x_ptr)
+            {
+                _x_ptr++;
+                _v_ptr++;
+                _delta_ptr++;
+            }
+
         }
+        else if (x < *(_x_ptr-1))
+        {
+            _x_ptr--;
+            _v_ptr--;
+            _delta_ptr--;
+            while(x < *(_x_ptr-1))
+            {
+                _x_ptr--;
+                _v_ptr--;
+                _delta_ptr--;
+            }
+        }
+        return *_v_ptr + (x - *_x_ptr)*(*_delta_ptr);
     }
 
 };
@@ -50,21 +122,6 @@ class LinearFixedTable {
     std::array< double, N> values;
     std::array< std::array< double, COLS >, N > data;
     std::array< std::array< double, COLS >, N > delta;
-
-    inline unsigned int lower_bound(const double& x) {
-        unsigned int lo = 0;
-        unsigned int hi = N - 1;
-        unsigned int mid = (lo + hi) >> 1;
-        while(lo != mid) {
-            if(x > this->values[mid]) {
-                lo = mid;
-            } else {
-                hi = mid;
-            }
-            mid = (lo + hi) >> 1;
-        }
-        return mid;
-    }
 
 public:
 
@@ -76,19 +133,20 @@ public:
         }
     }
 
-    inline void get(const unsigned int& x, std::array< double, COLS >& arr) {
-        if(x < this->values[0]) {
-            arr = this->data[0];
+    inline void get(const double& x, std::array< double, COLS >& arr) {
+        if(x < this->values.front()) {
+            arr = this->data.front();
             return;
         }
 
-        if(x > this->values[N-1]) {
-            arr = this->data[N-1];
+        if(x > this->values.back()) {
+            arr = this->data.back();
             return;
         }
 
-        unsigned int idx = this->lower_bound(x);
-        const double d = x - this->values[idx];
+        auto it = std::lower_bound(values.begin(),values.end(),x);
+        auto idx = std::distance(values.begin(),it);
+        const double d = x - *it;
         const std::array<double, COLS>& row = this->data[idx];
         const std::array<double, COLS>& factor = this->delta[idx];
         for(int i = 0; i < COLS; i++) {
