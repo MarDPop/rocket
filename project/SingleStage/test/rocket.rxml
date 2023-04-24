@@ -10,7 +10,7 @@
 		<CD0>0.7</CD0>
 		<CL_alpha>1.8</CL_alpha>
 		<CM_alpha>-0.0</CM_alpha>
-		<CM_alpha_dot>-0.01</CM_alpha_dot>
+		<CM_alpha_dot>-0.05</CM_alpha_dot>
 		<InducedLiftK>0.4</InducedLiftK>
 		<RefArea>0.0029</RefArea>
 		<RefLength>0.5</RefLength>
@@ -18,7 +18,7 @@
 		<COP>-0.35</COP>
 		<dCLdTheta>0.1</dCLdTheta>
         <dCDdTheta>0.0</dCDdTheta>
-		<dCMdTheta>0.0</dCMdTheta>
+		<dCMdTheta>-0.0</dCMdTheta>
 		<AreaRef>0.002</AreaRef>
 		<FinZCenter>-0.45</FinZCenter>
 		<FinSpanCenter>0.1</FinSpanCenter>

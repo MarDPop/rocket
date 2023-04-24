@@ -69,6 +69,36 @@ public:
 
 class ConstrainedParachute : public virtual Parachute
 {
+    Vector _relative_position;
+
+    Vector _relative_velocity;
+
+    double _deployment_duration;
+
+    double _tether_length;
+
+    double _tether_spring_constant;
+
+    double _volume_deployed;
+
 public:
+
+    enum MATERIAL {DEFAULT_MATERIAL = 0, NYLON = 1};
+
+    ConstrainedParachute(SingleStageRocket& rocket);
+
+    inline void set_deployment_duration(double duration)
+    {
+        this->_deployment_duration = duration;
+    }
+
+    inline void set_tether_location(double Z)
+    {
+        this->_action.location.z = Z;
+    }
+
+    void set_params(double area, double tether_length, double youngs_modulus, double area_tether_cross_section);
+
+    const BodyAction& update(double time);
 
 };
