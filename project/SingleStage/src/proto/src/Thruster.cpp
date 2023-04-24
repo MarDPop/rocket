@@ -74,6 +74,10 @@ void Thruster::set_time(double time)
 
 void EstesThruster::update_thrust_and_massrate(double time)
 {
+    while(time > this->_times[this->_idx])
+    {
+        this->_idx++;
+    }
     if(time < this->_burnout_time)
     {
         int idx = time * this->_dT_inv;
@@ -105,20 +109,26 @@ void EstesThruster::load(std::string fn)
             if(line[0] != ';') break;
         }
         auto row = util::split(line);
-        this->_propellant_mass = std::stod(row[0]);
-        this->_total_impulse = std::stod(row[1]);
-        this->_chute_delay = std::stod(row[2]);
-        double dT = std::stod(row[3]);
-        this->_dT_inv = 1.0/dT;
+        this->_name = row[0];
+        this->_diameter_mm = std::stoi(row[1]);
+        this->_length_mm = std::stoi(row[2]);
+        this->_propellant_mass = std::stod(row[4]);
+        this->_total_mass = std::stod(row[5]);
+
         for(; getline( myfile, line ); )
         {
-            if(line[0] == ';')
-            {
-                continue;
-            }
-            this->_thrusts.push_back(std::stod(line));
+            auto row = util::split(line);
+            this->_times.push_back(std::stod(row[0]));
+            this->_thrusts.push_back(std::stod(row[1]));
         }
-        this->_burnout_time = dT*this->_thrusts.size();
+
+        this->_total_impulse = 0.0;
+        for(unsigned i = 1; i < this->_times.size();i++)
+        {
+            this->_total_impulse += (this->_times[i] - this->_times[i-1])*(this->_thrusts[i] + this->_thrusts[i-1])*0.5;
+        }
+
+        this->_burnout_time = this->_times.back();
 
         this->_inv_avg_exit_velocity = this->_propellant_mass / this->_total_impulse;
         myfile.close();

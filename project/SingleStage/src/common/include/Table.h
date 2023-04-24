@@ -8,6 +8,43 @@
 
 #include "util.h"
 
+class SimpleTable
+{
+    std::vector< double > _x;
+    std::vector< double > _v;
+    std::vector< double > _delta;
+
+public:
+
+    LinearFixedTable( const std::vector< double >& x, const std::vector< double >& v) : _x(x), _v(v) \
+    {
+        for(unsigned int i = 1; i < _x.size(); i++) {
+            this->_delta[i-1] = (this->_v[i] - this->_v[i-1])/(this->_x[i] - this->_x[i-1]);
+        }
+    }
+
+    inline void get(const unsigned int& x) {
+        if(x < this->values[0]) {
+            arr = this->data[0];
+            return;
+        }
+
+        if(x > this->values[N-1]) {
+            arr = this->data[N-1];
+            return;
+        }
+
+        unsigned int idx = this->lower_bound(x);
+        const double d = x - this->values[idx];
+        const std::array<double, COLS>& row = this->data[idx];
+        const std::array<double, COLS>& factor = this->delta[idx];
+        for(int i = 0; i < COLS; i++) {
+            arr[i] = row[i] + d*factor[i];
+        }
+    }
+
+};
+
 template < unsigned int N, int COLS >
 class LinearFixedTable {
     std::array< double, N> values;

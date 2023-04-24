@@ -107,7 +107,11 @@ class EstesThruster : public virtual Thruster
 
     std::vector<double> _thrusts;
 
+    std::vector<double> _thrusts;
+
     double _propellant_mass;
+
+    double _total_mass;
 
     double _total_impulse;
 
@@ -127,7 +131,7 @@ public:
 
     inline void reset()
     {
-        this->idx = 0;
+        this->_idx = 0;
     }
 
     inline double get_burnout_time()
@@ -135,9 +139,14 @@ public:
         return this->_burnout_time;
     }
 
+    inline void set_chute_delay(double delay)
+    {
+        this->_chute_delay = delay;
+    }
+
     inline double get_chute_delay()
     {
-        return this->_chute_delay
+        return this->_chute_delay;
     }
 
     inline double get_propellant_mass()
