@@ -142,6 +142,13 @@ struct Inertia
         this->CoM.z = basic.CoM_axial;
     }
 
+    inline Inertia(){}
+
+    inline Inertia(const Inertia_Basic& basic)
+    {
+        this->set_from_basic(basic);
+    }
+
     inline void operator=(const Inertia& inertia)
     {
         this->mass = inertia.mass;

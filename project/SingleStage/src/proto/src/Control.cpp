@@ -28,7 +28,7 @@ void ControlFinSimple::get_outputs(const Commands& commands, const KinematicStat
 {
     double dynamic_pressure_factor = sensors->get_measured_dynamic_pressure();
 
-    if(dynamic_pressure_factor < 0.1)
+    if(dynamic_pressure_factor < 5)
     {
         return;
     }

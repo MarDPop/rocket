@@ -16,7 +16,7 @@
 		<RefLength>0.5</RefLength>
 		<StallAngle>0.2</StallAngle>
 		<COP>-0.35</COP>
-		<dCLdTheta>0.0</dCLdTheta>
+		<dCLdTheta>0.1</dCLdTheta>
         <dCDdTheta>0.0</dCDdTheta>
 		<dCMdTheta>0.0</dCMdTheta>
 		<AreaRef>0.002</AreaRef>
@@ -43,7 +43,7 @@
 		<Control Type="FinControl">
 			<Proportional>1.0</Proportional>
 			<Damping>0.1</Damping>
-			<FinGain>00000.0</FinGain> 
+			<FinGain>40000.0</FinGain> 
 		</Control>
 
 		<Navigation>

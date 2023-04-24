@@ -165,7 +165,7 @@ FinControlAero::FinControlAero(unsigned NFINS) : fins(NFINS), NUMBER_FINS(NFINS)
     {
         fin.span_x = cos(angle);
         fin.span_y = sin(angle);
-        fin.servo = std::make_unique<BoundedServo>(-0.1,0.1);
+        fin.servo = std::make_unique<BoundedServo>(-0.25,0.25);
         angle += dAngle;
     }
 }
