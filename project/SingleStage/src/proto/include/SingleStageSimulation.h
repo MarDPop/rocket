@@ -54,13 +54,13 @@ class SingleStageSimulation
 {
 friend class Loader;
 
-    std::unique_ptr<SingleStageRocket> rocket;
+    std::unique_ptr<SingleStageRocket> _rocket;
 
-    std::unique_ptr<Environment> atmosphere;
+    std::unique_ptr<Environment> _environment;
 
-    Recording record;
+    Recording _record;
 
-    Launch_Parameters launch;
+    Launch_Parameters _launch;
 
 public:
 

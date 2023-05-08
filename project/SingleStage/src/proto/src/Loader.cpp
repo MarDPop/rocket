@@ -28,39 +28,39 @@ void Loader::loadSimulation(SingleStageSimulation& simulation, const char* fn)
         double ground_temperature = AtmosphereElement->FirstChildElement("Temperature")->DoubleText();
         double ground_pressure = AtmosphereElement->FirstChildElement("Pressure")->DoubleText();
         double lapse_rate = AtmosphereElement->FirstChildElement("LapseRate")->DoubleText();
-        simulation.atmosphere = std::make_unique<EnvironmentTable>(ground_altitude,ground_pressure,ground_temperature,lapse_rate);
+        simulation._environment = std::make_unique<EnvironmentTable>(ground_altitude,ground_pressure,ground_temperature,lapse_rate);
         auto* windEl = AtmosphereElement->FirstChildElement("Wind");
         if(windEl)
         {
             const char* wind_fn = windEl->Attribute("File");
             if(wind_fn)
             {
-                simulation.atmosphere->wind.load(wind_fn);
+                simulation._environment->wind.load(wind_fn);
             }
         }
     }
     else
     {
-        simulation.atmosphere = std::make_unique<Environment>();
+        simulation._environment = std::make_unique<Environment>();
     }
 
     auto* launchElement = root->FirstChildElement("Launch");
     if(launchElement)
     {
-        simulation.launch.latitude = launchElement->FirstChildElement("Latitude")->DoubleText();
-        simulation.launch.longitude = launchElement->FirstChildElement("Longitude")->DoubleText();
-        simulation.launch.altitude = launchElement->FirstChildElement("Altitude")->DoubleText();
-        simulation.launch.pitch_angle = launchElement->FirstChildElement("Pitch")->DoubleText();
-        simulation.launch.heading = launchElement->FirstChildElement("Heading")->DoubleText();
+        simulation._launch.latitude = launchElement->FirstChildElement("Latitude")->DoubleText();
+        simulation._launch.longitude = launchElement->FirstChildElement("Longitude")->DoubleText();
+        simulation._launch.altitude = launchElement->FirstChildElement("Altitude")->DoubleText();
+        simulation._launch.pitch_angle = launchElement->FirstChildElement("Pitch")->DoubleText();
+        simulation._launch.heading = launchElement->FirstChildElement("Heading")->DoubleText();
     }
     else
     {
 
     }
 
-    simulation.rocket.reset(new SingleStageRocket(simulation.atmosphere.get()));
+    simulation._rocket.reset(new SingleStageRocket(simulation._environment.get()));
 
-    Loader::loadRocket(*simulation.rocket,rocket_fn);
+    Loader::loadRocket(*simulation._rocket,rocket_fn);
 }
 
 Inertia_Basic loadBasicInertia(tinyxml2::XMLElement* inertiaElement)
@@ -250,6 +250,16 @@ Parachute* loadParachute(tinyxml2::XMLElement* chuteElement, SingleStageRocket& 
             double tDeploy = chuteElement->FirstChildElement("DeploymentTime")->DoubleText();
             return new ParachuteTimed(rocket,CDA,tDeploy);
         }
+        else if(strcmp(type,"Constrained") == 0)
+        {
+            double tDeploy = chuteElement->FirstChildElement("DeploymentTime")->DoubleText();
+            double area = chuteElement->FirstChildElement("Area")->DoubleText();
+            double length = chuteElement->FirstChildElement("TetherLength")->DoubleText();
+            double spring = chuteElement->FirstChildElement("TetherSpringConst")->DoubleText();
+            double damper = chuteElement->FirstChildElement("TetherDamperConst")->DoubleText();
+            double mass = chuteElement->FirstChildElement("ChuteMass")->DoubleText();
+            return new ParachuteModeled(rocket,tDeploy,area,length,spring,damper,mass);
+        }
     }
     return new Parachute(rocket,CDA);
 }
@@ -296,7 +306,8 @@ void loadGNC(GNC& gnc, tinyxml2::XMLElement* gncElement, Parachute* parachute, A
                 if(strcmp(type,"SimpleIntegrate") == 0)
                 {
                     gnc.navigation.filter = std::make_unique<FilterSimpleIntegrate>();
-                } else if(strcmp(type,"Basic") == 0)
+                }
+                else if(strcmp(type,"Basic") == 0)
                 {
                     gnc.navigation.filter = std::make_unique<FilterBasic>();
                 }

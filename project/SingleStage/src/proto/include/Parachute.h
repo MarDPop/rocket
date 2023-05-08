@@ -46,11 +46,7 @@ public:
         return this->_deployed;
     }
 
-    inline void deploy(double time)
-    {
-        this->_deployed = true;
-        this->_time_deployed = time;
-    }
+    virtual void deploy(double time);
 
     virtual const BodyAction& update(double time);
 
@@ -67,25 +63,37 @@ public:
     const BodyAction& update(double time);
 };
 
-class ConstrainedParachute : public virtual Parachute
+class ParachuteModeled : public virtual Parachute
 {
-    Vector _relative_position;
+    Vector _chute_position;
 
-    Vector _relative_velocity;
+    Vector _chute_velocity;
+
+    double _chute_mass;
 
     double _deployment_duration;
 
-    double _tether_length;
+    double _tether_unstretched_length;
+
+    double _old_tether_length;
 
     double _tether_spring_constant;
 
+    double _tether_damper_constant;
+
+    double _max_strain;
+
     double _volume_deployed;
+
+    double _time_old;
 
 public:
 
     enum MATERIAL {DEFAULT_MATERIAL = 0, NYLON = 1};
 
-    ConstrainedParachute(SingleStageRocket& rocket);
+    ParachuteModeled(SingleStageRocket& rocket, double deployment_time, double area, double tether_length, double tether_spring_constant, double tether_damper_constant, double chute_mass);
+
+    void deploy(double time) override;
 
     inline void set_deployment_duration(double duration)
     {
@@ -97,7 +105,7 @@ public:
         this->_action.location.z = Z;
     }
 
-    void set_params(double area, double tether_length, double youngs_modulus, double area_tether_cross_section);
+    void set_params(double area, double tether_length, double tether_spring_constant, double tether_damper_constant);
 
     const BodyAction& update(double time);
 

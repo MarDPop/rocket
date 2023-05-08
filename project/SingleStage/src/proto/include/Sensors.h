@@ -37,24 +37,23 @@ struct computed_quatities
     void set(const measured_quantities& measured, const altitude_cal& cal);
 };
 
-/*
-struct Measurements
-{
+class SingleStageRocket;
 
-};
-
-class SensorsBase
+class Sensor
 {
+    const SingleStageRocket& _rocket;
+
+    std::default_random_engine _generator;
 
 public:
 
-    SensorsBase();
-    ~SensorsBase();
+    Sensor(const SingleStageRocket& rocket);
+    virtual ~Sensor();
+
+    virtual void update(double time) = 0;
 
 };
-*/
 
-class SingleStageRocket;
 
 class Sensors
 {

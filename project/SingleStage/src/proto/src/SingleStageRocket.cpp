@@ -62,7 +62,7 @@ void SingleStageRocket::compute_acceleration(double time)
     allActions.force.zero();
     allActions.moment.zero();
 
-    allActions += this->aerodynamics->update();
+    //allActions += this->aerodynamics->update();
 
     if(this->thruster->is_active())
     {

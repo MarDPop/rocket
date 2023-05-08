@@ -439,13 +439,14 @@
 		<Unit filename="src/common/src/Planet.cpp" />
 		<Unit filename="src/proto/include/Action.h" />
 		<Unit filename="src/proto/include/Aerodynamics.h" />
-		<Unit filename="src/proto/include/Atmosphere.h" />
 		<Unit filename="src/proto/include/Control" />
 		<Unit filename="src/proto/include/Control.h" />
+		<Unit filename="src/proto/include/Environment.h" />
 		<Unit filename="src/proto/include/Filter.h" />
 		<Unit filename="src/proto/include/GNC.h" />
 		<Unit filename="src/proto/include/Gravity.h" />
 		<Unit filename="src/proto/include/Guidance.h" />
+		<Unit filename="src/proto/include/Gyro.h" />
 		<Unit filename="src/proto/include/Kinematics.h" />
 		<Unit filename="src/proto/include/Loader.h" />
 		<Unit filename="src/proto/include/Navigation.h" />
@@ -458,8 +459,8 @@
 		<Unit filename="src/proto/include/WindHistory.h" />
 		<Unit filename="src/proto/include/thruster1D.h" />
 		<Unit filename="src/proto/src/Aerodynamics.cpp" />
-		<Unit filename="src/proto/src/Atmosphere.cpp" />
 		<Unit filename="src/proto/src/Control.cpp" />
+		<Unit filename="src/proto/src/Environment.cpp" />
 		<Unit filename="src/proto/src/Filter.cpp" />
 		<Unit filename="src/proto/src/Gravity.cpp" />
 		<Unit filename="src/proto/src/Guidance.cpp" />
