@@ -43,11 +43,9 @@ friend class Loader;
 
     Environment* const _environment;
 
-    bool symmetric_inertia_assumption = false;
+    bool principal_axis_assumption = false;
 
     void compute_acceleration(double time);
-
-    void step(double& time, double dt);
 
     void update_inertia(double inv_dt);
 
@@ -60,9 +58,9 @@ public:
     {
         this->inertia_empty = inertia_empty;
         if( (fabs(inertia_empty.MoI.Ixy) + fabs(inertia_empty.MoI.Ixz) + fabs(inertia_empty.MoI.Ixz) < 1e-6) &&
-             (fabs(inertia_empty.CoM.x) + fabs(inertia_empty.CoM.y) < 1e-6) )
+            (fabs(inertia_empty.CoM.x) + fabs(inertia_empty.CoM.y) < 1e-6) )
         {
-            this->symmetric_inertia_assumption = true;
+            this->principal_axis_assumption = true;
             this->I_inverse.zero(); // ensure zero non diagonal terms
         }
     }

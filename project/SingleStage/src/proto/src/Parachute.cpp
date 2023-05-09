@@ -105,7 +105,6 @@ const BodyAction& ParachuteModeled::update(double time)
     }
 
     // get air values for aerodynamics
-    const auto& air_values = this->_rocket.get_aerodynamics().get_aero_values();
     const auto& rocket_state = this->_rocket.get_state();
     const auto& environment = this->_rocket.get_environment().values;
 

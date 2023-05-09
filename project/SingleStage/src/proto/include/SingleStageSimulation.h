@@ -4,6 +4,7 @@
 #include "Environment.h"
 #include <string>
 #include <vector>
+#include <array>
 #include <memory>
 
 #include "../../common/include/Cartesian.h"
@@ -54,13 +55,23 @@ class SingleStageSimulation
 {
 friend class Loader;
 
+    Launch_Parameters _launch;
+
     std::unique_ptr<SingleStageRocket> _rocket;
 
     std::unique_ptr<Environment> _environment;
 
     Recording _record;
 
-    Launch_Parameters _launch;
+    double _time;
+
+    double _dt;
+
+    void (SingleStageSimulation::*step)();
+
+    void euler_step();
+
+    void huen_step();
 
 public:
 

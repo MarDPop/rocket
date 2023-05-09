@@ -6,6 +6,9 @@
 
 using namespace Cartesian;
 
+/**
+* State in "Inertial" Frame
+*/
 struct KinematicState
 {
     /**
@@ -29,12 +32,12 @@ struct KinematicState
     Axis CS; // TODO: make this quaternion
 
     /**
-    * Current angular speed in body frame (rad/s)
+    * Current angular speed in ENU frame (rad/s)
     */
     Vector angular_velocity;
 
     /**
-    * Current angular acceleration in body frame (rad/s)
+    * Current angular acceleration in ENU frame (rad/s)
     */
     Vector angular_acceleration;
 };

@@ -13,7 +13,7 @@ void SingleStageRocket::update_inertia(double inv_dt)
 
     this->MoI_rate_change = this->inertia.MoI;
 
-    if(this->symmetric_inertia_assumption)
+    if(this->principal_axis_assumption)
     {
         // Get mass first
         this->inertia.mass = this->inertia_empty.mass + fuel_inertia.mass;
@@ -62,7 +62,7 @@ void SingleStageRocket::compute_acceleration(double time)
     allActions.force.zero();
     allActions.moment.zero();
 
-    //allActions += this->aerodynamics->update();
+    allActions += this->aerodynamics->update();
 
     if(this->thruster->is_active())
     {
@@ -79,76 +79,38 @@ void SingleStageRocket::compute_acceleration(double time)
     this->state.acceleration = total_force * (1.0/this->inertia.mass);
     this->state.acceleration.z -= this->_environment->values.gravity;
 
-    // Don't do extra work for symmetric
-    Axis I = this->inertia.MoI.get_inertia_matrix();
-    Vector torque = allActions.moment - this->state.angular_velocity.cross(I*this->state.angular_velocity);
+    Vector angular_velocity_body = this->state.CS*this->state.angular_velocity;
 
-    if(this->thruster->is_active())
+    // Don't do extra work for on principal axis
+    Vector angular_acceleration_body;
+    if(this->principal_axis_assumption)
     {
-        Axis I_dot = this->MoI_rate_change.get_inertia_matrix();
-        torque -= I_dot*this->state.angular_velocity;
-    }
-    // remember angular acceleration is in body frame
-    this->state.angular_acceleration = this->I_inverse * torque;
-}
+        double Iw[3];
+        Iw[0] = (this->inertia.MoI.Izz - this->inertia.MoI.Iyy)*angular_velocity_body.z*angular_velocity_body.y;
+        Iw[1] = (this->inertia.MoI.Ixx - this->inertia.MoI.Izz)*angular_velocity_body.z*angular_velocity_body.x;
+        Iw[2] = (this->inertia.MoI.Iyy - this->inertia.MoI.Ixx)*angular_velocity_body.y*angular_velocity_body.x;
 
-void SingleStageRocket::step(double& time, double dt)
-{
-    // Get initial state
-    this->compute_acceleration(time);
-
-    // only update GNC at beginning of time step
-    this->gnc.update(time); // TODO: Investigate why this breaks things in dynamics when put at start of step
-
-    KinematicState state0 = this->state;
-
-    // propagate to time + dt
-    time += dt;
-
-    this->state.position += this->state.velocity*dt;
-    this->state.velocity += this->state.acceleration*dt;
-
-    Vector inertial_rotation_rate = state0.CS.transpose_mult(this->state.angular_velocity);
-    this->state.angular_velocity += this->state.angular_acceleration*dt;
-
-    // Rotations are non linear -> rotate CS
-    double rotation_rate = inertial_rotation_rate.norm();
-    if(rotation_rate > 1e-8)
-    {
-        this->state.CS = Axis(rotation_rate*dt,inertial_rotation_rate*(1.0/rotation_rate))*state0.CS;  // confirmed true since rotation matrix is orthogonal
-    }
-
-    // Compute mass changes, no need to recompute at next step
-    if(this->thruster->is_active())
-    {
-        this->thruster->set_time(time);
-        this->update_inertia(1.0/dt);
-    }
-
-    /* Huen step */
-
-    // recompute state rate at time + dt
-    this->compute_acceleration(time);
-
-    double dt_half = dt*0.5;
-
-    this->state.position = state0.position + (state0.velocity + this->state.velocity)*dt_half;
-    this->state.velocity = state0.velocity + (state0.acceleration + this->state.acceleration)*dt_half;
-
-    this->state.angular_velocity = state0.angular_velocity + (state0.angular_acceleration + this->state.angular_acceleration)*dt_half;
-
-    // Average angular rate
-    inertial_rotation_rate += this->state.CS.transpose_mult(this->state.angular_velocity);
-    rotation_rate = inertial_rotation_rate.norm();
-    if(rotation_rate > 1e-8)
-    {
-        this->state.CS = Axis(rotation_rate*dt_half,inertial_rotation_rate*(1.0/rotation_rate))*state0.CS;  // confirmed true since rotation matrix is orthogonal
+        angular_acceleration_body.data[0] = (allActions.moment.data[0] - Iw[0])/this->inertia.MoI.I[0];
+        angular_acceleration_body.data[1] = (allActions.moment.data[1] - Iw[1])/this->inertia.MoI.I[1];
+        angular_acceleration_body.data[2] = (allActions.moment.data[2] - Iw[2])/this->inertia.MoI.I[2];
     }
     else
     {
-        this->state.CS = state0.CS;
+        Axis I = this->inertia.MoI.get_inertia_matrix();
+        Vector torque = allActions.moment - angular_velocity_body.cross(I*angular_velocity_body);
+
+        if(this->thruster->is_active())
+        {
+            Axis I_dot = this->MoI_rate_change.get_inertia_matrix();
+            torque -= I_dot*angular_velocity_body;
+        }
+        // remember angular acceleration is in body frame
+        angular_acceleration_body = this->I_inverse * torque;
     }
+
+    this->state.angular_acceleration = this->state.CS.transpose_mult(angular_acceleration_body);
 }
+
 SingleStageRocket::SingleStageRocket(Environment* atmosphere) : gnc(*this), _environment(atmosphere) {}
 
 SingleStageRocket::~SingleStageRocket(){}

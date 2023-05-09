@@ -373,7 +373,7 @@ void Loader::loadRocket(SingleStageRocket& rocket, const char* fn)
 
     Inertia_Basic inertia = loadBasicInertia(InertiaElement);
     rocket.inertia_empty.set_from_basic(inertia);
-    rocket.symmetric_inertia_assumption = true;
+    rocket.principal_axis_assumption = true;
 
     auto* ThrusterElement = root->FirstChildElement("Thruster");
     if(!ThrusterElement) { throw std::invalid_argument("No thruster"); }
