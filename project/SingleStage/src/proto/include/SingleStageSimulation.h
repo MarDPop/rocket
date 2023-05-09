@@ -69,15 +69,15 @@ friend class Loader;
 
     double _max_position_error = 1e-3;
 
-    double _max_angular_error = 1e-3;
+    double _max_angular_error = 1e-2;
 
     double _position_error_mag = 1e-6;
 
-    double _angle_error_proj = 0.9999;
+    double _angle_error_proj = 0.999;
 
     double _min_dt = 1e-5;
 
-    double _max_dt = 1.0;
+    double _max_dt = 0.1;
 
     void (SingleStageSimulation::*step)();
 

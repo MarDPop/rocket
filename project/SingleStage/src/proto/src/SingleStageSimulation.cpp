@@ -177,11 +177,11 @@ void SingleStageSimulation::euler_heun_adaptive_step()
         Vector position_error = position_euler - this->_rocket->state.position;
         double err_squared = position_error.mag();
 
-        double dt_factor_position = this->_position_error_mag/(err_squared + 1e-6);
+        double dt_factor_position = sqrt(2.0*this->_position_error_mag/(err_squared + this->_position_error_mag));
 
         double angle_error = Z_axis_euler.dot(this->_rocket->state.CS.axis.z);
 
-        double dt_factor_angular = (1.0 - this->_angle_error_proj) / (1.0 - angle_error + 1e-6) ;
+        double dt_factor_angular = 2.0*(1.0 - this->_angle_error_proj) / (2.0 - angle_error - this->_angle_error_proj) ;
 
         double dt_factor = dt_factor_position*dt_factor_angular;
         this->_dt *= dt_factor;

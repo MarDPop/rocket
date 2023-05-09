@@ -47,6 +47,9 @@ friend class Loader;
 
     void compute_acceleration(double time);
 
+    /**
+    * updates inertia from current mass
+    */
     void update_inertia(double inv_dt);
 
 public:
