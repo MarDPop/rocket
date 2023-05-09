@@ -24,8 +24,8 @@ const Commands& GuidanceTimedParachute::get_commands(const KinematicState& estim
         this->_commands.z_axis_inertial.zero();
         this->chute->deploy(time);
     }
-
-    if( estimated_state.velocity.z < 0.0 ) {
+    else if( estimated_state.velocity.z < 10000.0 )
+    {
         this->_commands.z_axis_inertial.zero();
     }
 
