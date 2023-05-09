@@ -39,7 +39,8 @@
 		<Guidance Type="DelayParachute">
 			<Burnout>2.6</Burnout>
 			<!-- <Delay>9</Delay> -->
-			<Delay>5</Delay>
+			<!-- <Delay>5</Delay> -->
+			<Delay>15</Delay>
 		</Guidance>
 		<!--
 		<Control>

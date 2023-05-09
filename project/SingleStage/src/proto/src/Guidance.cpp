@@ -19,11 +19,16 @@ GuidanceTimedParachute::GuidanceTimedParachute(double burnout, double delay) : G
 
 const Commands& GuidanceTimedParachute::get_commands(const KinematicState& estimated_state, double time)
 {
-    if( !this->chute->is_deployed() && time > _deploy )
+    if( !this->chute->is_deployed() && time > this->_deploy )
     {
         this->_commands.z_axis_inertial.zero();
         this->chute->deploy(time);
     }
+
+    if( estimated_state.velocity.z < 0.0 ) {
+        this->_commands.z_axis_inertial.zero();
+    }
+
     return this->_commands;
 }
 
