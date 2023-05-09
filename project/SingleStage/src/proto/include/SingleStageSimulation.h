@@ -67,13 +67,17 @@ friend class Loader;
 
     double _dt;
 
-    double _max_position_error = 1e-6;
+    double _max_position_error = 1e-3;
 
-    double _max_angular_error = 1e-6;
+    double _max_angular_error = 1e-3;
 
-    double _position_error_mag = 1e-12;
+    double _position_error_mag = 1e-6;
 
-    double _angle_error_proj = 0.9999999999;
+    double _angle_error_proj = 0.9999;
+
+    double _min_dt = 1e-5;
+
+    double _max_dt = 1.0;
 
     void (SingleStageSimulation::*step)();
 
@@ -86,6 +90,8 @@ friend class Loader;
     void rk23_step();
 
 public:
+
+    void set_timestep_constraints(double min_dt, double max_dt);
 
     void set_error_tolerance(double position_error, double angle_error);
 

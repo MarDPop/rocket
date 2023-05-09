@@ -108,70 +108,6 @@ void SingleStageSimulation::huen_step()
     this->_rocket->state.angular_velocity = state0.angular_velocity + (state0.angular_acceleration + this->_rocket->state.angular_acceleration)*dt_half; // Might need to do this after for stability
 }
 
-void SingleStageSimulation::huen_step()
-{
-    // Get initial state
-    this->_rocket->compute_acceleration(this->_time);
-
-    // only update GNC at beginning of time step
-    this->_rocket->gnc.update(this->_time); // TODO: Investigate why this breaks things in dynamics when put at start of step
-
-    // Save initial state
-    KinematicState state0 = this->_rocket->state;
-
-    // propagate to time + dt
-    this->_time += this->_dt;
-
-    // Compute mass changes, no need to recompute at next step
-    if(this->_rocket->thruster->is_active())
-    {
-        this->_rocket->thruster->set_time(this->_time);
-        this->_rocket->update_inertia(1.0/this->_dt);
-    }
-
-    // linear motion
-    this->_rocket->state.position += (state0.velocity*this->_dt);
-    this->_rocket->state.velocity += (state0.acceleration*this->_dt);
-
-    // Angular motion
-    // Rotations are non linear -> rotate CS
-    double rotation_rate = state0.angular_velocity.norm();
-    if(rotation_rate > 1e-8)
-    {
-        double angle = rotation_rate*this->_dt;
-        Vector axis = state0.angular_velocity * (1.0 / rotation_rate);
-        this->_rocket->state.CS = Axis( angle, axis )*state0.CS;  // confirmed true since rotation matrix is orthogonal
-    }
-
-    this->_rocket->state.angular_velocity += (state0.angular_acceleration*this->_dt);
-
-    /* Average step */
-
-    // recompute state rate at time + dt
-    this->_rocket->compute_acceleration(this->_time);
-
-    double dt_half = this->_dt*0.5;
-
-    this->_rocket->state.position = state0.position + (state0.velocity + this->_rocket->state.velocity)*dt_half;
-    this->_rocket->state.velocity = state0.velocity + (state0.acceleration + this->_rocket->state.acceleration)*dt_half;
-
-    Vector added_angular_velocity = this->_rocket->state.angular_velocity + state0.angular_velocity;
-    rotation_rate = added_angular_velocity.norm();
-    if(rotation_rate > 1e-8)
-    {
-        double angle = rotation_rate*dt_half;
-        Vector axis = added_angular_velocity * (1.0 / rotation_rate);
-        this->_rocket->state.CS = Axis( angle, axis )*state0.CS;  // confirmed true since rotation matrix is orthogonal
-    }
-    else
-    {
-        this->_rocket->state.CS = state0.CS;
-    }
-
-    // Average angular rate
-    this->_rocket->state.angular_velocity = state0.angular_velocity + (state0.angular_acceleration + this->_rocket->state.angular_acceleration)*dt_half; // Might need to do this after for stability
-}
-
 void SingleStageSimulation::euler_heun_adaptive_step()
 {
     // Get initial state
@@ -239,26 +175,52 @@ void SingleStageSimulation::euler_heun_adaptive_step()
         this->_rocket->state.angular_velocity = state0.angular_velocity + (state0.angular_acceleration + this->_rocket->state.angular_acceleration)*dt_half; // Might need to do this after for stability
 
         Vector position_error = position_euler - this->_rocket->state.position;
-        if(position_error.mag() > this->_max_position_error*this->_max_position_error) {
+        double err_squared = position_error.mag();
 
-        }
+        double dt_factor_position = this->_position_error_mag/(err_squared + 1e-6);
 
         double angle_error = Z_axis_euler.dot(this->_rocket->state.CS.axis.z);
-        if(angle_error < this->_angle_error_proj)
-        {
 
+        double dt_factor_angular = (1.0 - this->_angle_error_proj) / (1.0 - angle_error + 1e-6) ;
+
+        double dt_factor = dt_factor_position*dt_factor_angular;
+        this->_dt *= dt_factor;
+
+        if(this->_dt < this->_min_dt)
+        {
+            this->_dt = this->_min_dt;
+            break;
         }
 
+        if(dt_factor > 1.0)
+        {
+            if(this->_dt > this->_max_dt)
+            {
+                this->_dt = this->_max_dt;
+            }
+            break;
+        }
     }
 }
 
+void SingleStageSimulation::rk23_step()
+{
+
+}
 
 SingleStageSimulation::SingleStageSimulation()
 {
-    this->step = &SingleStageSimulation::euler_step;
+    // this->step = &SingleStageSimulation::euler_step;
+    this->step = &SingleStageSimulation::euler_heun_adaptive_step;
 }
 
 SingleStageSimulation::~SingleStageSimulation() {}
+
+void SingleStageSimulation::set_timestep_constraints(double min_dt, double max_dt)
+{
+    this->_min_dt = min_dt;
+    this->_max_dt = max_dt;
+}
 
 void SingleStageSimulation::set_error_tolerance(double position_error, double angle_error)
 {
