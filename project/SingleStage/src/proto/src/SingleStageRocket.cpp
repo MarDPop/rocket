@@ -57,6 +57,8 @@ void SingleStageRocket::compute_acceleration(double time)
 {
     this->_environment->set(this->state.position.z, time);
 
+    // Get all body actions centered at CoM
+    // all forces referenced from nose
     BodyAction allActions;
     allActions.location = this->inertia.CoM;
     allActions.force.zero();

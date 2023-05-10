@@ -25,9 +25,11 @@ friend class Loader;
 
     KinematicState state;
 
-    Inertia inertia_empty;
-
     Inertia inertia;
+
+    Axis CS;
+
+    Inertia inertia_empty;
 
     MOI MoI_rate_change;
 

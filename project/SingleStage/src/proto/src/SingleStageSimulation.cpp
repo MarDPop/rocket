@@ -121,16 +121,6 @@ void SingleStageSimulation::euler_heun_adaptive_step()
     double time0 = this->_time;
     for(int iter = 0; iter < 10; iter++)
     {
-        // propagate to time + dt
-        this->_time = time0 + this->_dt;
-
-        // Compute mass changes, no need to recompute at next step
-        if(this->_rocket->thruster->is_active())
-        {
-            this->_rocket->thruster->set_time(this->_time);
-            this->_rocket->update_inertia(1.0/this->_dt);
-        }
-
         // linear motion
         this->_rocket->state.position = state0.position + (state0.velocity*this->_dt);
         this->_rocket->state.velocity = state0.position + (state0.acceleration*this->_dt);
@@ -146,6 +136,16 @@ void SingleStageSimulation::euler_heun_adaptive_step()
         }
 
         this->_rocket->state.angular_velocity = state0.angular_velocity + (state0.angular_acceleration*this->_dt);
+
+        // propagate to time + dt
+        this->_time = time0 + this->_dt;
+
+        // Compute mass changes, no need to recompute at next step
+        if(this->_rocket->thruster->is_active())
+        {
+            this->_rocket->thruster->set_time(this->_time);
+            this->_rocket->update_inertia(1.0/this->_dt);
+        }
 
         Vector position_euler = this->_rocket->state.position;
         Vector Z_axis_euler = this->_rocket->state.CS.axis.z;
