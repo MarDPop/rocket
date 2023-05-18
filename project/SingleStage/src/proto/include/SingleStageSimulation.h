@@ -73,9 +73,9 @@ friend class Loader;
 
     double _position_error_mag = 1e-6;
 
-    double _angle_error_proj = 0.999;
+    double _angle_error_proj = 0.998;
 
-    double _min_dt = 1e-5;
+    double _min_dt = 1e-4;
 
     double _max_dt = 0.1;
 

@@ -27,8 +27,6 @@ friend class Loader;
 
     Inertia inertia;
 
-    Axis CS;
-
     Inertia inertia_empty;
 
     MOI MoI_rate_change;

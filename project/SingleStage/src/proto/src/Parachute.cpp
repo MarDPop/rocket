@@ -62,7 +62,7 @@ void ParachuteModeled::set_params(double area, double tether_length, double teth
     this->_tether_unstretched_length = tether_length;
     this->_tether_spring_constant = tether_spring_constant;
     this->_tether_damper_constant = tether_damper_constant;
-    this->_max_strain = tether_length*0.2;
+    this->_max_strain = tether_length*0.5;
     this->_volume_deployed = area*sqrt(area)*0.25; // 0.25 is some form factor, smaller for "flatter" parchutes
     this->_chute_position.zero();
     this->_chute_velocity.zero();
@@ -125,7 +125,7 @@ const BodyAction& ParachuteModeled::update(double time)
         double strain = std::min(tether_length - this->_tether_unstretched_length, this->_max_strain);
         double strain_rate = (tether_length - this->_old_tether_length)/dt;
         double tension = strain*this->_tether_spring_constant - strain_rate*this->_tether_damper_constant;
-        CDA *= (this->_tether_unstretched_length/tether_length); // shrink area due to tension
+        // CDA *= (this->_tether_unstretched_length/tether_length); // shrink area due to tension
         tension_inertial = tether * (tension/tether_length);
     }
     else

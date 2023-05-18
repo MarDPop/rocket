@@ -2059,7 +2059,7 @@
 	<android/log.h>
 	<assert.h>
 
-1681829644 source:c:\users\mariu\onedrive\documents\repos\rocket\rocket\project\singlestage\src\app\proto.cpp
+1684379625 source:c:\users\mariu\onedrive\documents\repos\rocket\rocket\project\singlestage\src\app\proto.cpp
 	<iostream>
 	"../common/include/util.h"
 	"../common/include/Cartesian.h"
@@ -2076,7 +2076,7 @@
 	<vector>
 	<cmath>
 
-1682174537 c:\users\mariu\onedrive\documents\repos\rocket\rocket\project\singlestage\src\common\include\cartesian.h
+1684205603 c:\users\mariu\onedrive\documents\repos\rocket\rocket\project\singlestage\src\common\include\cartesian.h
 	<cmath>
 	<algorithm>
 	"string.h"
@@ -2084,7 +2084,7 @@
 	<stdio.h>
 	<string>
 
-1683644589 c:\users\mariu\onedrive\documents\repos\rocket\rocket\project\singlestage\src\proto\include\singlestagesimulation.h
+1684208300 c:\users\mariu\onedrive\documents\repos\rocket\rocket\project\singlestage\src\proto\include\singlestagesimulation.h
 	"SingleStageRocket.h"
 	"Environment.h"
 	<string>
@@ -2093,7 +2093,7 @@
 	<memory>
 	"../../common/include/Cartesian.h"
 
-1683590420 c:\users\mariu\onedrive\documents\repos\rocket\rocket\project\singlestage\src\proto\include\singlestagerocket.h
+1683678656 c:\users\mariu\onedrive\documents\repos\rocket\rocket\project\singlestage\src\proto\include\singlestagerocket.h
 	<vector>
 	<array>
 	<memory>
@@ -2106,8 +2106,9 @@
 	"Environment.h"
 	"Parachute.h"
 
-1683592555 c:\users\mariu\onedrive\documents\repos\rocket\rocket\project\singlestage\src\proto\include\kinematics.h
+1684380040 c:\users\mariu\onedrive\documents\repos\rocket\rocket\project\singlestage\src\proto\include\kinematics.h
 	"../../common/include/Cartesian.h"
+	<array>
 	"string.h"
 
 1682097084 c:\users\mariu\onedrive\documents\repos\rocket\rocket\project\singlestage\src\proto\include\aerodynamics.h
@@ -2249,7 +2250,7 @@
 
 1681100684 c:\users\mariu\onedrive\documents\repos\rocket\rocket\project\singlestage\src\proto\include\gravity.h
 
-1683603644 source:c:\users\mariu\onedrive\documents\repos\rocket\rocket\project\singlestage\src\proto\src\guidance.cpp
+1684377693 source:c:\users\mariu\onedrive\documents\repos\rocket\rocket\project\singlestage\src\proto\src\guidance.cpp
 	"../include/Guidance.h"
 	"../include/Parachute.h"
 
@@ -3394,7 +3395,7 @@
 	"../include/Servo.h"
 	<cmath>
 
-1683644162 source:c:\users\mariu\onedrive\documents\repos\rocket\rocket\project\singlestage\src\proto\src\singlestagesimulation.cpp
+1684379585 source:c:\users\mariu\onedrive\documents\repos\rocket\rocket\project\singlestage\src\proto\src\singlestagesimulation.cpp
 	"../include/SingleStageSimulation.h"
 	"../../common/include/util.h"
 	<exception>
@@ -3442,17 +3443,17 @@
 	"../../common/include/fluid.h"
 	<iostream>
 
-1682352799 source:c:\users\mariu\onedrive\documents\repos\rocket\rocket\project\singlestage\src\proto\src\aerodynamics.cpp
+1684381273 source:c:\users\mariu\onedrive\documents\repos\rocket\rocket\project\singlestage\src\proto\src\aerodynamics.cpp
 	"../include/Aerodynamics.h"
 	"../include/SingleStageRocket.h"
 	<cmath>
 	<string>
 
-1683593424 source:c:\users\mariu\onedrive\documents\repos\rocket\rocket\project\singlestage\src\proto\src\parachute.cpp
+1684209232 source:c:\users\mariu\onedrive\documents\repos\rocket\rocket\project\singlestage\src\proto\src\parachute.cpp
 	"../include/Parachute.h"
 	"../include/SingleStageRocket.h"
 
-1683592796 source:c:\users\mariu\onedrive\documents\repos\rocket\rocket\project\singlestage\src\proto\src\singlestagerocket.cpp
+1684208651 source:c:\users\mariu\onedrive\documents\repos\rocket\rocket\project\singlestage\src\proto\src\singlestagerocket.cpp
 	"../include/SingleStageRocket.h"
 	"../../common/include/util.h"
 	"../include/Action.h"

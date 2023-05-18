@@ -857,12 +857,12 @@ namespace Cartesian {
             return q0*cos(theta) + q2*sin(theta);
         }
 
-        inline Axis to_rotation_matrix() const
+        inline Axis to_rotation_matrix_unit() const
         {
             Axis out;
-            double i2 = 2*data[1];
-            double j2 = 2*data[2];
-            double k2 = 2*data[3];
+            double i2 = 2.0*data[1];
+            double j2 = 2.0*data[2];
+            double k2 = 2.0*data[3];
 
             out.data[0] = 1.0 - j2*data[2] - k2*data[3];
             out.data[4] = 1.0 - i2*data[1] - k2*data[3];

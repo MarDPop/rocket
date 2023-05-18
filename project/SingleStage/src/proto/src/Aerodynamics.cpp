@@ -108,7 +108,7 @@ AerodynamicsBasicCoefficient::aero_coef AerodynamicsBasicCoefficient::get_aero_c
     }
 
     output.CM = std::min(this->_CM_max,this->_CM_alpha*sAoA);
-    output.CL = this->_CL_alpha*sAoA;
+    output.CL = std::min(this->_CL_alpha*sAoA, this->_CL_max*2);
     output.CD += this->_K*output.CL*output.CL;
     if(output.CL > this->_CL_max)
     {

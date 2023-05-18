@@ -10,42 +10,37 @@ using namespace Cartesian;
 /**
 * State in "Inertial" Frame
 */
-union KinematicState
+struct KinematicState
 {
-    std::array<double,19> x;
-    struct
-    {
-        /**
-        * Current position in ENU (m)
-        */
-        Vector position;
+    /**
+    * Current position in ENU (m)
+    */
+    Vector position;
 
-        /**
-        * Current body frame in ENU (z axis is axial)
-        */
-        Quaternion orientation; // TODO: make this quaternion
+    /**
+     * Current body frame in ENU (z axis is axial)
+     */
+    Axis CS; // TODO: make this quaternion
 
-        /**
-        * Current velocity in ENU (m/s)
-        */
-        Vector velocity;
+    /**
+    * Current velocity in ENU (m/s)
+    */
+    Vector velocity;
 
-        /**
-        * Current angular speed in ENU frame (rad/s)
-        */
-        Vector angular_velocity;
+    /**
+    * Current angular speed in ENU frame (rad/s)
+    */
+    Vector angular_velocity;
 
-        /**
-        * Current position in ENU (m/s2)
-        */
-        Vector acceleration;
+    /**
+    * Current position in ENU (m/s2)
+    */
+    Vector acceleration;
 
-        /**
-        * Current angular acceleration in ENU frame (rad/s)
-        */
-        Vector angular_acceleration;
-    };
-
+    /**
+    * Current angular acceleration in ENU frame (rad/s)
+    */
+    Vector angular_acceleration;
 };
 
 struct Inertia_Basic

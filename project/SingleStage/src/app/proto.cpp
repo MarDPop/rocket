@@ -34,6 +34,9 @@ int main(int argc, char *argv[])
 
     Loader::loadSimulation(sim,argv[1]);
 
+    sim.set_error_tolerance(0.0001,0.001);
+    sim.set_timestep_constraints(1e-3,0.1);
+
     sim.run(argv[2],run_debug);
 
     std::cout << "Done. Press enter to exit" << std::endl;

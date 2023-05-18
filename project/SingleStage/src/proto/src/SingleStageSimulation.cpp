@@ -123,7 +123,7 @@ void SingleStageSimulation::euler_heun_adaptive_step()
     {
         // linear motion
         this->_rocket->state.position = state0.position + (state0.velocity*this->_dt);
-        this->_rocket->state.velocity = state0.position + (state0.acceleration*this->_dt);
+        this->_rocket->state.velocity = state0.velocity + (state0.acceleration*this->_dt);
 
         // Angular motion
         // Rotations are non linear -> rotate CS
@@ -174,16 +174,33 @@ void SingleStageSimulation::euler_heun_adaptive_step()
         // Average angular rate
         this->_rocket->state.angular_velocity = state0.angular_velocity + (state0.angular_acceleration + this->_rocket->state.angular_acceleration)*dt_half; // Might need to do this after for stability
 
+        // Calculate errors
         Vector position_error = position_euler - this->_rocket->state.position;
         double err_squared = position_error.mag();
 
-        double dt_factor_position = sqrt(2.0*this->_position_error_mag/(err_squared + this->_position_error_mag));
+        double dt_factor_position;
+        if(err_squared < this->_position_error_mag)
+        {
+            dt_factor_position = 1.1;
+        }
+        else
+        {
+            dt_factor_position = sqrt(this->_position_error_mag/err_squared);
+        }
 
         double angle_error = Z_axis_euler.dot(this->_rocket->state.CS.axis.z);
 
-        double dt_factor_angular = 2.0*(1.0 - this->_angle_error_proj) / (2.0 - angle_error - this->_angle_error_proj) ;
+        double dt_factor_angular;
+        if(angle_error > this->_angle_error_proj)
+        {
+            dt_factor_angular = 1.1;
+        }
+        else
+        {
+            dt_factor_angular = this->_max_angular_error/sqrt(2.0*(1.0 - angle_error));
+        }
 
-        double dt_factor = dt_factor_position*dt_factor_angular;
+        double dt_factor = std::min(dt_factor_position, dt_factor_angular);
         this->_dt *= dt_factor;
 
         if(this->_dt < this->_min_dt)

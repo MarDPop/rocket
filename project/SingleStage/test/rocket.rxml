@@ -8,17 +8,17 @@
 	
 	<Aerodynamics Type="FinAerodynamics" NumberFins="3" unit="SI">
 		<CD0>0.7</CD0>
-		<CL_alpha>1.8</CL_alpha>
+		<CL_alpha>1.5</CL_alpha>
 		<CM_alpha>-0.0</CM_alpha>
-		<CM_alpha_dot>-0.2</CM_alpha_dot>
+		<CM_alpha_dot>-0.8</CM_alpha_dot>
 		<InducedLiftK>0.4</InducedLiftK>
 		<RefArea>0.0029</RefArea>
 		<RefLength>0.5</RefLength>
 		<StallAngle>0.2</StallAngle>
 		<COP>-0.35</COP>
 		<dCLdTheta>0.1</dCLdTheta>
-        <dCDdTheta>0.0</dCDdTheta>
-		<dCMdTheta>-0.0</dCMdTheta>
+        <dCDdTheta>0.02</dCDdTheta>
+		<dCMdTheta>-0.005</dCMdTheta>
 		<AreaRef>0.002</AreaRef>
 		<FinZCenter>-0.45</FinZCenter>
 		<FinSpanCenter>0.1</FinSpanCenter>
@@ -26,12 +26,19 @@
 	
 	<Thruster Type="Estes" File="test/Estes_F26.eng" COM="-0.43" />
 	
+	<!--
 	<Parachute Type="Constrained">
-		<Area>0.003</Area>
+		<Area>0.005</Area>
 		<TetherLength>1.0</TetherLength>
-		<TetherSpringConst>50</TetherSpringConst>
-		<TetherDamperConst>0.1</TetherDamperConst>
+		<TetherSpringConst>3</TetherSpringConst>
+		<TetherDamperConst>0.0001</TetherDamperConst>
 		<ChuteMass>0.005</ChuteMass>
+		<DeploymentTime>3.0</DeploymentTime>
+	</Parachute>
+	-->
+	
+	<Parachute Type="Timed">
+		<CDA>0.01</CDA>
 		<DeploymentTime>3.0</DeploymentTime>
 	</Parachute>
 	

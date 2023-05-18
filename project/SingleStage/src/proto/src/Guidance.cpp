@@ -24,7 +24,7 @@ const Commands& GuidanceTimedParachute::get_commands(const KinematicState& estim
         this->_commands.z_axis_inertial.zero();
         this->chute->deploy(time);
     }
-    else if( estimated_state.velocity.z < 10000.0 )
+    else if( estimated_state.velocity.z < -10.0 ) // TODO: Fix
     {
         this->_commands.z_axis_inertial.zero();
     }
@@ -36,17 +36,11 @@ GuidanceSimpleAscent::GuidanceSimpleAscent() : Guidance() {}
 
 const Commands& GuidanceSimpleAscent::get_commands(const KinematicState& estimated_state, double time)
 {
-    if(this->chute->is_deployed())
-    {
-        return this->_commands;
-    }
-    else if (estimated_state.velocity.z < -1.0)
+    if (!this->chute->is_deployed() && estimated_state.velocity.z < -1.0)
     {
         this->chute->deploy(time);
         this->_commands.z_axis_inertial.zero();
-        return this->_commands;
     }
-
     return this->_commands;
 }
 
