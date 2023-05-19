@@ -35,7 +35,7 @@ void ControlFinSimple::get_outputs(const Commands& commands, const KinematicStat
 
     auto arm = this->get_desired_arm_magnitude_body(commands, estimated_state);
 
-    double gain = this->fin_gain/dynamic_pressure_factor;
+    double gain = sqrt(this->fin_gain/dynamic_pressure_factor);
 
     for(unsigned fin_idx = 0; fin_idx < aero.NUMBER_FINS; fin_idx++)
     {

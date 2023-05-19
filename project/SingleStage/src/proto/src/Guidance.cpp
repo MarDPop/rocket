@@ -66,7 +66,7 @@ const Commands& GuidanceVerticalAscent::get_commands(const KinematicState& estim
 
     double scale = rescaled_anti_vector.norm();
 
-    if(scale > 1e-4) // REMEMBER TO PUT BACK
+    if(scale > 1e-6)
     {
         this->_commands.z_axis_inertial = rescaled_anti_vector * (1.0/scale);
     }

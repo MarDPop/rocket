@@ -56,17 +56,18 @@ void FilterBasic::update(const Sensors& sensors, double time)
     this->computed_state.velocity += (this->computed_state.acceleration * dt);
 
     this->computed_state.position.z = (this->computed_state.position.z + computed.altitude)*0.5;
-    if(fabs(this->computed_state.velocity.z) > 10.0) {
+    if(fabs(this->computed_state.velocity.z) > 10.0)
+    {
         double dHdt = (computed.altitude - this->alt_old)/dt;
         this->computed_state.velocity.z = this->computed_state.velocity.z*0.8 + dHdt*0.2;
     }
     this->alt_old = computed.altitude;
 
-    Vector angular_velocity = this->computed_state.CS.transpose_mult(measured.angular_velocity);
-    double angular_rate = angular_velocity.norm();
-    if(angular_rate > 1e-9)
+    this->computed_state.angular_velocity = this->computed_state.CS.transpose_mult(measured.angular_velocity);
+    double angular_rate = this->computed_state.angular_velocity.norm();
+    if(angular_rate > 1e-8)
     {
-        Axis rotm(angular_rate*dt,angular_velocity *(1/angular_rate));
+        Axis rotm(angular_rate*dt,this->computed_state.angular_velocity *(1.0/angular_rate));
         this->computed_state.CS = rotm * this->computed_state.CS;
         //this->computed_state.CS.gram_schmidt_orthogonalize();
     }

@@ -16,10 +16,10 @@
 		<RefLength>0.5</RefLength>
 		<StallAngle>0.2</StallAngle>
 		<COP>-0.35</COP>
-		<dCLdTheta>0.1</dCLdTheta>
-        <dCDdTheta>0.02</dCDdTheta>
-		<dCMdTheta>-0.005</dCMdTheta>
-		<AreaRef>0.002</AreaRef>
+		<dCLdTheta>0.3</dCLdTheta>
+        <dCDdTheta>0.01</dCDdTheta>
+		<dCMdTheta>-0.001</dCMdTheta>
+		<AreaRef>0.001</AreaRef>
 		<FinZCenter>-0.45</FinZCenter>
 		<FinSpanCenter>0.1</FinSpanCenter>
 	</Aerodynamics>
@@ -43,20 +43,28 @@
 	</Parachute>
 	
 	<GNC>
+		
 		<Guidance Type="DelayParachute">
 			<Burnout>2.6</Burnout>
-			<!-- <Delay>9</Delay> -->
-			<!-- <Delay>5</Delay> -->
 			<Delay>6</Delay>
 		</Guidance>
+		<!-- -->
+		
+		<!--
+		<Guidance Type="VerticalAscent">
+			<Proportional>1.0</Proportional>
+			<Damping>0.2</Damping>
+		</Guidance>
+		->
+		
 		<!--
 		<Control>
 		</Control>
 		-->
 		<Control Type="FinControl">
 			<Proportional>1.0</Proportional>
-			<Damping>0.1</Damping>
-			<FinGain>40000.0</FinGain> 
+			<Damping>0.001</Damping>
+			<FinGain>1250000.0</FinGain> 
 		</Control>
 
 		<Navigation>
@@ -65,7 +73,8 @@
 					<Barometer>1.4</Barometer>
 					<Thermometer>0.007</Thermometer>
 					<Accelerometer>0.1</Accelerometer>
-					<Gyro>0.004</Gyro>
+					<!-- <Gyro>0.004</Gyro> -->
+					<Gyro>0.0000001</Gyro>
 				</Variances>
 			</Sensor>
 			<Filter Type="Basic">
