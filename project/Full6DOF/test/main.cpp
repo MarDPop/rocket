@@ -7,7 +7,7 @@
 
 #include "../lib/Eigen/Dense"
 
-struct test_dynamics : public virtual ODE_Dynamics<2>
+struct test_dynamics : public virtual Fixed_Size_Dynamics<2>
 {
     Eigen::Vector2d state;
 
@@ -27,7 +27,7 @@ struct test_dynamics : public virtual ODE_Dynamics<2>
 
 };
 
-void print(const ODE_Recording<2>& recording, std::string filename)
+void print(const Fixed_Size_Recording<2>& recording, std::string filename)
 {
     std::ofstream output(filename);
 
@@ -46,7 +46,7 @@ int main(int argc, char** argv)
 
     test_dynamics dyn;
 
-    ODE<2> ode(dyn);
+    Fixed_Size_ODE<2> ode(dyn);
     ode.set_timestep(0.01);
     ode.set_state(initial_state);
     ode.run_to_time(10);

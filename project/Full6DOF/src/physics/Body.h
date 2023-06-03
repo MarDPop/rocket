@@ -8,7 +8,7 @@
  * @brief 
  * 
  */
-class Body_Point_Mass : public virtual ODE_Dynamics<7>
+class Body_Point_Mass : public virtual Fixed_Size_Dynamics<7>
 {
 protected:
 
@@ -226,7 +226,7 @@ struct Inertia
  * 
  */
 template<MOMENT_CONSTANTS NDEG>
-class Body
+class Body : Fixed_Size_Dynamics< NDEG>
 {
 protected:
 
