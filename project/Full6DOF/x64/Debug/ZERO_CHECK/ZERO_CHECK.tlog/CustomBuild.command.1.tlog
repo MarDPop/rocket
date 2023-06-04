@@ -1,0 +1,10 @@
+^C:\USERS\MARIU\ONEDRIVE\DOCUMENTS\REPOS\ROCKET\ROCKET\PROJECT\FULL6DOF\CMAKEFILES\07F0BE956C161AF06FF26B1F9AB302FD\GENERATE.STAMP.RULE
+setlocal
+C:\Qt\Tools\CMake_64\bin\cmake.exe -SC:/Users/mariu/OneDrive/Documents/repos/rocket/rocket/project/Full6DOF -BC:/Users/mariu/OneDrive/Documents/repos/rocket/rocket/project/Full6DOF --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file C:/Users/mariu/OneDrive/Documents/repos/rocket/rocket/project/Full6DOF/Full6DOF.sln
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

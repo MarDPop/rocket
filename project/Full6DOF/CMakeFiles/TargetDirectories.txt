@@ -1,0 +1,3 @@
+C:/Users/mariu/OneDrive/Documents/repos/rocket/rocket/project/Full6DOF/CMakeFiles/Full6DOF.dir
+C:/Users/mariu/OneDrive/Documents/repos/rocket/rocket/project/Full6DOF/CMakeFiles/ALL_BUILD.dir
+C:/Users/mariu/OneDrive/Documents/repos/rocket/rocket/project/Full6DOF/CMakeFiles/ZERO_CHECK.dir

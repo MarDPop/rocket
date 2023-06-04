@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\mariu\OneDrive\Documents\repos\rocket\rocket\project\Full6DOF\test\main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\mariu\OneDrive\Documents\repos\rocket\rocket\project\Full6DOF\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{DF28DF3C-34E6-34F9-930E-CC2EC8C979C4}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

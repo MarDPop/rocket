@@ -92,6 +92,7 @@ struct MomentOfInertia
     inline Eigen::Matrix3d get_inertia_matrix() const;
 };
 
+template<>
 inline Eigen::Matrix3d MomentOfInertia<FULL>::get_inertia_matrix() const
 {
     Eigen::Matrix3d inertia;
@@ -105,6 +106,7 @@ inline Eigen::Matrix3d MomentOfInertia<FULL>::get_inertia_matrix() const
     return inertia;
 }
 
+template<>
 inline Eigen::Matrix3d MomentOfInertia<PLANE_SYMMETRY>::get_inertia_matrix() const
 {
     Eigen::Matrix3d inertia;
@@ -118,6 +120,7 @@ inline Eigen::Matrix3d MomentOfInertia<PLANE_SYMMETRY>::get_inertia_matrix() con
     return inertia;
 }
 
+template<>
 inline Eigen::Matrix3d MomentOfInertia<PRINCIPAL_AXIS>::get_inertia_matrix() const
 {
     Eigen::Matrix3d inertia;
@@ -130,6 +133,7 @@ inline Eigen::Matrix3d MomentOfInertia<PRINCIPAL_AXIS>::get_inertia_matrix() con
     return inertia;
 }
 
+template<>
 inline Eigen::Matrix3d MomentOfInertia<AXISYMMETRIC>::get_inertia_matrix() const
 {
     Eigen::Matrix3d inertia;
@@ -141,6 +145,7 @@ inline Eigen::Matrix3d MomentOfInertia<AXISYMMETRIC>::get_inertia_matrix() const
     return inertia;
 }
 
+template<>
 inline Eigen::Matrix3d MomentOfInertia<EQUAL>::get_inertia_matrix() const
 {
     Eigen::Matrix3d inertia;
@@ -185,7 +190,7 @@ struct Inertia
 
         // Compute center of mass
         output.center_of_mass = this->center_of_mass*this->mass + inertia.center_of_mass*inertia.mass;
-        output.center_of_mass *= (1.0/out.mass);
+        output.center_of_mass *= (1.0/output.mass);
 
         output.moment_of_inertia = this->moment_of_inertia + inertia.moment_of_inertia;
 
@@ -203,8 +208,8 @@ struct Inertia
         output.moment_of_inertia.I[4] -= mr.x()*r.z();
         output.moment_of_inertia.I[5] -= mr.y()*r.z();
 
-        r = input.center_of_mass - output.center_of_mass;
-        mr = r*input.mass;
+        r = inertia.center_of_mass - output.center_of_mass;
+        mr = r*inertia.mass;
         mr2 = mr.dot(r);
         output.moment_of_inertia.I[0] += mr2;
         output.moment_of_inertia.I[1] += mr2;
@@ -216,6 +221,8 @@ struct Inertia
         output.moment_of_inertia.I[3] -= mr.x()*r.y();
         output.moment_of_inertia.I[4] -= mr.x()*r.z();
         output.moment_of_inertia.I[5] -= mr.y()*r.z();
+
+        return output;
     }
 
 };
@@ -230,9 +237,9 @@ class Body : Fixed_Size_Dynamics<17 + NDEG>
 {
 protected:
 
-    union
+    union 
     {
-        std::array<double,17 + NDEG> _state;
+        std::array<double,17 + NDEG> x;
         struct 
         {
             Eigen::Vector3d _position;
@@ -259,7 +266,7 @@ protected:
     {
         memcpy(this->_position.data(),&x[0],3*sizeof(double));
         memcpy(this->_velocity.data(),&x[3],3*sizeof(double));
-        memcpy(this->_orientation.data(),&x[6],4*sizeof(double)); // scalar last for Eigen!
+        memcpy(this->_orientation.coeffs().data(),&x[6],4*sizeof(double)); // scalar last for Eigen!
         memcpy(this->_angular_velocity.data(),&x[10],3*sizeof(double));
         this->_inertia.mass = x[13];
         memcpy(this->_inertia.center_of_mass.data(),&x[14],3*sizeof(double));
@@ -269,25 +276,19 @@ protected:
 
     inline void get_orientation_rate(double* dx)
     {
-        /*
-            dx[3] = _angular_velocity.dot(_orientation.vec());
-            dx[0] = _orientation.w()*_angular_velocity.x();
-            dx[1] = _orientation.w()*_angular_velocity.y();
-            dx[2] = _orientation.w()*_angular_velocity.z();
-        */
 
         Eigen::Matrix4d angular_matrix {
-            {0.0, -_angular_velocity.x(), -_angular_velocity.y(), -_angular_velocity.z()},
-            {_angular_velocity.x(), 0.0, _angular_velocity.z(), -_angular_velocity.y()},
-            {_angular_velocity.y(),- _angular_velocity.z(), 0.0, _angular_velocity.x()},
-            {_angular_velocity.z(), _angular_velocity.y(), -_angular_velocity.x(), 0.0}
+            {-_angular_velocity.x(), -_angular_velocity.y(), -_angular_velocity.z(), 0.0},
+            {0.0, _angular_velocity.z(), -_angular_velocity.y(), _angular_velocity.x()},
+            {-_angular_velocity.z(), 0.0, _angular_velocity.x(), _angular_velocity.y()},
+            {_angular_velocity.y(), -_angular_velocity.x(), 0.0, _angular_velocity.z()}
         }; // outer product w x q
 
-        Eigen::Vector4d quat {_orientation.w(), _orientation.x(), _orientation.y(), _orientation.z()};
+        Eigen::Map<Eigen::Vector4d> quat(_orientation.coeffs().data());
 
-        quat = (angular_matrix*quat);
+        Eigen::Vector4d mult = angular_matrix*quat;
 
-        auto q = quat.data();
+        auto q = mult.data();
         dx[0] = q[0]*0.5;
         dx[1] = q[1]*0.5;
         dx[2] = q[2]*0.5;
@@ -315,7 +316,9 @@ protected:
 
 public:
 
-    inline bool set_state(const std::array<double, 13 + NDEG>& x, const double& time, std::array<double,13 + NDEG>& dx)
+    inline Body() {}
+
+    inline bool set_state(const std::array<double, 17 + NDEG>& x, const double& time, std::array<double,17 + NDEG>& dx) override
     {
         this->set_state_and_time(x,time);
         this->compute_state_rate();

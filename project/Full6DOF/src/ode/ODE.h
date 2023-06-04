@@ -193,7 +193,7 @@ public:
         this->_recording.times.clear();
     }
 
-    inline const ODE_Recording<NSTATES>& get_recording()  const
+    inline const Fixed_Size_Recording<NSTATES>& get_recording()  const
     {
         return this->_recording;
     }

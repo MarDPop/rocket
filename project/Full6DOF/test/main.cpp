@@ -7,6 +7,9 @@
 
 #include "../lib/Eigen/Dense"
 
+#include "../src/vehicle/Vehicle.h"
+
+
 struct test_dynamics : public virtual Fixed_Size_Dynamics<2>
 {
     Eigen::Vector2d state;
@@ -40,7 +43,7 @@ void print(const Fixed_Size_Recording<2>& recording, std::string filename)
     }
 }
 
-int main(int argc, char** argv) 
+void test1()
 {
     std::array<double,2> initial_state = {0.0, 100.0};
 
@@ -54,6 +57,18 @@ int main(int argc, char** argv)
     print(ode.get_recording(),"output.dat");
 
     std::cout << dyn.get_position() << std::endl;
+}
+
+void test2()
+{
+    Vehicle<Body<AXISYMMETRIC>,2> vehicle;
+
+    std::cout << vehicle.blah();
+}
+
+int main(int argc, char** argv) 
+{
+    test2();
 
     return 0;
 }

@@ -2,7 +2,9 @@
 
 #include "../physics/Body.h"
 
+#include "GNC.h"
 #include "Action.h"
+
 #include <memory>
 
 class Vehicle_3DOF : public virtual Body_Point_Mass
@@ -17,15 +19,23 @@ public:
 };
 
 
-template<typename T, unsigned N_ACTIONS>
+template<class T, unsigned N_ACTIONS>
 class Vehicle : public virtual T
 {
 
-    std::array<Action*,N_ACTIONS> _actions;
+    std::array<BodyAction*, N_ACTIONS> _actions;
+
+    GNC _gnc;
 
 public:
 
     inline Vehicle(){}
 
+    inline int blah()
+    {
+        return 1;
+    }
+
 };
+
 
