@@ -2,16 +2,15 @@
 
 #include <vector>
 
-#include "Body.h"
+#include "Gravity.h"
+#include "Atmosphere.h"
+#include "Geometry.h"
 
-
-class Stage_Vehicle
+struct Stage
 {
 
-    
+    Gravity& _gravity;
 
-public:
-
-    
+    Atmosphere& _atmosphere;    
 
 };

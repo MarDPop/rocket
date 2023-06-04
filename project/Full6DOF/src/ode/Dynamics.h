@@ -53,6 +53,11 @@ public:
         return _data[idx];
     }
 
+    inline const T& operator[](unsigned idx) const
+    {
+        return _data[idx];
+    }
+
     inline T& operator=(const fixed_vector& copy)
     {
         std::copy(copy._data,copy._end,_data);
@@ -63,14 +68,24 @@ public:
         return _data;
     }
 
+    inline const T* start() const
+    {
+        return _data;
+    }
+
     inline T* end()
+    {
+        return _end;
+    }
+
+    inline const T* end() const
     {
         return _end;
     }
 
     inline unsigned size() const
     {
-        return _end - _data;
+        return static_cast<unsigned>(_end - _data); // we know it won't be larger than unsigned
     }
 
     inline void set(const T* values)

@@ -27,14 +27,11 @@ class Vehicle : public virtual T
 
     GNC _gnc;
 
+    Stage 
+
 public:
 
     inline Vehicle(){}
-
-    inline int blah()
-    {
-        return 1;
-    }
 
 };
 

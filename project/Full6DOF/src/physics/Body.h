@@ -239,7 +239,7 @@ protected:
 
     union 
     {
-        std::array<double,17 + NDEG> x;
+        std::array<double,17 + NDEG> _state;
         struct 
         {
             Eigen::Vector3d _position;
@@ -262,15 +262,9 @@ protected:
 
     double _time;
 
-    inline void set_state_and_time(const std::array<double, 17 + NDEG>& x, double time)
+    inline void set_state_and_time(const std::array<double, 17 + NDEG>& state, double time)
     {
-        memcpy(this->_position.data(),&x[0],3*sizeof(double));
-        memcpy(this->_velocity.data(),&x[3],3*sizeof(double));
-        memcpy(this->_orientation.coeffs().data(),&x[6],4*sizeof(double)); // scalar last for Eigen!
-        memcpy(this->_angular_velocity.data(),&x[10],3*sizeof(double));
-        this->_inertia.mass = x[13];
-        memcpy(this->_inertia.center_of_mass.data(),&x[14],3*sizeof(double));
-        memcpy(this->_inertia.moment_of_inertia.I.data(),&x[17],NDEG*sizeof(double));
+        this->_state = state;
         this->_time = time;
     }
 

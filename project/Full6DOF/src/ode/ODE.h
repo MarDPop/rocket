@@ -210,7 +210,7 @@ public:
         // Add a bit extra to allow for first 
         constexpr unsigned RECORDING_BUFFER = 3u;
         // New size
-        unsigned buffered_size = _recording.times.size() + approximate_number_of_records + RECORDING_BUFFER;
+        std::size_t buffered_size = _recording.times.size() + approximate_number_of_records + RECORDING_BUFFER;
         _recording.states.reserve(buffered_size);
         _recording.state_rates.reserve(buffered_size);
         _recording.times.reserve(buffered_size);
@@ -537,7 +537,7 @@ public:
         // Add a bit extra to allow for first 
         constexpr unsigned RECORDING_BUFFER = 3u;
         // New size
-        unsigned buffered_size = _recording.times.size() + approximate_number_of_records + RECORDING_BUFFER;
+        std::size_t buffered_size = _recording.times.size() + approximate_number_of_records + RECORDING_BUFFER;
         _recording.states.reserve(buffered_size);
         _recording.state_rates.reserve(buffered_size);
         _recording.times.reserve(buffered_size);

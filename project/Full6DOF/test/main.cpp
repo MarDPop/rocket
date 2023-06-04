@@ -62,8 +62,6 @@ void test1()
 void test2()
 {
     Vehicle<Body<AXISYMMETRIC>,2> vehicle;
-
-    std::cout << vehicle.blah();
 }
 
 int main(int argc, char** argv) 
