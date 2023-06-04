@@ -84,7 +84,7 @@ struct MomentOfInertia
         MomentOfInertia output;
         for(unsigned idx = 0; idx < NDEG; idx++)
         {
-            output.I[idx] = I[idx] + moi[idx];
+            output.I[idx] = I[idx] + moi.I[idx];
         }
         return output;
     }
@@ -226,39 +226,87 @@ struct Inertia
  * 
  */
 template<MOMENT_CONSTANTS NDEG>
-class Body : Fixed_Size_Dynamics< NDEG>
+class Body : Fixed_Size_Dynamics<17 + NDEG>
 {
 protected:
 
-    double _time;
+    union
+    {
+        std::array<double,17 + NDEG> _state;
+        struct 
+        {
+            Eigen::Vector3d _position;
 
-    Eigen::Vector3d _position;
+            Eigen::Vector3d _velocity;
 
-    Eigen::Vector3d _velocity;
+            Eigen::Quaterniond _orientation;
+
+            Eigen::Vector3d _angular_velocity;
+
+            Inertia<NDEG> _inertia;
+        };
+    };
 
     Eigen::Vector3d _acceleration;
 
-    Eigen::Quaterniond _orientation;
-
-    Eigen::Vector3d _angular_velocity;
-
     Eigen::Vector3d _angular_acceleration;
-
-    Inertia<NDEG> _inertia;
 
     Inertia<NDEG> _inertia_rate;
 
-    inline virtual void set_state_and_time(const std::array<double, 7>& x, double time)
+    double _time;
+
+    inline void set_state_and_time(const std::array<double, 17 + NDEG>& x, double time)
     {
         memcpy(this->_position.data(),&x[0],3*sizeof(double));
         memcpy(this->_velocity.data(),&x[3],3*sizeof(double));
-        this->_inertia.mass = x[6];
+        memcpy(this->_orientation.data(),&x[6],4*sizeof(double)); // scalar last for Eigen!
+        memcpy(this->_angular_velocity.data(),&x[10],3*sizeof(double));
+        this->_inertia.mass = x[13];
+        memcpy(this->_inertia.center_of_mass.data(),&x[14],3*sizeof(double));
+        memcpy(this->_inertia.moment_of_inertia.I.data(),&x[17],NDEG*sizeof(double));
         this->_time = time;
     }
 
-    inline virtual void compute_acceleration(){}
+    inline void get_orientation_rate(double* dx)
+    {
+        /*
+            dx[3] = _angular_velocity.dot(_orientation.vec());
+            dx[0] = _orientation.w()*_angular_velocity.x();
+            dx[1] = _orientation.w()*_angular_velocity.y();
+            dx[2] = _orientation.w()*_angular_velocity.z();
+        */
 
-    inline virtual void compute_mass_rate(){} 
+        Eigen::Matrix4d angular_matrix {
+            {0.0, -_angular_velocity.x(), -_angular_velocity.y(), -_angular_velocity.z()},
+            {_angular_velocity.x(), 0.0, _angular_velocity.z(), -_angular_velocity.y()},
+            {_angular_velocity.y(),- _angular_velocity.z(), 0.0, _angular_velocity.x()},
+            {_angular_velocity.z(), _angular_velocity.y(), -_angular_velocity.x(), 0.0}
+        }; // outer product w x q
+
+        Eigen::Vector4d quat {_orientation.w(), _orientation.x(), _orientation.y(), _orientation.z()};
+
+        quat = (angular_matrix*quat);
+
+        auto q = quat.data();
+        dx[0] = q[0]*0.5;
+        dx[1] = q[1]*0.5;
+        dx[2] = q[2]*0.5;
+        dx[3] = q[3]*0.5;
+        
+    }
+
+    inline void get_state_rate(double* dx)
+    {
+        memcpy(dx,this->_velocity.data(),3*sizeof(double));
+        memcpy(dx + 3,this->_acceleration.data(),3*sizeof(double));
+        get_orientation_rate(dx + 6);
+        memcpy(dx + 10,this->_angular_acceleration.data(),3*sizeof(double));
+        dx[13] = this->_inertia_rate.mass;
+        memcpy(dx + 14,this->_inertia_rate.center_of_mass.data(),3*sizeof(double));
+        memcpy(dx + 17,this->_inertia_rate.moment_of_inertia.I.data(),NDEG*sizeof(double));
+    }
+
+    inline virtual void compute_state_rate(){} 
 
     inline virtual bool stop_conditions()
     {
@@ -267,20 +315,11 @@ protected:
 
 public:
 
-    inline bool set_state(const std::array<double, 7>& x, const double& time, std::array<double,7>& dx)
+    inline bool set_state(const std::array<double, 13 + NDEG>& x, const double& time, std::array<double,13 + NDEG>& dx)
     {
         this->set_state_and_time(x,time);
-        this->compute_acceleration();
-        this->compute_mass_rate();
-
-        dx[0] = x[3];
-        dx[1] = x[4];
-        dx[2] = x[5];
-        dx[3] = _acceleration[0];
-        dx[4] = _acceleration[1];
-        dx[5] = _acceleration[2];
-        dx[6] = _inertia_rate.mass;
-
+        this->compute_state_rate();
+        this->get_state_rate(dx.data());
         return this->stop_conditions();
     }
 

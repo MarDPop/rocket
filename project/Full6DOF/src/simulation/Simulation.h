@@ -6,7 +6,7 @@
 
 class Simulation
 {
-    std::unique_ptr<Vehicle> _vehicle;
+    
 
 public:
 

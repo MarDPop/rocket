@@ -53,7 +53,7 @@ public:
         long days = timestamp_ns / JULIAN_DAY_NANOSEC;
         long day_nanos = timestamp_ns - (days*JULIAN_DAY_NANOSEC);
 
-        int leap_seconds_after_unix = get_TAI_leap_seconds(MJD_UNIX_EPOCH + static_cast<int>(days)); // TODO: see if need to subtract UNIX_TAI
+        int leap_seconds_after_unix = get_TAI_leap_seconds(MJD_UNIX_EPOCH + static_cast<int>(days)) - UNIX_TAI_LEAPSECONDS; // TODO: see if need to subtract UNIX_TAI
 
         day_nanos -= leap_seconds_after_unix;
         if(day_nanos < 0)
