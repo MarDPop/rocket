@@ -4,6 +4,7 @@
 
 #include "GNC.h"
 #include "Action.h"
+#include "../physics/Stage.h"
 
 #include <memory>
 
@@ -27,7 +28,7 @@ class Vehicle : public virtual T
 
     GNC _gnc;
 
-    Stage 
+    Environment _environment;
 
 public:
 

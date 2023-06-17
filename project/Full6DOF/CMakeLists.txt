@@ -3,6 +3,8 @@ cmake_minimum_required(VERSION 3.10)
 # set the project name
 project(Full6DOF VERSION 0.1)
 
+#add_library(PhysicsModule)
+
 include_directories(${PROJECT_SOURCE_DIR})
 
 # add the executable

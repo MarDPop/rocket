@@ -2,6 +2,7 @@
 
 #include <memory>
 
+#include "Time.h"
 #include "Gravity.h"
 #include "Atmosphere.h"
 #include "Ephemeris.h"
@@ -26,5 +27,10 @@ struct Planet
                     _ephemeris(std::move(ephemeris)), 
                     _geometry(geometry) {}
 
-    void set_Julian_date(double jd) {}
+    inline void set_time(EpochTime time)
+    {
+        this->_gravity.set_time(time);
+        this->_ephemeris.set_time(time);
+    }
+
 };

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Time.h"
+
 #include <array>
 #include <vector>
 
@@ -60,6 +62,10 @@ class EphemerisHistory
 
 public:
 
+    void set_time(EpochTime time)
+    {
+
+    }
 
 
 };

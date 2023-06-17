@@ -6,11 +6,13 @@
 #include "Atmosphere.h"
 #include "Geometry.h"
 
-struct Stage
+struct Environment
 {
 
-    Gravity& _gravity;
+    Gravity* gravity = nullptr;
 
-    Atmosphere& _atmosphere;    
+    Atmosphere* atmosphere = nullptr;
+
+    Geometry* geometry = nullptr;    
 
 };
